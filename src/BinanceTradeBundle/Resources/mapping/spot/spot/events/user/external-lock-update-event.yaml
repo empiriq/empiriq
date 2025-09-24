@@ -1,0 +1,10 @@
+Empiriq\BinanceContracts\Spot\Spot\Events\User\ExternalLockUpdateEvent:
+    attributes:
+        time:
+            serialized_name: 'E'
+        asset:
+            serialized_name: 'a'
+        delta:
+            serialized_name: 'd'
+        transactionTime:
+            serialized_name: 'T'

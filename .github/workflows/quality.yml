@@ -1,0 +1,28 @@
+name: Code Quality and Tests Action
+on:
+    pull_request:
+    push:
+
+jobs:
+    quality-checks:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v4
+
+            - name: Set up PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.4
+
+            - name: Install dependencies
+              uses: ramsey/composer-install@v3
+
+            - name: Run PHPCS (Code Style)
+              run: vendor/bin/phpcs --standard=PSR12 --exclude=Generic.Files.LineLength src
+
+            - name: Run Psalm (Static Analysis)
+              run: vendor/bin/psalm --config=etc/psalm.xml --no-progress
+
+            - name: Run PHPUnit (Tests)
+              run: vendor/bin/phpunit --configuration=etc/phpunit.xml --cache-directory=var

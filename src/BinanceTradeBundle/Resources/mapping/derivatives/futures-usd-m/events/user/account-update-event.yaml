@@ -1,0 +1,49 @@
+Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\AccountUpdateEvent:
+    attributes:
+        time:
+            serialized_name: 'E'
+        transactionTime:
+            serialized_name: 'T'
+        updateData:
+            serialized_name: 'a'
+
+Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\Payload\AccountUpdateData:
+    attributes:
+        reason:
+            serialized_name: 'm'
+        balances:
+            serialized_name: 'B'
+        positions:
+            serialized_name: 'P'
+
+Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\Payload\BalanceUpdate:
+    attributes:
+        asset:
+            serialized_name: 'a'
+        walletBalance:
+            serialized_name: 'wb'
+        crossWalletBalance:
+            serialized_name: 'cw'
+        balanceChange:
+            serialized_name: 'bc'
+
+Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\Payload\PositionUpdate:
+    attributes:
+        symbol:
+            serialized_name: 's'
+        positionAmt:
+            serialized_name: 'pa'
+        entryPrice:
+            serialized_name: 'ep'
+        breakEvenPrice:
+            serialized_name: 'bep'
+        accumulatedRealized:
+            serialized_name: 'cr'
+        unrealizedPnl:
+            serialized_name: 'up'
+        marginType:
+            serialized_name: 'mt'
+        isolatedWallet:
+            serialized_name: 'iw'
+        positionSide:
+            serialized_name: 'ps'

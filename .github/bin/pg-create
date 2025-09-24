@@ -1,0 +1,38 @@
+#!/bin/sh
+set -eu
+
+print_help() {
+    cat <<EOF
+pg-create - Register missing packages on Packagist
+
+Usage:
+  .github/bin/pkg-list | .github/bin/pg-missing | .github/bin/pg-create
+
+Options:
+  -h, --help    Show this help message and exit
+EOF
+}
+
+case "${1:-}" in
+    -h|--help) print_help; exit 0 ;;
+esac
+
+: "${PG_USER:?Error: the PG_USER environment variable is not set!}"
+: "${PG_TOKEN:?Error: the PG_TOKEN environment variable is not set!}"
+
+# --- Main loop: read `.github/bin/pg-missing` output ---
+while IFS= read -r LINE; do
+    echo "Registering package on Packagist for: $LINE"
+    RESPONSE=$(curl -s -w "\n%{http_code}" \
+        -X POST "https://packagist.org/api/create-package" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $PG_USER:$PG_TOKEN" \
+        -d "{\"repository\":{\"url\":\"https://github.com/$LINE\"}}")
+    HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+    HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
+    if [ "${HTTP_CODE#2}" = "$HTTP_CODE" ]; then
+        echo "Failed to register $LINE (HTTP $HTTP_CODE): $HTTP_BODY" >&2
+        exit 1
+    fi
+    echo "Successfully registered $LINE on Packagist"
+done

@@ -1,0 +1,26 @@
+#!/bin/sh
+set -eu
+
+print_help() {
+    cat <<EOF
+pg-missing - List packages missing on Packagist
+
+Usage:
+  .github/bin/pkg-list | .github/bin/pg-missing
+
+Options:
+  -h, --help    Show this help message and exit
+EOF
+}
+
+case "${1:-}" in
+    -h|--help) print_help; exit 0 ;;
+esac
+
+# --- Main loop: read `.github/bin/pkg-list` output ---
+while IFS= read -r LINE; do
+    STATUS=$(curl -s -o /dev/null -w "%{http_code}" -I "https://packagist.org/packages/$LINE.json")
+    if [ "$STATUS" -ne 200 ]; then
+        echo "$LINE"
+    fi
+done

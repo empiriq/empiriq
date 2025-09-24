@@ -1,0 +1,26 @@
+Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\TradeLiteEvent:
+    attributes:
+        time:
+            serialized_name: 'E'
+        transactionTime:
+            serialized_name: 'T'
+        symbol:
+            serialized_name: 's'
+        originalQuantity:
+            serialized_name: 'q'
+        originalPrice:
+            serialized_name: 'p'
+        isMaker:
+            serialized_name: 'm'
+        clientOrderId:
+            serialized_name: 'c'
+        side:
+            serialized_name: 'S'
+        lastFilledPrice:
+            serialized_name: 'L'
+        lastFilledQuantity:
+            serialized_name: 'l'
+        tradeId:
+            serialized_name: 't'
+        orderId:
+            serialized_name: 'i'

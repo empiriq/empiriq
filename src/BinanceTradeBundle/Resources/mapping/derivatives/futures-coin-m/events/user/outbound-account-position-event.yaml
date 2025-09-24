@@ -1,0 +1,17 @@
+Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Events\User\AccountUpdateEvent:
+    attributes:
+        time:
+            serialized_name: 'E'
+        lastAccountUpdate:
+            serialized_name: 'u'
+        balances:
+            serialized_name: 'B'
+
+Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Common\Balance:
+    attributes:
+        asset:
+            serialized_name: 'a'
+        free:
+            serialized_name: 'f'
+        locked:
+            serialized_name: 'l'

@@ -1,0 +1,28 @@
+Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Events\Market\DepthEvent:
+    attributes:
+        time:
+            serialized_name: 'E'
+        symbol:
+            serialized_name: 's'
+        firstId:
+            serialized_name: 'U'
+        finalId:
+            serialized_name: 'u'
+        bids:
+            serialized_name: 'b'
+        asks:
+            serialized_name: 'a'
+
+Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Common\Ask:
+    attributes:
+        price:
+            serialized_name: '0'
+        quantity:
+            serialized_name: '1'
+
+Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Common\Bid:
+    attributes:
+        price:
+            serialized_name: '0'
+        quantity:
+            serialized_name: '1'

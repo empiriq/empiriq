@@ -1,0 +1,10 @@
+Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\EventInterface:
+    discriminator_map:
+        type_property: 'e'
+        mapping:
+            "depthUpdate": Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\Market\DepthEvent
+            "trade": Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\Market\TradeEvent
+            "ORDER_TRADE_UPDATE": Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\OrderTradeUpdateEvent
+            "ACCOUNT_UPDATE": Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\AccountUpdateEvent
+            "TRADE_LITE": Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\TradeLiteEvent
+            "MARGIN_CALL": Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\MarginCallEvent

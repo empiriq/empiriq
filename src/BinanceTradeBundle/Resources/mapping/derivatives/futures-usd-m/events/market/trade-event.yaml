@@ -1,0 +1,12 @@
+Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\Market\TradeEvent:
+    attributes:
+        time:
+            serialized_name: 'T'
+        symbol:
+            serialized_name: 's'
+        price:
+            serialized_name: 'p'
+        quantity:
+            serialized_name: 'q'
+        isBuyerMaker:
+            serialized_name: 'm'

@@ -1,0 +1,24 @@
+<?php
+
+namespace Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common;
+
+/*
+* LIMIT = "LIMIT"
+* MARKET = "MARKET"
+* STOP = "STOP"
+* STOP_MARKET = "STOP_MARKET"
+* TAKE_PROFIT = "TAKE_PROFIT"
+* TAKE_PROFIT_MARKET = "TAKE_PROFIT_MARKET"
+* TRAILING_STOP_MARKET = "TRAILING_STOP_MARKET"
+* LIQUIDATION = "LIQUIDATION"
+*/
+enum OrderType: string
+{
+    case LIMIT = 'LIMIT';
+    case MARKET = 'MARKET';
+    case STOP_LOSS = 'STOP_LOSS';
+    case STOP_LOSS_LIMIT = 'STOP_LOSS_LIMIT';
+    case TAKE_PROFIT = 'TAKE_PROFIT';
+    case TAKE_PROFIT_LIMIT = 'TAKE_PROFIT_LIMIT';
+    case LIMIT_MAKER = 'LIMIT_MAKER';
+}

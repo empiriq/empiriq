@@ -1,0 +1,81 @@
+#!/bin/sh
+set -eu
+
+print_help() {
+    cat <<EOF
+gh-create - Create missing GitHub repositories for packages
+
+Usage:
+  .github/bin/pkg-list | .github/bin/gh-missing | .github/bin/gh-create
+
+Options:
+  -h, --help    Show this help message and exit
+EOF
+}
+
+case "${1:-}" in
+    -h|--help) print_help; exit 0 ;;
+esac
+
+: "${GH_TOKEN:?Error: the GH_TOKEN environment variable is not set!}"
+
+# --- Helpers ---
+extract_field() {
+    file=$1
+    field=$2
+    grep "\"$field\"" "$file" | head -n1 | sed -E "s/.*\"$field\": *\"([^\"]+)\".*/\1/"
+}
+
+extract_keywords() {
+    sed -n 's/.*"keywords"[[:space:]]*:[[:space:]]*\(\[[^]]*\]\).*/\1/p' "$1"
+}
+
+# --- Main loop: read `.github/bin/gh-missing` output ---
+while IFS= read -r LINE; do
+  ORG=$(echo "$LINE" | cut -d'/' -f1)
+  NAME=$(echo "$LINE" | cut -d'/' -f2)
+  FILE="src/$NAME/composer.json"
+  if [ ! -f "$FILE" ]; then
+      echo "Error: $FILE not found for $LINE" >&2
+      exit 1
+  fi
+
+  DESCRIPTION=$(extract_field "$FILE" description || echo "")
+  KEYWORDS=$(extract_keywords "$FILE" || echo "[]")
+
+  echo "Creating GitHub repository: $LINE"
+  HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+    "https://api.github.com/orgs/$ORG/repos" \
+    -H "Authorization: token $GH_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -d "{
+      \"name\": \"$NAME\",
+      \"description\": \"$DESCRIPTION\",
+      \"private\": false,
+      \"has_issues\": false,
+      \"has_projects\": false,
+      \"has_wiki\": false,
+      \"has_downloads\": false
+    }")
+  if [ "${HTTP_CODE#2}" = "$HTTP_CODE" ]; then
+    echo "Failed to create repo $ORG/$NAME (HTTP $HTTP_CODE)" >&2
+    exit 1
+  fi
+  echo "Created repo $LINE"
+
+  if [ "$KEYWORDS" != "[]" ]; then
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+      -X PUT "https://api.github.com/repos/$ORG/$NAME/topics" \
+      -H "Authorization: token $GH_TOKEN" \
+      -H "Accept: application/vnd.github.mercy-preview+json" \
+      -d "{\"names\": $KEYWORDS}")
+
+    if [ "${HTTP_CODE#2}" = "$HTTP_CODE" ]; then
+      echo "Failed to set topics for $ORG/$NAME (HTTP $HTTP_CODE)" >&2
+    else
+      echo "Repository $LINE created with topics: $KEYWORDS"
+    fi
+  else
+    echo "Repository $LINE created without topics"
+  fi
+done

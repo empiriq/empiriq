@@ -1,0 +1,10 @@
+Empiriq\BinanceContracts\Spot\Spot\Common\EventInterface:
+    discriminator_map:
+        type_property: 'e'
+        mapping:
+            "depthUpdate": Empiriq\BinanceContracts\Spot\Spot\Events\Market\DepthEvent
+            "trade": Empiriq\BinanceContracts\Spot\Spot\Events\Market\TradeEvent
+            "balanceUpdate": Empiriq\BinanceContracts\Spot\Spot\Events\User\BalanceUpdateEvent
+            "executionReport": Empiriq\BinanceContracts\Spot\Spot\Events\User\ExecutionReportEvent
+            "externalLockUpdate": Empiriq\BinanceContracts\Spot\Spot\Events\User\ExternalLockUpdateEvent
+            "outboundAccountPosition": Empiriq\BinanceContracts\Spot\Spot\Events\User\OutboundAccountPositionEvent

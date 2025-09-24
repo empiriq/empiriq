@@ -1,0 +1,47 @@
+#!/bin/sh
+set -eu
+
+print_help() {
+    cat <<EOF
+pkg-split - Split commits from monorepo and push them into target repositories
+
+Usage:
+  .github/bin/pkg-list | .github/bin/pkg-split
+
+Options:
+  -h, --help    Show this help message and exit
+EOF
+}
+
+case "${1:-}" in
+    -h|--help) print_help; exit 0 ;;
+esac
+
+# --- Environment checks ---
+: "${GH_TOKEN:?Error: the GH_TOKEN environment variable is not set!}"
+: "${GH_USER:?Error: the GH_USER environment variable is not set!}"
+: "${GH_EMAIL:?Error: the GH_EMAIL environment variable is not set!}"
+
+git config user.name "$GH_USER"
+git config user.email "$GH_EMAIL"
+
+# --- Main loop: read `.github/bin/pkg-list` output ---
+while IFS= read -r LINE; do
+    TAG=${GITHUB_REF#refs/tags/}
+    NAME=$(echo "$LINE" | cut -d'/' -f2)
+    PACKAGE_PATH="src/$NAME"
+    COMMIT=$(git subtree split --prefix="$PACKAGE_PATH" main -q)
+
+#    CHANGELOG=$(git cliff "$COMMIT")
+#    gh release create "$TAG" \
+#        --title "$PACKAGE_PATH $TAG" \
+#        --notes "$CHANGELOG" \
+#        --repo "$LINE"
+
+    echo "Pushing tag $TAG to https://github.com/$LINE"
+    git push "https://x-access-token:$GH_TOKEN@github.com/$LINE" "$COMMIT:refs/tags/$TAG" --force
+
+    echo "Pushing branch main to https://github.com/$LINE"
+    git push "https://x-access-token:$GH_TOKEN@github.com/$LINE" "$COMMIT:refs/heads/main" --force
+
+done

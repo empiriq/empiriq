@@ -1,0 +1,10 @@
+Empiriq\BinanceContracts\Spot\Spot\Events\User\BalanceUpdateEvent:
+    attributes:
+        time:
+            serialized_name: 'E'
+        asset:
+            serialized_name: 'a'
+        delta:
+            serialized_name: 'd'
+        clearTime:
+            serialized_name: 'T'

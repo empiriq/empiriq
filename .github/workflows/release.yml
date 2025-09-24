@@ -1,0 +1,43 @@
+name: Release Action
+on:
+    push:
+        tags: [ 'v*' ]
+
+permissions:
+    contents: write
+    packages: write
+    issues: read
+
+jobs:
+    split-packages:
+        runs-on: ubuntu-latest
+        env:
+            GH_TOKEN: ${{ secrets.GH_TOKEN }}
+            GH_USER: ${{ vars.GH_USER }}
+            GH_EMAIL: ${{ vars.GH_EMAIL }}
+            PG_TOKEN: ${{ secrets.PG_TOKEN }}
+            PG_USER: ${{ vars.PG_USER }}
+        steps:
+            # --- Git setup ---
+            - name: Checkout repository (full history)
+              uses: actions/checkout@v4
+              with:
+                  persist-credentials: false
+                  fetch-depth: 0
+
+            - name: Setup git-cliff
+              uses: kenji-miyake/setup-git-cliff@v1
+
+            # --- GitHub sync ---
+            - name: Create GitHub repos for packages
+              run: .github/bin/pkg-list | .github/bin/gh-missing | .github/bin/gh-create
+
+            - name: Split and push packages
+              run: .github/bin/pkg-list | .github/bin/pkg-split
+
+            # --- Packagist sync ---
+            - name: Create missing Packagist packages
+              run: .github/bin/pkg-list | .github/bin/pg-missing | .github/bin/pg-create
+
+            - name: Update Packagist metadata
+              run: .github/bin/pkg-list | .github/bin/pg-registered | .github/bin/pg-update

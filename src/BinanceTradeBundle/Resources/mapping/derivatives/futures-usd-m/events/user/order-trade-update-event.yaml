@@ -1,0 +1,79 @@
+Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\OrderTradeUpdateEvent:
+    attributes:
+        time:
+            serialized_name: 'E'
+        transactionTime:
+            serialized_name: 'T'
+        order:
+            serialized_name: 'o'
+
+Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\Order:
+    attributes:
+        symbol:
+            serialized_name: 's'
+        side:
+            serialized_name: 'S'
+        id:
+            serialized_name: 'i'
+        clientId:
+            serialized_name: 'c'
+        type:
+            serialized_name: 'o'
+        timeInForce:
+            serialized_name: 'f'
+        originalQuantity:
+            serialized_name: 'q'
+        originalPrice:
+            serialized_name: 'p'
+        averagePrice:
+            serialized_name: 'ap'
+        stopPrice:
+            serialized_name: 'sp'
+        executionType:
+            serialized_name: 'x'
+        status:
+            serialized_name: 'X'
+        lastFilledQuantity:
+            serialized_name: 'l'
+        cumulativeFilledQuantity:
+            serialized_name: 'z'
+        lastFilledPrice:
+            serialized_name: 'L'
+        commissionAsset:
+            serialized_name: 'N'
+        commissionAmount:
+            serialized_name: 'n'
+        tradeTime:
+            serialized_name: 'T'
+        tradeId:
+            serialized_name: 't'
+        bidNotional:
+            serialized_name: 'b'
+        askNotional:
+            serialized_name: 'a'
+        isMaker:
+            serialized_name: 'm'
+        reduceOnly:
+            serialized_name: 'R'
+        workingType:
+            serialized_name: 'wt'
+        originalOrderType:
+            serialized_name: 'ot'
+        positionSide:
+            serialized_name: 'ps'
+        closePosition:
+            serialized_name: 'cp'
+        activationPrice:
+            serialized_name: 'AP'
+        callbackRate:
+            serialized_name: 'cr'
+        priceProtect:
+            serialized_name: 'pP'
+        realizedProfit:
+            serialized_name: 'rp'
+        preventionMode:
+            serialized_name: 'V'
+        priceMatchMode:
+            serialized_name: 'pm'
+        gtdCancelTime:
+            serialized_name: 'gtd'

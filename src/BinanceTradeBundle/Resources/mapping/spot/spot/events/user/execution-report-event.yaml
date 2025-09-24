@@ -1,0 +1,68 @@
+Empiriq\BinanceContracts\Spot\Spot\Events\User\ExecutionReportEvent:
+    attributes:
+        time:
+            serialized_name: 'E'
+        symbol:
+            serialized_name: 's'
+        clientOrderId:
+            serialized_name: 'c'
+        side:
+            serialized_name: 'S'
+        type:
+            serialized_name: 'o'
+        timeInForce:
+            serialized_name: 'f'
+        quantity:
+            serialized_name: 'q'
+        price:
+            serialized_name: 'p'
+        stopPrice:
+            serialized_name: 'P'
+        icebergQty:
+            serialized_name: 'F'
+        orderListId:
+            serialized_name: 'g'
+        origClientOrderId:
+            serialized_name: 'C'
+        executionType:
+            serialized_name: 'x'
+        status:
+            serialized_name: 'X'
+        rejectReason:
+            serialized_name: 'r'
+        orderId:
+            serialized_name: 'i'
+        lastQty:
+            serialized_name: 'l'
+        cumulativeQty:
+            serialized_name: 'z'
+        lastPrice:
+            serialized_name: 'L'
+        commissionAmount:
+            serialized_name: 'n'
+        commissionAsset:
+            serialized_name: 'N'
+        transactionTime:
+            serialized_name: 'T'
+        tradeId:
+            serialized_name: 't'
+        preventedMatchId:
+            serialized_name: 'v'
+        executionId:
+            serialized_name: 'I'
+        inOrderBook:
+            serialized_name: 'w'
+        isMaker:
+            serialized_name: 'm'
+        creationTime:
+            serialized_name: 'O'
+        cumulativeQuoteQty:
+            serialized_name: 'Z'
+        lastQuoteQty:
+            serialized_name: 'Y'
+        quoteOrderQty:
+            serialized_name: 'Q'
+        workingTime:
+            serialized_name: 'W'
+        selfTradePreventionMode:
+            serialized_name: 'V'

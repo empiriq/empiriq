@@ -1,0 +1,43 @@
+#!/bin/sh
+set -eu
+#todo replace ls -l pkg
+
+print_help() {
+    cat <<EOF
+pkg-list - List package names in the monorepo
+
+Usage:
+  .github/bin/pkg-list
+
+Options:
+  -h, --help    Show this help message and exit
+EOF
+}
+
+# --- Parse CLI args ---
+case "${1:-}" in
+    -h|--help) print_help; exit 0 ;;
+esac
+
+extract_name() {
+    grep '"name"' "$1" | head -n1 | sed -E 's/.*"name": *"([^"]+)".*/\1/'
+}
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd)"
+PACKAGES_PATH="$SCRIPT_DIR/../../src"
+
+# --- Main ---
+for DIR in "$PACKAGES_PATH"/*; do
+    FILE="$DIR/composer.json"
+    BASENAME=$(basename "$DIR")
+    if [ -f "$FILE" ]; then
+        PACKAGE_NAME=$(extract_name "$FILE")
+        PACKAGE_PART=$(printf "%s" "$PACKAGE_NAME" | cut -d/ -f2)
+        if [ "$PACKAGE_PART" = "$BASENAME" ]; then
+            printf "%s\n" "$PACKAGE_NAME"
+        else
+            echo "Error: directory '$BASENAME' does not match package name '$PACKAGE_NAME'" >&2
+            exit 1
+        fi
+    fi
+done
