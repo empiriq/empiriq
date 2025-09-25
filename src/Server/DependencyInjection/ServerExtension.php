@@ -15,6 +15,8 @@ class ServerExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
+        $port = $config['port'];
+        $password = $config['password'];
 
         $container->autowire('Empiriq\Server')
             ->setAutowired(true)

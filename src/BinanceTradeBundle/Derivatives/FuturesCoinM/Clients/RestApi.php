@@ -5,12 +5,9 @@ namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients;
 use Empiriq\BinanceTradeBundle\Common\Clients\Rest\RestClient;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
+use Empiriq\Contracts\SerializerInterface;
 use Psr\Log\LoggerInterface;
 use React\Http\Browser;
-use Symfony\Component\Serializer\Encoder\DecoderInterface;
-use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @see https://developers.binance.com/docs/derivatives/coin-margined-futures/general-info
@@ -21,7 +18,7 @@ final class RestApi extends RestClient
      * @param string $uri
      * @param string $apiKey
      * @param SignerInterface $signer
-     * @param NormalizerInterface & DenormalizerInterface & EncoderInterface & DecoderInterface $serializer
+     * @param SerializerInterface $serializer
      * @param LoggerInterface $logger
      * @param SanitizerInterface $sanitizer
      * @param float $resolverTimeout
@@ -30,7 +27,7 @@ final class RestApi extends RestClient
         string $uri,
         protected string $apiKey,
         protected SignerInterface $signer,
-        protected NormalizerInterface & DenormalizerInterface & EncoderInterface & DecoderInterface $serializer,
+        protected SerializerInterface $serializer,
         protected LoggerInterface $logger,
         protected SanitizerInterface $sanitizer,
         float $resolverTimeout = 10,
