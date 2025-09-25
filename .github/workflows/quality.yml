@@ -1,4 +1,5 @@
 name: Code Quality and Tests Action
+
 on:
     pull_request:
     push:
@@ -22,7 +23,7 @@ jobs:
               run: vendor/bin/phpcs --standard=PSR12 src
 
             - name: Run Psalm (Static Analysis)
-              run: vendor/bin/psalm --config=etc/psalm.xml --no-progress
+              run: vendor/bin/psalm --config=etc/psalm.xml --show-info=true --no-progress
 
             - name: Run PHPUnit (Tests)
               run: vendor/bin/phpunit --configuration=etc/phpunit.xml --cache-directory=var

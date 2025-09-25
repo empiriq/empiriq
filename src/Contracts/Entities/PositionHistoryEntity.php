@@ -2,15 +2,20 @@
 
 namespace Empiriq\Contracts\Entities;
 
-class PositionHistoryEntity
+use Empiriq\Contracts\Common\PositionSide;
+
+final class PositionHistoryEntity
 {
-    public $symbol;
-    public $side;
-    public $closingPnl;
-    public $entryPrice;
-    public $avgClosePrice;
-    public $maxOpenInterest;
-    public $closedVol;
-    public $opened;
-    public $closed;
+    public function __construct(
+        public string $symbol,
+        public PositionSide $side,
+        public float $closingPnl,
+        public float $entryPrice,
+        public float $avgClosePrice,
+        public float $maxOpenInterest,
+        public float $closedVol,
+        public float $opened,
+        public float $closed,
+    ) {
+    }
 }

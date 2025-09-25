@@ -2,6 +2,6 @@
 
 namespace Empiriq\Contracts\Entities;
 
-class PositionEntity
+final class PositionEntity
 {
 }

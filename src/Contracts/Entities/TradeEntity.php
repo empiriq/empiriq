@@ -2,7 +2,7 @@
 
 namespace Empiriq\Contracts\Entities;
 
-class TradeEntity
+final class TradeEntity
 {
     public function __construct(
         public int $time,

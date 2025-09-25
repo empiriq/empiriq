@@ -2,7 +2,7 @@
 
 namespace Empiriq\Contracts\Entities;
 
-class BalanceEntity
+final class BalanceEntity
 {
     public function __construct(
         public string $asset,

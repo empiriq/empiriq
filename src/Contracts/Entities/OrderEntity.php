@@ -2,6 +2,6 @@
 
 namespace Empiriq\Contracts\Entities;
 
-class OrderEntity
+final class OrderEntity
 {
 }

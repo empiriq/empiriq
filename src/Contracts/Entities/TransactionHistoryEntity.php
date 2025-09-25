@@ -2,11 +2,16 @@
 
 namespace Empiriq\Contracts\Entities;
 
-class TransactionHistoryEntity
+use Empiriq\Contracts\Common\TransactionType;
+
+final class TransactionHistoryEntity
 {
-    public $time;
-    public $type;
-    public $amount;
-    public $asset;
-    public $symbol;
+    public function __construct(
+        public int $time,
+        public TransactionType $type,
+        public float $amount,
+        public string $asset,
+        public string $symbol,
+    ) {
+    }
 }

@@ -2,6 +2,6 @@
 
 namespace Empiriq\Contracts\Entities;
 
-class DepthEntity
+final class DepthEntity
 {
 }
