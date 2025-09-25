@@ -101,12 +101,24 @@ abstract class RestClient
             return reject($e);
         } catch (SerializerBaseException $e) {
             $this->logger->error(
-                sprintf('Serialization failed for request (id: %s query: %s %s) %s', $id, $method, $path, $e->getMessage())
+                sprintf(
+                    'Serialization failed for request (id: %s query: %s %s) %s',
+                    $id,
+                    $method,
+                    $path,
+                    $e->getMessage()
+                )
             );
             return reject(new SerializationException($e->getMessage(), $e->getCode(), $e));
         } catch (Throwable $e) {
             $this->logger->error(
-                sprintf('Unexpected error while sending request (id: %s query: %s %s) %s', $id, $method, $path, $e->getMessage())
+                sprintf(
+                    'Unexpected error while sending request (id: %s query: %s %s) %s',
+                    $id,
+                    $method,
+                    $path,
+                    $e->getMessage()
+                )
             );
             return reject(new RuntimeException($e->getMessage(), $e->getCode(), $e));
         }

@@ -69,9 +69,9 @@
     },
     "scripts": {
         "phpcs": "vendor/bin/phpcs --standard=PSR12 src",
-        "phpunit": "./vendor/bin/phpunit",
-        "psalm": "./vendor/bin/psalm",
-        "message": "./vendor/bin/conventional-commits prepare"
+        "psalm": "vendor/bin/psalm --config=etc/psalm.xml",
+        "phpunit": "vendor/bin/phpunit",
+        "message": "vendor/bin/conventional-commits prepare"
     },
     "config": {
         "allow-plugins": {

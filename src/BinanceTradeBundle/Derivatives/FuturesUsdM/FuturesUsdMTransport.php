@@ -2,6 +2,8 @@
 
 namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM;
 
+use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Authentication\AccountStatusResponse;
+use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\TimeResponse;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesUsdMStreamInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\TransportInterface;
@@ -15,8 +17,6 @@ use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\MarketDataMethods
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\MarketStreamMethods;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\TradingMethods;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\UserDataStreamMethods;
-use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Authentication\AccountStatusResponse;
-use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\TimeResponse;
 use React\Promise\PromiseInterface;
 
 use function React\Promise\all;
@@ -49,6 +49,7 @@ readonly class FuturesUsdMTransport implements TransportInterface
             }
         }
     }
+
     //todo share send() method for custom send
 
     public function run(): PromiseInterface
@@ -68,7 +69,11 @@ readonly class FuturesUsdMTransport implements TransportInterface
             }),
             $this->websocketStreams->run(),
         ])
-            ->then(fn() => all(array_map(fn(FuturesUsdMStreamInterface $stream) => $stream->subscribe($this), $this->streams)))
+            ->then(
+                fn() => all(
+                    array_map(fn(FuturesUsdMStreamInterface $stream) => $stream->subscribe($this), $this->streams)
+                )
+            )
             ->then(fn() => $this);
     }
 

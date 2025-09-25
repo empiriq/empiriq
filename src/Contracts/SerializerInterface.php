@@ -8,6 +8,11 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface as SymfonySerializer;
 
-interface SerializerInterface extends SymfonySerializer, NormalizerInterface, DenormalizerInterface, EncoderInterface, DecoderInterface
+interface SerializerInterface extends
+    SymfonySerializer,
+    NormalizerInterface,
+    DenormalizerInterface,
+    EncoderInterface,
+    DecoderInterface
 {
 }

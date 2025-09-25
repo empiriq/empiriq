@@ -12,16 +12,12 @@ use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\RestApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WebsocketApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WebsocketStreams;
+use Empiriq\Contracts\SerializerInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Serializer\Encoder\DecoderInterface;
-use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 readonly class FuturesCoinMTransportFactory
 {
@@ -32,7 +28,7 @@ readonly class FuturesCoinMTransportFactory
      * @param string $restApiUri
      * @param string $websocketApiUri
      * @param string $websocketStreamsUri
-     * @param DecoderInterface&SerializerInterface&NormalizerInterface&EncoderInterface&DenormalizerInterface $serializer
+     * @param SerializerInterface $serializer
      * @param SanitizerInterface $sanitizer
      * @param float $resolverTimeout
      * @param LoggerInterface $logger
@@ -42,9 +38,11 @@ readonly class FuturesCoinMTransportFactory
         private string $apiKey = '',
         private SignerInterface $signer = new NullSigner(),
         private string $restApiUri = 'https://dapi.binance.com', // testnet https://testnet.binancefuture.com
-        private string $websocketApiUri = 'wss://ws-dapi.binance.com/ws-dapi/v1', // testnet wss://testnet.binancefuture.com/ws-dapi/v1
-        private string $websocketStreamsUri = 'wss://dstream.binance.com/ws', // testnet wss://dstream.binancefuture.com/ws
-        private SerializerInterface & NormalizerInterface & DenormalizerInterface & EncoderInterface & DecoderInterface $serializer = new Serializer(),
+        private string $websocketApiUri = 'wss://ws-dapi.binance.com/ws-dapi/v1',
+        // testnet wss://testnet.binancefuture.com/ws-dapi/v1
+        private string $websocketStreamsUri = 'wss://dstream.binance.com/ws',
+        // testnet wss://dstream.binancefuture.com/ws
+        private SerializerInterface $serializer = new Serializer(),
         private SanitizerInterface $sanitizer = new Sanitizer(),
         private float $resolverTimeout = 10,
         private LoggerInterface $logger = new Logger('FUTURES_COIN_M', [

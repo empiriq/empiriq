@@ -19,7 +19,7 @@ jobs:
               uses: ramsey/composer-install@v3
 
             - name: Run PHPCS (Code Style)
-              run: vendor/bin/phpcs --standard=PSR12 --exclude=Generic.Files.LineLength src
+              run: vendor/bin/phpcs --standard=PSR12 src
 
             - name: Run Psalm (Static Analysis)
               run: vendor/bin/psalm --config=etc/psalm.xml --no-progress

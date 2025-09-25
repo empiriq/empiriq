@@ -12,12 +12,12 @@ use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\RestApi;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WebsocketApi;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WebsocketStreams;
+use Empiriq\Contracts\SerializerInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 readonly class SpotTransportFactory
 {
@@ -38,7 +38,8 @@ readonly class SpotTransportFactory
         private string $apiKey = '',
         private SignerInterface $signer = new NullSigner(),
         private string $restApiUri = 'https://api.binance.com', // testnet https://testnet.binance.vision/api
-        private string $websocketApiUri = 'wss://ws-api.testnet.binance.vision/ws-api/v3', // testnet wss://ws-api.testnet.binance.vision/ws-api/v3
+        private string $websocketApiUri = 'wss://ws-api.testnet.binance.vision/ws-api/v3',
+        // testnet wss://ws-api.testnet.binance.vision/ws-api/v3
         private string $websocketStreamsUri = 'wss://stream.binance.com:9443/ws', // testnet ???
         private SerializerInterface $serializer = new Serializer(),
         private SanitizerInterface $sanitizer = new Sanitizer(),
