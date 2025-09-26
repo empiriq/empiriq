@@ -8,5 +8,4 @@ Installation
 composer require empiriq/empiriq
 ```
 
-v1.0.0-alpha
-v1.0.0-alpha.2
+v1.0.0-alpha.0

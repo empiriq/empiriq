@@ -8,14 +8,14 @@ use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\FuturesCoinMTransport;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMTransport;
 use Empiriq\BinanceTradeBundle\Spot\Spot\SpotTransport;
 use Empiriq\Contracts\ConnectorInterface;
-use Empiriq\Contracts\EnvironmentInterface;
+use Empiriq\Contracts\RunnableInterface;
 use Psr\Log\LoggerInterface;
 use React\Promise\PromiseInterface;
 use Throwable;
 
 use function React\Promise\all;
 
-readonly class Connector implements ConnectorInterface, EnvironmentInterface
+readonly class Connector implements ConnectorInterface, RunnableInterface
 {
     /**
      * @param TransportInterface[] $transports
@@ -38,7 +38,6 @@ readonly class Connector implements ConnectorInterface, EnvironmentInterface
      */
     public function run(): PromiseInterface
     {
-        var_dump(2);
         $this->logger->info('Starting connector run loop...');
         $connections = [];
         foreach ($this->transports as $transport) {

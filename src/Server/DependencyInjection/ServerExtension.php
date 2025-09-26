@@ -2,8 +2,8 @@
 
 namespace Empiriq\Server\DependencyInjection;
 
-use Empiriq\Contracts\EnvironmentInterface;
-use Empiriq\Server\ServerCommand;
+use Empiriq\Contracts\RunnableInterface;
+use Empiriq\Server\RunCommand;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -22,14 +22,13 @@ class ServerExtension extends Extension
             ->setAutowired(true)
             ->setAutoconfigured(true);
 
-        // Автоконфигурация: все EnvironmentInterface получат тег автоматически
-        $container->registerForAutoconfiguration(EnvironmentInterface::class)
-            ->addTag('app.environment');
+        $container->registerForAutoconfiguration(RunnableInterface::class)
+            ->addTag('runnable');
 
         // Регистрируем команду, в конструктор попадёт ленивый итератор
-        $container->register(ServerCommand::class, ServerCommand::class)
+        $container->register(RunCommand::class, RunCommand::class)
             ->addArgument(new Reference('logger'))
-            ->addArgument(new TaggedIteratorArgument('app.environment'))
+            ->addArgument(new TaggedIteratorArgument('runnable'))
             ->addTag('console.command');
     }
 }

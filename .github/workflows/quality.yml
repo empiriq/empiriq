@@ -1,8 +1,6 @@
 name: Code Quality and Tests Action
 
-on:
-    pull_request:
-    push:
+on: [push, pull_request]
 
 jobs:
     quality-checks:
