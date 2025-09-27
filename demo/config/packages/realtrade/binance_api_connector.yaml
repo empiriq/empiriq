@@ -1,0 +1,8 @@
+binance_api_connector:
+    api_key: '%env(BINANCE_API_KEY)%'
+    api_secret: '%env(BINANCE_API_SECRET)%'
+    rest_api_uri: 'https://testnet.binancefuture.com'
+    websocket_api_uri: 'wss://testnet.binancefuture.com/ws-fapi/v1'
+    websocket_market_streams_uri: 'wss://fstream.binancefuture.com/ws'
+    resolver_timeout: 15
+    symbols: ['BTCUSDT', 'ETHUSDT']

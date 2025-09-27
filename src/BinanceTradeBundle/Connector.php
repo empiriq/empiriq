@@ -7,15 +7,15 @@ use Empiriq\BinanceTradeBundle\Common\Interfaces\TransportInterface;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\FuturesCoinMTransport;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMTransport;
 use Empiriq\BinanceTradeBundle\Spot\Spot\SpotTransport;
-use Empiriq\Contracts\ConnectorInterface;
 use Empiriq\Contracts\RunnableInterface;
 use Psr\Log\LoggerInterface;
 use React\Promise\PromiseInterface;
 use Throwable;
 
 use function React\Promise\all;
+use function React\Promise\resolve;
 
-readonly class Connector implements ConnectorInterface, RunnableInterface
+readonly class Connector implements RunnableInterface
 {
     /**
      * @param TransportInterface[] $transports
@@ -56,9 +56,9 @@ readonly class Connector implements ConnectorInterface, RunnableInterface
     }
 
     /**
-     * @return void
+     * @return PromiseInterface
      */
-    public function shutdown(): void
+    public function shutdown(): PromiseInterface
     {
         $this->logger->info('Shutting down connector...');
         foreach ($this->transports as $transport) {
@@ -66,6 +66,8 @@ readonly class Connector implements ConnectorInterface, RunnableInterface
             $transport->shutdown();
         }
         $this->logger->info('Connector stopped successfully');
+
+        return resolve($this);
     }
 
     /**

@@ -1,0 +1,5 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    php_errors:
+        log: true   # отправлять в Monolog
+        throw: false # не кидать как исключение

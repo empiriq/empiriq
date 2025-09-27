@@ -1,0 +1,14 @@
+monolog:
+    channels:
+        - deprecation
+    handlers:
+        console:
+            type: console
+            channels: ["!deprecation"]
+            process_psr_3_messages: false
+        deprecation:
+            type: stream
+            path: "%kernel.logs_dir%/deprecation.log"
+            level: info
+            channels: ["deprecation"]
+            formatter: monolog.formatter.json

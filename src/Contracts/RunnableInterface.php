@@ -7,4 +7,6 @@ use React\Promise\PromiseInterface;
 interface RunnableInterface
 {
     public function run(): PromiseInterface;
+
+    public function shutdown(): PromiseInterface;
 }
