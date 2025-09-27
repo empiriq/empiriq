@@ -7,6 +7,7 @@ use Empiriq\BinanceTradeBundle\Common\Interfaces\TransportInterface;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\FuturesCoinMTransport;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMTransport;
 use Empiriq\BinanceTradeBundle\Spot\Spot\SpotTransport;
+use Empiriq\Contracts\ExchangeConnectorInterface;
 use Empiriq\Contracts\RunnableInterface;
 use Psr\Log\LoggerInterface;
 use React\Promise\PromiseInterface;
@@ -15,7 +16,7 @@ use Throwable;
 use function React\Promise\all;
 use function React\Promise\resolve;
 
-readonly class Connector implements RunnableInterface
+readonly class Connector implements ExchangeConnectorInterface, RunnableInterface
 {
     /**
      * @param TransportInterface[] $transports
@@ -111,5 +112,10 @@ readonly class Connector implements RunnableInterface
     public function spot(): SpotTransport
     {
         return $this->getTransport(SpotTransport::class);
+    }
+
+    public function getConfig(): array
+    {
+        return [];
     }
 }

@@ -4,7 +4,7 @@ namespace Empiriq\BinanceManager;
 
 use BadMethodCallException;
 use Empiriq\BinanceManager\Common\Interfaces\RegistryInterface;
-use Empiriq\Contracts\ConnectorInterface;
+use Empiriq\Contracts\ExchangeConnectorInterface;
 use Empiriq\Contracts\ManagerInterface;
 use LogicException;
 use React\Promise\PromiseInterface;
@@ -12,11 +12,11 @@ use React\Promise\PromiseInterface;
 readonly class Manager implements ManagerInterface
 {
     /**
-     * @param ConnectorInterface $connector
+     * @param ExchangeConnectorInterface $connector
      * @param array<string, RegistryInterface> $registries
      */
     public function __construct(
-        public ConnectorInterface $connector,
+        public ExchangeConnectorInterface $connector,
         public array $registries,
     ) {
         foreach ($this->registries as $registry) {

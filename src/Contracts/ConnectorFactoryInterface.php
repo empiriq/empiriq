@@ -13,7 +13,7 @@ interface ConnectorFactoryInterface
      * @param array<string, mixed> $options
      * @param EventDispatcherInterface $dispatcher
      * @param SerializerInterface $serializer
-     * @return ConnectorInterface
+     * @return ExchangeConnectorInterface
      */
     public function createConnector(
         array $markets,
@@ -21,5 +21,5 @@ interface ConnectorFactoryInterface
         array $options,
         EventDispatcherInterface $dispatcher,
         SerializerInterface $serializer,
-    ): ConnectorInterface;
+    ): ExchangeConnectorInterface;
 }

@@ -4,7 +4,7 @@ namespace Empiriq\BinanceBackTradeBundle;
 
 use Empiriq\BinanceBackTradeBundle\Common\Helpers\ParallelIterator;
 use Empiriq\BinanceBackTradeBundle\Common\Interfaces\ReceiverInterface;
-use Empiriq\Contracts\ConnectorInterface;
+use Empiriq\Contracts\ExchangeConnectorInterface;
 use Empiriq\Contracts\RunnableInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use React\Promise\PromiseInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 use function React\Promise\resolve;
 
-class Connector implements RunnableInterface
+class Connector implements ExchangeConnectorInterface, RunnableInterface
 {
     /**
      * @param SerializerInterface $serializer
@@ -59,5 +59,10 @@ class Connector implements RunnableInterface
     public function shutdown(): PromiseInterface
     {
         return resolve($this);
+    }
+
+    public function getConfig(): array
+    {
+        return [];
     }
 }
