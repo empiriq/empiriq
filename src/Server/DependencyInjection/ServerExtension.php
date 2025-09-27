@@ -25,7 +25,6 @@ class ServerExtension extends Extension
         $container->registerForAutoconfiguration(RunnableInterface::class)
             ->addTag('runnable');
 
-        // Регистрируем команду, в конструктор попадёт ленивый итератор
         $container->register(RunCommand::class, RunCommand::class)
             ->addArgument(new Reference('logger'))
             ->addArgument(new TaggedIteratorArgument('runnable'))

@@ -87,6 +87,6 @@ final class BinanceApiConnectorExtension extends Extension
         $container->setDefinition(Connector::class, (new Definition(Connector::class, [
             [new Reference(FuturesUsdMTransport::class)],
             $logger,
-        ]))->setPublic(true)->setAutowired(true)->setAutoconfigured(true));
+        ]))->setPublic(true)->setAutowired(true)->setAutoconfigured(true))->addTag('empiriq.runnable');
     }
 }
