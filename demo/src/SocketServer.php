@@ -37,6 +37,12 @@ final class SocketServer implements RunnableInterface
         return $this->deferred->promise();
     }
 
+    #[\Override]
+    public function shutdown(): PromiseInterface
+    {
+        return resolve($this);
+    }
+
     /**
      * Когда к серверу подключился новый клиент
      * @param ConnectionInterface $connection
@@ -66,10 +72,5 @@ final class SocketServer implements RunnableInterface
     public function __error(Throwable $e): void
     {
         $this->deferred->reject($e);
-    }
-
-    public function shutdown(): PromiseInterface
-    {
-        return resolve($this);
     }
 }

@@ -16,6 +16,7 @@
         "php": ">=8.4",
         "ext-zip": "*",
         "ext-openssl": "*",
+        "ext-pcntl": "*",
         "psr/event-dispatcher": "^1.0",
         "symfony/polyfill-php84": "^1.32",
         "symfony/serializer-pack": "^1.3",

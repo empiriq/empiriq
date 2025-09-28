@@ -24,7 +24,6 @@ abstract class Connection
 
     public function run(): PromiseInterface
     {
-        var_dump(3);
         return connect($this->uri)->then(function (WebSocket $connection) {
             $this->logger->info(sprintf('WebSocket connected (uri: %s)', $this->uri));
             $connection->on('message', [$this, '__message']);

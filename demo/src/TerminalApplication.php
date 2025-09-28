@@ -57,7 +57,7 @@ final class TerminalApplication extends Application
 
         return array_filter(
             parent::all($namespace),
-            fn($name) => !in_array($name, $commandsToRemove, true),
+            static fn($name) => !in_array($name, $commandsToRemove),
             ARRAY_FILTER_USE_KEY
         );
     }

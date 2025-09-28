@@ -28,6 +28,6 @@ services:
 
     Empiriq\Demo\RunCommand:
         arguments:
-            $logger: '@logger'
             $runners: !tagged_iterator 'empiriq.runnable'
+            $logger: '@logger'
         tags: [ 'console.command' ]
