@@ -8,8 +8,9 @@ use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\UserData\Subscrib
 use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 
-readonly class UserDataStream implements FuturesUsdMStreamInterface
+final readonly class UserDataStream implements FuturesUsdMStreamInterface
 {
+    #[\Override]
     public function subscribe(FuturesUsdMTransport $transport): PromiseInterface
     {
         if ($transport->isLoggedIn()) {

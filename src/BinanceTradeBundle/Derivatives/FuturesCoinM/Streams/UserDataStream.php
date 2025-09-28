@@ -8,8 +8,9 @@ use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Responses\UserData\Subscri
 use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 
-readonly class UserDataStream implements FuturesCoinMStreamInterface
+final readonly class UserDataStream implements FuturesCoinMStreamInterface
 {
+    #[\Override]
     public function subscribe(FuturesCoinMTransport $transport): PromiseInterface
     {
         if ($transport->isLoggedIn()) {

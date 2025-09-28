@@ -11,7 +11,7 @@ use React\Promise\PromiseInterface;
  *
  * Constructs a stream name like "btcusdt@depth" based on the given symbol.
  */
-readonly class DepthStream implements SpotStreamInterface
+final readonly class DepthStream implements SpotStreamInterface
 {
     /**
      * @param string[] $symbols The trading pair symbol (e.g. "BTCUSDT"). Case-insensitive.
@@ -21,6 +21,7 @@ readonly class DepthStream implements SpotStreamInterface
     ) {
     }
 
+    #[\Override]
     public function subscribe(SpotTransport $transport): PromiseInterface
     {
         return $transport->subscribe(

@@ -4,7 +4,10 @@ namespace Empiriq\BinanceTradeBundle\Common\Signers;
 
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
 
-readonly class Ed25519Signer implements SignerInterface
+/**
+ * @api Ed25519 signer that creates request signatures using a private key.
+ */
+final readonly class Ed25519Signer implements SignerInterface
 {
     public function __construct(
         private string $privateKeyPath,
@@ -12,6 +15,7 @@ readonly class Ed25519Signer implements SignerInterface
     ) {
     }
 
+    #[\Override]
     public function createSignature(array $params): string
     {
         ksort($params);

@@ -4,13 +4,17 @@ namespace Empiriq\BinanceTradeBundle\Common\Signers;
 
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
 
-readonly class HmacSigner implements SignerInterface
+/**
+ * @api HMAC-SHA256 signer that creates request signatures using a secret key.
+ */
+final readonly class HmacSigner implements SignerInterface
 {
     public function __construct(
         private string $secretKey,
     ) {
     }
 
+    #[\Override]
     public function createSignature(array $params): string
     {
         ksort($params);

@@ -11,12 +11,7 @@ use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 readonly class Sanitizer implements SanitizerInterface
 {
     /**
-     * @var list<string> Lowercased sensitive keys.
-     */
-    private array $normalizedKeys;
-
-    /**
-     * @param list<string> $sensitiveKeys Keys to sanitize (case-insensitive).
+     * @param list<string> $keys Keys to sanitize.
      * @param bool $partialMask Whether to use partial masking instead of full masking.
      * @param int $prefixLength Number of visible characters at the start of the string.
      * @param int $suffixLength Number of visible characters at the end of the string.
@@ -24,19 +19,19 @@ readonly class Sanitizer implements SanitizerInterface
      * @param int $maxMaskLength Maximum number of mask characters in the middle part.
      */
     public function __construct(
-        private array $sensitiveKeys = ['apiKey', 'secretKey', 'signature'],
+        private array $keys = ['apiKey', 'secretKey', 'signature'],
         private bool $partialMask = true,
         private int $prefixLength = 2,
         private int $suffixLength = 2,
         private string $maskChar = '*',
         private int $maxMaskLength = 4,
     ) {
-        $this->normalizedKeys = array_map('strtolower', $this->sensitiveKeys);
     }
 
     /**
      * Sanitize request array by masking sensitive keys.
      */
+    #[\Override]
     public function sanitize(array $request): array
     {
         foreach ($request as $key => &$value) {
@@ -55,7 +50,7 @@ readonly class Sanitizer implements SanitizerInterface
      */
     private function isSensitiveKey(string $key): bool
     {
-        return in_array(strtolower($key), $this->normalizedKeys, true);
+        return in_array($key, $this->keys, true);
     }
 
     /**

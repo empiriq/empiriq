@@ -7,16 +7,21 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class BinanceTradeBundle extends Bundle
+/**
+ * @api Provides interaction with the Binance exchange
+ */
+final class BinanceTradeBundle extends Bundle
 {
     /**
      * Returns the bundle's container extension class.
      */
+    #[\Override]
     protected function getContainerExtensionClass(): string
     {
         return BinanceApiConnectorExtension::class;
     }
 
+    #[\Override]
     public function getContainerExtension(): ?ExtensionInterface
     {
         return new BinanceApiConnectorExtension();
@@ -26,6 +31,7 @@ class BinanceTradeBundle extends Bundle
      * @param ContainerBuilder $container
      * @return void
      */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
@@ -35,6 +41,7 @@ class BinanceTradeBundle extends Bundle
      * @return void
      * @throws \Throwable
      */
+    #[\Override]
     public function boot(): void
     {
     }

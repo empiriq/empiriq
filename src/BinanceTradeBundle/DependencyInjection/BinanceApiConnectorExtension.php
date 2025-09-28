@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class BinanceApiConnectorExtension extends Extension
 {
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();

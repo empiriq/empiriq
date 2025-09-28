@@ -53,10 +53,10 @@ abstract class RestClient
         mixed $payload = null,
         ?int $recvWindow = null
     ): PromiseInterface {
+        $id = bin2hex(random_bytes(8));
+        $headers = [];
+        $params = [];
         try {
-            $id = bin2hex(random_bytes(8));
-            $headers = [];
-            $params = [];
             if (!is_null($payload)) {
                 $params = (array)$this->serializer->normalize($payload);
             }
@@ -68,7 +68,7 @@ abstract class RestClient
             }
             if ($permission->requiresSignature()) {
                 $params['timestamp'] = $this->calculateTimestamp();
-                $params['signature'] = $this->getSigner()->createSignature($params);
+                $params['signature'] = $this->signer->createSignature($params);
             }
             $this->logger->info(
                 sprintf('Sending request (id: %s) %s %s', $id, $method, $path),
@@ -76,7 +76,7 @@ abstract class RestClient
             );
 
             return $this->client->request($method, $path, $headers, http_build_query($params))
-                ->then(function (Response $response) use ($id, $type) {
+                ->then(function (Response $response) use ($id, $type): mixed {
                     $data = [
                         'id' => $id,
                         'status' => 200,
@@ -120,7 +120,7 @@ abstract class RestClient
                     $e->getMessage()
                 )
             );
-            return reject(new RuntimeException($e->getMessage(), $e->getCode(), $e));
+            return reject(new RuntimeException($e->getMessage(), (int)$e->getCode(), $e));
         }
     }
 
@@ -135,11 +135,6 @@ abstract class RestClient
     private function calculateTimestamp(): int
     {
         return (int)(new DateTime('now', new DateTimeZone('UTC')))->format('Uv') + $this->timeOffsetMs;
-    }
-
-    private function getSigner(): SignerInterface
-    {
-        return $this->signer ??= new NullSigner();
     }
 
     private function getApiKey(): string

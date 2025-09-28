@@ -7,11 +7,13 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 final class Configuration implements ConfigurationInterface
 {
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('binance_api_connector');
-        $rootNode = $treeBuilder->getRootNode();
-        $rootNode
+        /** @psalm-suppress UndefinedMethod */
+        $treeBuilder
+            ->getRootNode()
             ->children()
                 ->scalarNode('api_key')->isRequired()->cannotBeEmpty()->end()
                 ->scalarNode('api_secret')->isRequired()->cannotBeEmpty()->end()

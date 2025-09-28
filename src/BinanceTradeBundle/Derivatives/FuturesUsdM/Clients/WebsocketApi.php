@@ -42,16 +42,19 @@ final class WebsocketApi extends ResponseResolver implements ClientInterface
     ) {
     }
 
+    #[\Override]
     protected static function extractRawResponse(array $data): ?array
     {
         return isset($data['id']) ? $data : null;
     }
 
+    #[\Override]
     protected static function extractRawEvent(array $data): ?array
     {
         return $data['event'] ?? null;
     }
 
+    #[\Override]
     protected static function getEventType(): string
     {
         return EventInterface::class;

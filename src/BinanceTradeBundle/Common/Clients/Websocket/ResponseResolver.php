@@ -22,6 +22,7 @@ abstract class ResponseResolver extends RequestSender
     /* @var array<string, PendingRequest> */
     private array $pending = [];
 
+    #[\Override]
     protected function message(array $data): void
     {
         if ($rawResponse = static::extractRawResponse($data)) {
@@ -95,16 +96,19 @@ abstract class ResponseResolver extends RequestSender
         $this->pending = [];
     }
 
+    #[\Override]
     public function shutdown(): void
     {
         $this->connection->close();
     }
 
+    #[\Override]
     protected function close(): void
     {
         $this->rejectAllPending(new DisconnectedException());
     }
 
+    #[\Override]
     protected function error(DisconnectedException $exception): void
     {
         $this->rejectAllPending($exception);

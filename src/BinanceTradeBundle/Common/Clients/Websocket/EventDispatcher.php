@@ -9,6 +9,7 @@ abstract class EventDispatcher extends Connection
 {
     protected EventDispatcherInterface $dispatcher;
 
+    #[\Override]
     protected function message(array $data): void
     {
         if ($rawEvent = static::extractRawEvent($data)) {

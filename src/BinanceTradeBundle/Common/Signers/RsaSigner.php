@@ -4,7 +4,10 @@ namespace Empiriq\BinanceTradeBundle\Common\Signers;
 
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
 
-readonly class RsaSigner implements SignerInterface
+/**
+ * @api RSA-SHA256 signer that creates request signatures using a secret key.
+ */
+final readonly class RsaSigner implements SignerInterface
 {
     public function __construct(
         private string $privateKeyPath,
@@ -12,6 +15,7 @@ readonly class RsaSigner implements SignerInterface
     ) {
     }
 
+    #[\Override]
     public function createSignature(array $params): string
     {
         ksort($params);

@@ -4,7 +4,7 @@ namespace Empiriq\BinanceTradeBundle\Common\Clients\Websocket\Dto;
 
 use React\Promise\Deferred;
 
-readonly class PendingRequest
+final readonly class PendingRequest
 {
     public function __construct(
         public string $id,

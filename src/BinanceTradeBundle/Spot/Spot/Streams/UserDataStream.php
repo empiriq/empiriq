@@ -8,8 +8,9 @@ use Empiriq\BinanceContracts\Spot\Spot\Responses\UserData\SubscribeResponse;
 use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 
-readonly class UserDataStream implements SpotStreamInterface
+final readonly class UserDataStream implements SpotStreamInterface
 {
+    #[\Override]
     public function subscribe(SpotTransport $transport): PromiseInterface
     {
         if ($transport->isLoggedIn()) {
