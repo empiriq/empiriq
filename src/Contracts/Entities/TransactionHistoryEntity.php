@@ -4,6 +4,9 @@ namespace Empiriq\Contracts\Entities;
 
 use Empiriq\Contracts\Common\TransactionType;
 
+/**
+ * @api
+ */
 final class TransactionHistoryEntity
 {
     public function __construct(

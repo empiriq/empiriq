@@ -8,6 +8,9 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface as SymfonySerializer;
 
+/**
+ * @api
+ */
 interface SerializerInterface extends
     SymfonySerializer,
     NormalizerInterface,

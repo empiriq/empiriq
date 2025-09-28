@@ -4,6 +4,9 @@ namespace Empiriq\Contracts\Entities;
 
 use Empiriq\Contracts\Common\OrderSide;
 
+/**
+ * @api
+ */
 final class TradeHistoryEntity
 {
     public function __construct(

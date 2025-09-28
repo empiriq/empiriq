@@ -2,6 +2,9 @@
 
 namespace Empiriq\Contracts\Entities;
 
+/**
+ * @api
+ */
 final class TradeEntity
 {
     public function __construct(

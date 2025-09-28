@@ -6,6 +6,9 @@ use Empiriq\Contracts\Common\OrderSide;
 use Empiriq\Contracts\Common\OrderStatus;
 use Empiriq\Contracts\Common\OrderType;
 
+/**
+ * @api
+ */
 final class OrderHistoryEntity
 {
     public function __construct(

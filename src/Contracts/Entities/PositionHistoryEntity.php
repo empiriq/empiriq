@@ -4,6 +4,9 @@ namespace Empiriq\Contracts\Entities;
 
 use Empiriq\Contracts\Common\PositionSide;
 
+/**
+ * @api
+ */
 final class PositionHistoryEntity
 {
     public function __construct(

@@ -7,11 +7,13 @@ use React\Promise\PromiseInterface;
 interface ManagerInterface
 {
     /**
+     * @api
      * @return PromiseInterface
      */
     public function run(): PromiseInterface;
 
     /**
+     * @api
      * @template T
      *
      * @param class-string<T> $className
@@ -20,6 +22,7 @@ interface ManagerInterface
     public function findRegistry(string $className): mixed;
 
     /**
+     * @api
      * @template T
      *
      * @param class-string<T> $className

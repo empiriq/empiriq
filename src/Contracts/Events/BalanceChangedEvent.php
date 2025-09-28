@@ -4,6 +4,9 @@ namespace Empiriq\Contracts\Events;
 
 use Empiriq\Contracts\Entities\BalanceEntity;
 
+/**
+ * @api
+ */
 final readonly class BalanceChangedEvent
 {
     /**

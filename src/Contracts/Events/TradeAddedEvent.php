@@ -4,6 +4,9 @@ namespace Empiriq\Contracts\Events;
 
 use Empiriq\Contracts\Entities\TradeEntity;
 
+/**
+ * @api
+ */
 final readonly class TradeAddedEvent
 {
     /**

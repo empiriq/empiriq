@@ -2,6 +2,9 @@
 
 namespace Empiriq\Contracts\Entities;
 
+/**
+ * @api
+ */
 final class BalanceEntity
 {
     public function __construct(

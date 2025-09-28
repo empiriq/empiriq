@@ -8,6 +8,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 interface ConnectorFactoryInterface
 {
     /**
+     * @api
      * @param array<string, string[]> $markets
      * @param array $streams
      * @param array<string, mixed> $options
