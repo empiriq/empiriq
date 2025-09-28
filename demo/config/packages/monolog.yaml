@@ -19,4 +19,4 @@ monolog:
             path: "%kernel.logs_dir%/deprecation.log"
             level: info
             channels: ["deprecation"]
-            formatter: monolog.formatter.json
+            formatter: monolog.formatter.line
