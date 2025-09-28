@@ -59,7 +59,7 @@ final class RunCommand extends Command implements SignalableCommandInterface
     }
 
     /**
-     * Returns handled signals (SIGINT, SIGTERM).
+     * Returns handled signals.
      * @return array
      */
     #[\Override]

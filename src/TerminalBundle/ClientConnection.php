@@ -60,7 +60,7 @@ final readonly class ClientConnection
      */
     public function __end(): void
     {
-        $this->connection->write('Bay');
+        $this->connection->write('Bye');
     }
 
     /**
