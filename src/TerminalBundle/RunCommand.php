@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\Server;
+namespace Empiriq\TerminalBundle;
 
 use Empiriq\Contracts\RunnableInterface;
 use Psr\Log\LoggerInterface;

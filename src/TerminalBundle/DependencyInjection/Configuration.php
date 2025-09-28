@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\Server\DependencyInjection;
+namespace Empiriq\TerminalBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

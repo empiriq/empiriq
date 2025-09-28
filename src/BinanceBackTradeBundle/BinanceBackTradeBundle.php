@@ -1,25 +1,25 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle;
+namespace Empiriq\BinanceBackTradeBundle;
 
-use Empiriq\BinanceTradeBundle\DependencyInjection\BinanceApiConnectorExtension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Empiriq\BinanceBackTradeBundle\DependencyInjection\BinanceHistoryConnectorExtension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ConnectorBundle extends Bundle //todo no extend, implement interface
+class BinanceBackTradeBundle extends Bundle
 {
     /**
      * Returns the bundle's container extension class.
      */
     protected function getContainerExtensionClass(): string
     {
-        return BinanceApiConnectorExtension::class;
+        return BinanceHistoryConnectorExtension::class;
     }
 
     public function getContainerExtension(): ?ExtensionInterface
     {
-        return new BinanceApiConnectorExtension();
+        return new BinanceHistoryConnectorExtension();
     }
 
     /**
@@ -33,9 +33,11 @@ class ConnectorBundle extends Bundle //todo no extend, implement interface
 
     /**
      * @return void
-     * @throws \Throwable
      */
     public function boot(): void
     {
+        /** @var Connector $connector */
+        $connector = $this->container->get(Connector::class);
+        $connector->run();
     }
 }

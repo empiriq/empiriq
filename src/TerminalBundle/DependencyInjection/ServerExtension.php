@@ -1,9 +1,9 @@
 <?php
 
-namespace Empiriq\Server\DependencyInjection;
+namespace Empiriq\TerminalBundle\DependencyInjection;
 
 use Empiriq\Contracts\RunnableInterface;
-use Empiriq\Server\RunCommand;
+use Empiriq\TerminalBundle\RunCommand;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;

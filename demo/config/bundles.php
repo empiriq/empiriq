@@ -3,7 +3,7 @@
 return [
     Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
-    Empiriq\BinanceBackTradeBundle\ConnectorBundle::class => ['backtrade' => true],
-    Empiriq\BinanceTradeBundle\ConnectorBundle::class => ['realtrade' => true],
-    Empiriq\Server\ServerBundle::class => ['realtrade' => false],
+    Empiriq\BinanceBackTradeBundle\BinanceBackTradeBundle::class => ['backtrade' => true],
+    Empiriq\BinanceTradeBundle\BinanceTradeBundle::class => ['realtrade' => true],
+    Empiriq\TerminalBundle\TerminalBundle::class => ['realtrade' => false],
 ];

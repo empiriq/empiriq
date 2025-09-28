@@ -1,5 +1,5 @@
 {
-    "name": "empiriq/server",
+    "name": "empiriq/terminal-bundle",
     "minimum-stability": "alpha",
     "prefer-stable": true,
     "description": "Framework designed for implementing your trading strategies",

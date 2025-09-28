@@ -1,13 +1,13 @@
 <?php
 
-namespace Empiriq\Server;
+namespace Empiriq\TerminalBundle;
 
-use Empiriq\Server\DependencyInjection\ServerExtension;
+use Empiriq\TerminalBundle\DependencyInjection\ServerExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class ServerBundle extends Bundle //todo no extend, implement interface
+class TerminalBundle extends Bundle
 {
     /**
      * Returns the bundle's container extension class.
