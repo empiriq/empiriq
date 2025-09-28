@@ -4,6 +4,9 @@ namespace Empiriq\Contracts;
 
 use React\Promise\PromiseInterface;
 
+/**
+ * @api
+ */
 interface ManagerInterface
 {
     /**

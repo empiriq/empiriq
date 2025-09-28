@@ -71,7 +71,7 @@
     },
     "scripts": {
         "phpcs": "vendor/bin/phpcs --standard=PSR12 src",
-        "psalm": "vendor/bin/psalm --config=etc/psalm.xml --show-info=true",
+        "psalm": "vendor/bin/psalm --config=etc/psalm.xml --output-format=compact --show-info=true",
         "phpunit": "vendor/bin/phpunit",
         "message": "vendor/bin/conventional-commits prepare"
     },
