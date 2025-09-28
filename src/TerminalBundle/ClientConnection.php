@@ -4,6 +4,7 @@ namespace Empiriq\TerminalBundle;
 
 use React\Socket\ConnectionInterface;
 use SplObjectStorage;
+use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Input\StringInput;
 use Throwable;
 
@@ -39,9 +40,14 @@ final readonly class ClientConnection
             return;
         }
         $input = new StringInput($commandLine);
-        $stream = new StreamOutput($this->connection);
+        $output = new StreamOutput($this->connection);
         try {
-            $this->terminalApplication->run($input, $stream);
+            $commandName = $input->getFirstArgument();
+            $command = $this->terminalApplication->find($commandName);
+            if ($command instanceof LazyCommand) {
+                $command = $command->getCommand();
+            }
+            $command->run($input, $output);
         } catch (Throwable $e) {
             $this->connection->write("Error: " . $e->getMessage() . "\n");
         }
