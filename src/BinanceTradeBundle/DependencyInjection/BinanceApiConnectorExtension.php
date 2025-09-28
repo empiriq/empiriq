@@ -6,11 +6,6 @@ use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner;
 use Empiriq\BinanceTradeBundle\Connector;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebsocketApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebsocketStreams;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMTransport;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\TradeStream;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -21,73 +16,56 @@ final class BinanceApiConnectorExtension extends Extension
     #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
+        $definition = new Definition(
+            class: Connector::class,
+            arguments: [
+                array_map(
+                    callback: static fn(array $transport): Definition => new Definition(
+                        class: $transport['transport_class'],
+                        arguments: [
+                            array_map(
+                                fn(array $stream): Definition => new Definition($stream['class'], $stream['arguments']),
+                                $transport['streams']
+                            ),
+                            new Definition($transport['rest_api_class'], [
+                                $transport['rest_api_uri'],
+                                $config['api_key'],
+                                new Reference('empiriq.binance.signer'),
+                                new Reference('empiriq.binance.serializer'),
+                                new Reference('logger'),
+                                new Reference('empiriq.binance.sanitizer'),
+                                $config['resolver_timeout'],
+                            ]),
+                            new Definition($transport['websocket_api_class'], [
+                                new Reference('event_dispatcher'),
+                                $transport['websocket_api_uri'],
+                                $config['api_key'],
+                                new Reference('empiriq.binance.signer'),
+                                new Reference('empiriq.binance.serializer'),
+                                new Reference('logger'),
+                                new Reference('empiriq.binance.sanitizer'),
+                                $config['resolver_timeout'],
+                            ]),
+                            new Definition($transport['websocket_streams_class'], [
+                                new Reference('event_dispatcher'),
+                                $transport['websocket_market_streams_uri'],
+                                new Reference('empiriq.binance.serializer'),
+                                new Reference('logger'),
+                                new Reference('empiriq.binance.sanitizer'),
+                                $config['resolver_timeout'],
+                            ]),
+                        ]
+                    ),
+                    array: $config['transports']
+                ),
+                new Reference('logger'),
+            ]
+        );
 
-        $apiKey         = $config['api_key'];
-        $apiSecret      = $config['api_secret'];
-        $restApiUri     = $config['rest_api_uri'];
-        $wsApiUri       = $config['websocket_api_uri'];
-        $wsStreamsUri   = $config['websocket_market_streams_uri'];
-        $resolverTimeout = $config['resolver_timeout'] ?? 10;
-
-        $logger = new Reference(\Psr\Log\LoggerInterface::class);
-
-        // --- базовые сервисы ---
-        $container->setDefinition(Serializer::class, new Definition(Serializer::class));
-        $container->setDefinition(Sanitizer::class, new Definition(Sanitizer::class));
-        $container->setDefinition(HmacSigner::class, new Definition(HmacSigner::class, [
-            $apiSecret,
-        ]));
-
-        // --- Streams ---
-        $container->setDefinition(TradeStream::class, new Definition(TradeStream::class, [
-            ['BTCUSDT'], // TODO: to config
-        ]));
-
-        // --- Клиенты ---
-        $container->setDefinition(RestApi::class, (new Definition(RestApi::class, [
-            $restApiUri,
-            $apiKey,
-            new Reference(HmacSigner::class),
-            new Reference(Serializer::class),
-            $logger,
-            new Reference(Sanitizer::class),
-            $resolverTimeout,
-        ]))->setAutowired(true)->setAutoconfigured(true));
-
-        $container->setDefinition(WebsocketApi::class, (new Definition(WebsocketApi::class, [
-            new Reference('event_dispatcher'),
-            $wsApiUri,
-            $apiKey,
-            new Reference(HmacSigner::class),
-            new Reference(Serializer::class),
-            $logger,
-            new Reference(Sanitizer::class),
-            $resolverTimeout,
-        ]))->setAutowired(true)->setAutoconfigured(true));
-
-        $container->setDefinition(WebsocketStreams::class, (new Definition(WebsocketStreams::class, [
-            new Reference('event_dispatcher'),
-            $wsStreamsUri,
-            new Reference(Serializer::class),
-            $logger,
-            new Reference(Sanitizer::class),
-            $resolverTimeout,
-        ]))->setAutowired(true)->setAutoconfigured(true));
-
-        // --- Transport ---
-        $container->setDefinition(FuturesUsdMTransport::class, (new Definition(FuturesUsdMTransport::class, [
-            [new Reference(TradeStream::class)],
-            new Reference(RestApi::class),
-            new Reference(WebsocketApi::class),
-            new Reference(WebsocketStreams::class),
-        ]))->setAutowired(true)->setAutoconfigured(true));
-
-        // --- Connector ---
-        $container->setDefinition(Connector::class, (new Definition(Connector::class, [
-            [new Reference(FuturesUsdMTransport::class)],
-            $logger,
-        ]))->setPublic(true)->setAutowired(true)->setAutoconfigured(true))->addTag('empiriq.runnable');
+        $container->setDefinition('empiriq.binance.serializer', new Definition(Serializer::class));
+        $container->setDefinition('empiriq.binance.sanitizer', new Definition(Sanitizer::class));
+        $container->setDefinition('empiriq.binance.signer', new Definition(HmacSigner::class, [$config['api_secret']]));
+        $container->setDefinition('connector', $definition)->addTag('empiriq.runnable');
     }
 }
