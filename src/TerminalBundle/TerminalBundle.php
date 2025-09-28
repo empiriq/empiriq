@@ -2,30 +2,29 @@
 
 namespace Empiriq\TerminalBundle;
 
-use Empiriq\TerminalBundle\DependencyInjection\ServerExtension;
+use Empiriq\TerminalBundle\DependencyInjection\TerminalExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class TerminalBundle extends Bundle
+/**
+ * @api TerminalBundle integrates runnable terminal services into a Symfony application.
+ */
+final class TerminalBundle extends Bundle
 {
-    /**
-     * Returns the bundle's container extension class.
-     */
+    #[\Override]
     protected function getContainerExtensionClass(): string
     {
-        return ServerExtension::class;
+        return TerminalExtension::class;
     }
 
+    #[\Override]
     public function getContainerExtension(): ?ExtensionInterface
     {
-        return new ServerExtension();
+        return new TerminalExtension();
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @return void
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
     }

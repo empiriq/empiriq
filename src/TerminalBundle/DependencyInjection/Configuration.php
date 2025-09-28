@@ -5,15 +5,17 @@ namespace Empiriq\TerminalBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-class Configuration implements ConfigurationInterface
+final class Configuration implements ConfigurationInterface
 {
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('server');
-        $treeBuilder->getRootNode()
+        $treeBuilder = new TreeBuilder('terminal');
+        /** @psalm-suppress UndefinedMethod */
+        $treeBuilder
+            ->getRootNode()
             ->children()
-            ->scalarNode('port')->isRequired()->cannotBeEmpty()->end()
-            ->scalarNode('password')->end()
+            ->scalarNode('serverUri')->isRequired()->cannotBeEmpty()->end()
             ->end();
 
         return $treeBuilder;

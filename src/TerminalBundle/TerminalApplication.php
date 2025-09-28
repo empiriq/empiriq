@@ -1,11 +1,14 @@
 <?php
 
-namespace Empiriq\Demo;
+namespace Empiriq\TerminalBundle;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * @api entrypoint for execute repl commands
+ */
 final class TerminalApplication extends Application
 {
     public function __construct(

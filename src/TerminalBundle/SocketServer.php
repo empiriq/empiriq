@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\Demo;
+namespace Empiriq\TerminalBundle;
 
 use Empiriq\Contracts\RunnableInterface;
 use React\Promise\Deferred;
@@ -13,23 +13,30 @@ use Throwable;
 
 use function React\Promise\resolve;
 
+/**
+ * @api SocketServer runs a ReactPHP socket server that accepts client connections
+ * and forwards them to {@see ClientConnection} for interactive terminal handling.
+ */
 final class SocketServer implements RunnableInterface
 {
-    private ?SplObjectStorage $clientConnection = null;
-    private ?Deferred $deferred = null;
     private ?ReactSocketServer $socketServer = null;
 
     public function __construct(
+        private readonly string $serverUri,
         private readonly TerminalApplication $terminalApplication,
+        private readonly SplObjectStorage $clientConnection = new SplObjectStorage(),
+        private readonly Deferred $deferred = new Deferred()
     ) {
     }
 
+    /**
+     * Start the socket server and listen for connections.
+     * @return PromiseInterface<int> Promise resolving when the server stops.
+     */
     #[\Override]
     public function run(): PromiseInterface
     {
-        $this->clientConnection = new SplObjectStorage();
-        $this->deferred = new Deferred();
-        $this->socketServer = new ReactSocketServer('0.0.0.0:2009', []);
+        $this->socketServer = new ReactSocketServer($this->serverUri, []);
         $this->socketServer->on('connection', [$this, '__connection']);
         $this->socketServer->on('close', [$this, '__close']);
         $this->socketServer->on('error', [$this, '__error']);
@@ -37,6 +44,10 @@ final class SocketServer implements RunnableInterface
         return $this->deferred->promise();
     }
 
+    /**
+     * Gracefully shut down the server.
+     * @return PromiseInterface<self>
+     */
     #[\Override]
     public function shutdown(): PromiseInterface
     {
@@ -44,9 +55,8 @@ final class SocketServer implements RunnableInterface
     }
 
     /**
-     * Когда к серверу подключился новый клиент
-     * @param ConnectionInterface $connection
-     * @return void
+     * Handle a new client connection.
+     * @param ConnectionInterface $connection Connected client socket
      */
     public function __connection(ConnectionInterface $connection): void
     {
@@ -56,8 +66,7 @@ final class SocketServer implements RunnableInterface
     }
 
     /**
-     * Когда сервер закрыт
-     * @return void
+     * Handle server close event and resolve the promise.
      */
     public function __close(): void
     {
@@ -65,9 +74,8 @@ final class SocketServer implements RunnableInterface
     }
 
     /**
-     * Когда произошла ошибка
-     * @param Throwable $e
-     * @return void
+     * Handle server error and reject the promise.
+     * @param Throwable $e Exception that occurred
      */
     public function __error(Throwable $e): void
     {

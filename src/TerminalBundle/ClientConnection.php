@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\Demo;
+namespace Empiriq\TerminalBundle;
 
 use React\Socket\ConnectionInterface;
 use SplObjectStorage;

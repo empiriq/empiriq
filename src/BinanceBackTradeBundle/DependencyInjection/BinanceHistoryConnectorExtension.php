@@ -2,7 +2,6 @@
 
 namespace Empiriq\BinanceBackTradeBundle\DependencyInjection;
 
-use DateTimeImmutable;
 use Empiriq\BinanceBackTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceBackTradeBundle\Connector;
 use Empiriq\BinanceBackTradeBundle\Spot\Spot\Receivers\SpotReceiver;
@@ -11,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Reference;
 
-class BinanceHistoryConnectorExtension extends Extension
+final class BinanceHistoryConnectorExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {

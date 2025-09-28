@@ -26,8 +26,3 @@ services:
         exclude:
             - '../src/Exclude/'
 
-    Empiriq\Demo\RunCommand:
-        arguments:
-            $runners: !tagged_iterator 'empiriq.runnable'
-            $logger: '@logger'
-        tags: [ 'console.command' ]
