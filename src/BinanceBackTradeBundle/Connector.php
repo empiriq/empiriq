@@ -36,7 +36,7 @@ class Connector implements ExchangeConnectorInterface, RunnableInterface
         return $this;
     }
 
-
+    #[\Override]
     public function run(): PromiseInterface
     {
         $eventIterator = new ParallelIterator(
@@ -56,13 +56,15 @@ class Connector implements ExchangeConnectorInterface, RunnableInterface
         return resolve($this);
     }
 
+    #[\Override]
     public function shutdown(): PromiseInterface
     {
         return resolve($this);
     }
 
-    public function getConfig(): array
+    #[\Override]
+    public function getPriority(): int
     {
-        return [];
+        return RunnableInterface::EXCHANGE_CONNECTOR_PRIORITY;
     }
 }

@@ -54,6 +54,12 @@ final class SocketServer implements RunnableInterface
         return resolve($this);
     }
 
+    #[\Override]
+    public function getPriority(): int
+    {
+        return RunnableInterface::SOCKET_SERVER_PRIORITY;
+    }
+
     /**
      * Handle a new client connection.
      * @param ConnectionInterface $connection Connected client socket

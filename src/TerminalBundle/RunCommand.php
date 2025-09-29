@@ -34,22 +34,11 @@ final class RunCommand extends Command implements SignalableCommandInterface
         parent::__construct();
     }
 
-    /**
-     * Runs all services and waits for their completion.
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $runners = [];
-        foreach ($this->runners as $runner) {
-            $this->logger->info(sprintf('Running: %s', $runner::class));
-            $runners[] = $runner->run();
-        }
         try {
-            await(all($runners));
+            $this->runByPriority($this->runners);
         } catch (Throwable $e) {
             $this->logger->error(sprintf('Runner execution failed: %s (%s)', $e->getMessage(), $e::class));
             return Command::FAILURE;
@@ -58,10 +47,6 @@ final class RunCommand extends Command implements SignalableCommandInterface
         return Command::SUCCESS;
     }
 
-    /**
-     * Returns handled signals.
-     * @return array
-     */
     #[\Override]
     public function getSubscribedSignals(): array
     {
@@ -71,32 +56,65 @@ final class RunCommand extends Command implements SignalableCommandInterface
         ];
     }
 
-    /**
-     * Handles shutdown when receiving system signals.
-     * @param int $signal
-     * @param int|false $previousExitCode
-     * @return int|false
-     */
     #[\Override]
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         $name = $signal === SIGINT ? 'SIGINT' : 'SIGTERM';
         $this->logger->info("Received {$name}, shutting down…");
 
-        $runners = [];
-        foreach ($this->runners as $runner) {
-            $this->logger->info(sprintf('Shutdown: %s', $runner::class));
-            $runners[] = $runner->shutdown();
-        }
         try {
-            await(all($runners));
+            $this->shutdownByPriority($this->runners);
         } catch (Throwable $e) {
             $this->logger->error(sprintf('Shutdown error: %s', $e->getMessage()));
-
             return Command::FAILURE;
         }
-        $this->logger->info('gracefully shutdown');
+        $this->logger->info('Shutdown complete');
 
-        return Command::SUCCESS;
+        return false;
+    }
+
+    private function runByPriority(iterable $runners): void
+    {
+        foreach ($this->groupByPriority($runners, 'DESC') as $priority => $group) {
+            $this->logger->info("Starting group priority {$priority}");
+            $promises = [];
+            foreach ($group as $runner) {
+                $this->logger->info(sprintf('Running: %s', $runner::class));
+                $promises[] = $runner->run();
+            }
+            await(all($promises));
+        }
+    }
+
+    private function shutdownByPriority(iterable $runners): void
+    {
+        foreach ($this->groupByPriority($runners, 'ASC') as $priority => $group) {
+            $this->logger->info("Stopping group priority {$priority}");
+            $promises = [];
+            foreach ($group as $runner) {
+                $this->logger->info(sprintf('Shutdown: %s', $runner::class));
+                $promises[] = $runner->shutdown();
+            }
+            await(all($promises));
+        }
+    }
+
+    /**
+     * @param iterable<RunnableInterface> $runners
+     * @return array<int, RunnableInterface[]>
+     */
+    private function groupByPriority(iterable $runners, string $direction = 'ASC'): array
+    {
+        $groups = [];
+        foreach ($runners as $runner) {
+            $groups[$runner->getPriority()][] = $runner;
+        }
+        if ($direction === 'ASC') {
+            ksort($groups);
+        } else {
+            krsort($groups);
+        }
+
+        return $groups;
     }
 }

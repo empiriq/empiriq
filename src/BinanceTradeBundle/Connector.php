@@ -37,6 +37,7 @@ readonly class Connector implements ExchangeConnectorInterface, RunnableInterfac
      * @return PromiseInterface
      * @throws Throwable
      */
+    #[\Override]
     public function run(): PromiseInterface
     {
         $this->logger->info('Starting connector run loop...');
@@ -59,6 +60,7 @@ readonly class Connector implements ExchangeConnectorInterface, RunnableInterfac
     /**
      * @return PromiseInterface
      */
+    #[\Override]
     public function shutdown(): PromiseInterface
     {
         $this->logger->info('Shutting down connector...');
@@ -69,6 +71,12 @@ readonly class Connector implements ExchangeConnectorInterface, RunnableInterfac
         $this->logger->info('Connector stopped successfully');
 
         return resolve($this);
+    }
+
+    #[\Override]
+    public function getPriority(): int
+    {
+        return RunnableInterface::EXCHANGE_CONNECTOR_PRIORITY;
     }
 
     /**
@@ -112,10 +120,5 @@ readonly class Connector implements ExchangeConnectorInterface, RunnableInterfac
     public function spot(): SpotTransport
     {
         return $this->getTransport(SpotTransport::class);
-    }
-
-    public function getConfig(): array
-    {
-        return [];
     }
 }
