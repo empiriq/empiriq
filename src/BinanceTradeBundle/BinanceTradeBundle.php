@@ -2,7 +2,7 @@
 
 namespace Empiriq\BinanceTradeBundle;
 
-use Empiriq\BinanceTradeBundle\DependencyInjection\BinanceApiConnectorExtension;
+use Empiriq\BinanceTradeBundle\DependencyInjection\BinanceTradeExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -18,13 +18,13 @@ final class BinanceTradeBundle extends Bundle
     #[\Override]
     protected function getContainerExtensionClass(): string
     {
-        return BinanceApiConnectorExtension::class;
+        return BinanceTradeExtension::class;
     }
 
     #[\Override]
     public function getContainerExtension(): ?ExtensionInterface
     {
-        return new BinanceApiConnectorExtension();
+        return new BinanceTradeExtension();
     }
 
     /**

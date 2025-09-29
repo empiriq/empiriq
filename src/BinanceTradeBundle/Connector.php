@@ -16,6 +16,9 @@ use Throwable;
 use function React\Promise\all;
 use function React\Promise\resolve;
 
+/**
+ * @api
+ */
 readonly class Connector implements ExchangeConnectorInterface, RunnableInterface
 {
     /**
