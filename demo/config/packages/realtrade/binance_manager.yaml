@@ -1,0 +1,9 @@
+binance_manager:
+    futures_usd:
+        trade_history:
+            arguments:
+                connector: '@connector'
+                dispatcher: '@event_dispatcher'
+                symbols: ['BNBUSDT']
+
+

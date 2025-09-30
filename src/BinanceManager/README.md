@@ -1,2 +1,0 @@
-Binance Manager Bundle
-===

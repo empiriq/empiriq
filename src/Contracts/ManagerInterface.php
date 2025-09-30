@@ -2,19 +2,11 @@
 
 namespace Empiriq\Contracts;
 
-use React\Promise\PromiseInterface;
-
 /**
  * @api
  */
 interface ManagerInterface
 {
-    /**
-     * @api
-     * @return PromiseInterface
-     */
-    public function run(): PromiseInterface;
-
     /**
      * @api
      * @template T

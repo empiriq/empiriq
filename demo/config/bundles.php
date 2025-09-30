@@ -5,5 +5,6 @@ return [
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
     Empiriq\BinanceBackTradeBundle\BinanceBackTradeBundle::class => ['backtrade' => true],
     Empiriq\BinanceTradeBundle\BinanceTradeBundle::class => ['realtrade' => true],
+    Empiriq\BinanceManagerBundle\BinanceManagerBundle::class => ['realtrade' => true],
     Empiriq\TerminalBundle\TerminalBundle::class => ['all' => true],
 ];

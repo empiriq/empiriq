@@ -10,29 +10,19 @@ use React\Promise\PromiseInterface;
  */
 interface RunnableInterface
 {
-    /**
-     * High priority for exchange connectors.
-     * These should run before other services.
-     */
     public const EXCHANGE_CONNECTOR_PRIORITY = 1000;
 
-    /**
-     * Lower priority for socket servers.
-     * These should run after connectors.
-     */
     public const SOCKET_SERVER_PRIORITY = 900;
 
+    public const REPOSITORY_PRIORITY = 800;
+
     /**
-     * Start the service.
-     *
-     * @return PromiseInterface Resolves when the service is running.
+     * @return PromiseInterface<self> Resolves when the service is running.
      */
     public function run(): PromiseInterface;
 
     /**
-     * Stop the service.
-     *
-     * @return PromiseInterface Resolves when the service is fully stopped.
+     * @return PromiseInterface<self> Resolves when the service is fully stopped.
      */
     public function shutdown(): PromiseInterface;
 

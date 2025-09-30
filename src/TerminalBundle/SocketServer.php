@@ -3,12 +3,10 @@
 namespace Empiriq\TerminalBundle;
 
 use Empiriq\Contracts\RunnableInterface;
-use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Socket\ConnectionInterface;
 use React\Socket\SocketServer as ReactSocketServer;
 use SplObjectStorage;
-use Symfony\Component\Console\Command\Command;
 use Throwable;
 
 use function React\Promise\resolve;
@@ -24,14 +22,13 @@ final class SocketServer implements RunnableInterface
     public function __construct(
         private readonly string $serverUri,
         private readonly TerminalApplication $terminalApplication,
-        private readonly SplObjectStorage $clientConnection = new SplObjectStorage(),
-        private readonly Deferred $deferred = new Deferred()
+        private readonly SplObjectStorage $clientConnection = new SplObjectStorage()
     ) {
     }
 
     /**
      * Start the socket server and listen for connections.
-     * @return PromiseInterface<int> Promise resolving when the server stops.
+     * @return PromiseInterface<self>
      */
     #[\Override]
     public function run(): PromiseInterface
@@ -41,7 +38,7 @@ final class SocketServer implements RunnableInterface
         $this->socketServer->on('close', [$this, '__close']);
         $this->socketServer->on('error', [$this, '__error']);
 
-        return $this->deferred->promise();
+        return resolve($this);
     }
 
     /**
@@ -76,7 +73,6 @@ final class SocketServer implements RunnableInterface
      */
     public function __close(): void
     {
-        $this->deferred->resolve(Command::SUCCESS);
     }
 
     /**
@@ -85,6 +81,5 @@ final class SocketServer implements RunnableInterface
      */
     public function __error(Throwable $e): void
     {
-        $this->deferred->reject($e);
     }
 }
