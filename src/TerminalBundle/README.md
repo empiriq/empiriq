@@ -1,6 +1,20 @@
 Terminal Bundle
 ===
 
+## Installation
+
+```bash
+composer require empiriq/terminal-bundle
+```
+
+Then register the bundle in your config/bundles.php:
+
+```php
+return [
+    Empiriq\TerminalBundle\TerminalBundle::class => ['all' => true],
+];
+```
+
 ## Connecting a Client
 
 You can connect to the Terminal server using standard UNIX tools.  

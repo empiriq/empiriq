@@ -14,14 +14,22 @@ Binance Trade Bundle
 
 # Transports
 
-[Derivatives/FuturesCoinM](src/Derivatives/FuturesCoinM)
+[Derivatives/FuturesCoinM](Derivatives/FuturesCoinM)
 
-[Derivatives/FuturesUsdM](src/Derivatives/FuturesUsdM)
+[Derivatives/FuturesUsdM](Derivatives/FuturesUsdM)
 
-[Spot/Spot](src/Spot/Spot)
+[Spot/Spot](Spot/Spot)
 
-# Connector
+## Installation
 
-# FAQ
+```bash
+composer require empiriq/binance-trade-bundle
+```
 
-- Выполнить кастомный метод
+Then register the bundle in your config/bundles.php:
+
+```php
+return [
+    Empiriq\BinanceTradeBundle\BinanceTradeBundle::class => ['all' => true],
+];
+```
