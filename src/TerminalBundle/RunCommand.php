@@ -61,7 +61,6 @@ final class RunCommand extends Command implements SignalableCommandInterface
     {
         $name = $signal === SIGINT ? 'SIGINT' : 'SIGTERM';
         $this->logger->info("Received {$name}, shutting down…");
-
         try {
             $this->shutdownByPriority($this->runners);
         } catch (Throwable $e) {
@@ -73,22 +72,47 @@ final class RunCommand extends Command implements SignalableCommandInterface
         return $previousExitCode;
     }
 
+    /**
+     * @throws Throwable
+     */
     private function runByPriority(iterable $runners): void
     {
-        foreach ($this->groupByPriority($runners, 'DESC') as $priority => $group) {
-            $this->logger->info("Starting group priority {$priority}");
-            $promises = [];
-            foreach ($group as $runner) {
-                $this->logger->info(sprintf('Running: %s', $runner::class));
-                $promises[] = $runner->run();
+        $started = [];
+        try {
+            foreach ($this->groupByPriority($runners, true) as $priority => $group) {
+                $this->logger->info("Starting group priority {$priority}");
+                $promises = [];
+                foreach ($group as $runner) {
+                    $this->logger->info(sprintf('Running: %s', $runner::class));
+                    $promises[] = $runner->run()->then(function ($result) use ($runner, &$started) {
+                        $started[] = $runner;
+                        return $result;
+                    });
+                }
+                await(all($promises));
             }
-            await(all($promises));
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf('Startup error: %s (%s)', $e->getMessage(), $e::class));
+            if (!empty($started)) {
+                $this->logger->info('Rolling back started services…');
+                try {
+                    $this->shutdownByPriority($started);
+                } catch (Throwable $shutdownError) {
+                    $this->logger->error(
+                        sprintf('Rollback error: %s (%s)', $shutdownError->getMessage(), $shutdownError::class)
+                    );
+                }
+            }
+            throw $e;
         }
     }
 
+    /**
+     * @throws Throwable
+     */
     private function shutdownByPriority(iterable $runners): void
     {
-        foreach ($this->groupByPriority($runners, 'ASC') as $priority => $group) {
+        foreach ($this->groupByPriority($runners) as $priority => $group) {
             $this->logger->info("Stopping group priority {$priority}");
             $promises = [];
             foreach ($group as $runner) {
@@ -103,16 +127,16 @@ final class RunCommand extends Command implements SignalableCommandInterface
      * @param iterable<RunnableInterface> $runners
      * @return array<int, RunnableInterface[]>
      */
-    private function groupByPriority(iterable $runners, string $direction = 'ASC'): array
+    private function groupByPriority(iterable $runners, bool $reverse = false): array
     {
         $groups = [];
         foreach ($runners as $runner) {
             $groups[$runner->getPriority()][] = $runner;
         }
-        if ($direction === 'ASC') {
-            ksort($groups);
-        } else {
+        if ($reverse) {
             krsort($groups);
+        } else {
+            ksort($groups);
         }
 
         return $groups;
