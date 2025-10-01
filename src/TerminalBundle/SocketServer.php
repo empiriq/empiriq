@@ -17,10 +17,11 @@ use function React\Promise\resolve;
  */
 final class SocketServer implements RunnableInterface
 {
-    private ?ReactSocketServer $socketServer = null;
+    private ?ReactSocketServer $server = null;
 
     public function __construct(
-        private readonly string $serverUri,
+        private readonly string $uri,
+        private readonly array $context,
         private readonly TerminalApplication $terminalApplication,
         private readonly SplObjectStorage $clientConnection = new SplObjectStorage()
     ) {
@@ -33,10 +34,10 @@ final class SocketServer implements RunnableInterface
     #[\Override]
     public function run(): PromiseInterface
     {
-        $this->socketServer = new ReactSocketServer($this->serverUri, []);
-        $this->socketServer->on('connection', [$this, '__connection']);
-        $this->socketServer->on('close', [$this, '__close']);
-        $this->socketServer->on('error', [$this, '__error']);
+        $this->server = new ReactSocketServer($this->uri, $this->context);
+        $this->server->on('connection', [$this, '__connection']);
+        $this->server->on('close', [$this, '__close']);
+        $this->server->on('error', [$this, '__error']);
 
         return resolve($this);
     }

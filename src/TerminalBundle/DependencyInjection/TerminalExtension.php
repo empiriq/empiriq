@@ -17,14 +17,14 @@ final class TerminalExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-        $serverUri = $config['serverUri'];
 
         $container->register(TerminalApplication::class)
             ->setAutowired(true)
             ->setAutoconfigured(true);
 
         $container->register(SocketServer::class)
-            ->addArgument($serverUri)
+            ->addArgument($config['uri'])
+            ->addArgument($config['context'])
             ->addArgument(new Reference(TerminalApplication::class))
             ->addTag('empiriq.runnable');
 

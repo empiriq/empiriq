@@ -15,7 +15,15 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder
             ->getRootNode()
             ->children()
-            ->scalarNode('serverUri')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('uri')
+                    ->isRequired()
+                    ->cannotBeEmpty()
+                ->end()
+                ->arrayNode('context')
+                    ->normalizeKeys(false)
+                    ->variablePrototype()->end()
+                    ->defaultValue([])
+                ->end()
             ->end();
 
         return $treeBuilder;
