@@ -60,7 +60,7 @@ final class RunCommand extends Command implements SignalableCommandInterface
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         $name = $signal === SIGINT ? 'SIGINT' : 'SIGTERM';
-        $this->logger->info("Received {$name}, shutting down…");
+        $this->logger->info(sprintf('Received %s, shutting down...', $name));
         try {
             $this->shutdownByPriority($this->runners);
         } catch (Throwable $e) {
@@ -80,7 +80,7 @@ final class RunCommand extends Command implements SignalableCommandInterface
         $started = [];
         try {
             foreach ($this->groupByPriority($runners, true) as $priority => $group) {
-                $this->logger->info("Starting group priority {$priority}");
+                $this->logger->info(sprintf('Starting group priority %s', $priority));
                 $promises = [];
                 foreach ($group as $runner) {
                     $this->logger->info(sprintf('Running: %s', $runner::class));
@@ -94,7 +94,7 @@ final class RunCommand extends Command implements SignalableCommandInterface
         } catch (Throwable $e) {
             $this->logger->error(sprintf('Startup error: %s (%s)', $e->getMessage(), $e::class));
             if (!empty($started)) {
-                $this->logger->info('Rolling back started services…');
+                $this->logger->info('Rolling back started services...');
                 try {
                     $this->shutdownByPriority($started);
                 } catch (Throwable $shutdownError) {
@@ -113,7 +113,7 @@ final class RunCommand extends Command implements SignalableCommandInterface
     private function shutdownByPriority(iterable $runners): void
     {
         foreach ($this->groupByPriority($runners) as $priority => $group) {
-            $this->logger->info("Stopping group priority {$priority}");
+            $this->logger->info(sprintf('Stopping group priority %s', $priority));
             $promises = [];
             foreach ($group as $runner) {
                 $this->logger->info(sprintf('Shutdown: %s', $runner::class));
