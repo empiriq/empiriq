@@ -70,7 +70,7 @@ final class RunCommand extends Command implements SignalableCommandInterface
         }
         $this->logger->info('Shutdown complete');
 
-        return false;
+        return $previousExitCode;
     }
 
     private function runByPriority(iterable $runners): void

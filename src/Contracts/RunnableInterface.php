@@ -12,9 +12,9 @@ interface RunnableInterface
 {
     public const EXCHANGE_CONNECTOR_PRIORITY = 1000;
 
-    public const SOCKET_SERVER_PRIORITY = 900;
+    public const REPOSITORY_PRIORITY = 900;
 
-    public const REPOSITORY_PRIORITY = 800;
+    public const SOCKET_SERVER_PRIORITY = 500;
 
     /**
      * @return PromiseInterface<self> Resolves when the service is running.
