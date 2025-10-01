@@ -39,6 +39,7 @@ class Connector implements ExchangeConnectorInterface, RunnableInterface
     #[\Override]
     public function run(): PromiseInterface
     {
+        // todo resolve immediately
         $eventIterator = new ParallelIterator(
             array_map(fn(ReceiverInterface $market) => $market->run($this->serializer), $this->markets)
         );

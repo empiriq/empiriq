@@ -7,9 +7,10 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 final class Configuration implements ConfigurationInterface
 {
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('binance_history_connector');
+        $treeBuilder = new TreeBuilder('binance_back_trade');
         $treeBuilder->getRootNode()
             ->children()
             ->scalarNode('symbol')->isRequired()->cannotBeEmpty()->end()

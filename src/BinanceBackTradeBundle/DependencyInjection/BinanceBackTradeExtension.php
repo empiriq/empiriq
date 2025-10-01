@@ -10,8 +10,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Reference;
 
-final class BinanceHistoryConnectorExtension extends Extension
+final class BinanceBackTradeExtension extends Extension
 {
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container)
     {
         // 1. Читаем конфиг
