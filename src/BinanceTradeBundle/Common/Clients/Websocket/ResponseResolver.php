@@ -57,7 +57,6 @@ abstract class ResponseResolver extends RequestSender
     {
         $pending = new PendingRequest($request['id'], new Deferred(), $request, $type);
         $this->pending[$pending->id] = $pending;
-        $this->logger->info(sprintf('Created pending request (id: %s)', $pending->id));
 
         return timeout($pending->deferred->promise(), $this->resolverTimeout)
             ->catch(function (ReactTimeoutException $exception) use ($pending) {

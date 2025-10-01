@@ -49,6 +49,8 @@ final class SocketServer implements RunnableInterface
     #[\Override]
     public function shutdown(): PromiseInterface
     {
+        $this->server->close();
+
         return resolve($this);
     }
 
