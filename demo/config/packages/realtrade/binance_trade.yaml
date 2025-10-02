@@ -1,6 +1,10 @@
 binance_trade:
     api_key: '%env(BINANCE_API_KEY)%'
-    api_secret: '%env(BINANCE_API_SECRET)%'
+    signer:
+        class: 'Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner'
+        arguments: ['%env(BINANCE_API_SECRET)%']
+#        class: 'Empiriq\BinanceTradeBundle\Common\Signers\Ed25519Signer'
+#        arguments: ['%env(EMPIRIQ_BINANCE_CONNECTOR_WEBSOCKET_SIGNER_PRIVATE_KEY_PATH)%']
     transports:
         futures_usd:
             rest_api_uri: 'https://testnet.binancefuture.com'
