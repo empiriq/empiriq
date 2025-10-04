@@ -2,7 +2,7 @@
     "name": "empiriq/binance-contracts",
     "minimum-stability": "alpha",
     "prefer-stable": true,
-    "description": "Framework designed for implementing your trading strategies",
+    "description": "Strongly-typed request, response, and event objects for Binance API",
     "keywords": ["empiriq-component", "binance", "binance-api", "binance-streams", "binance-websockets"],
     "type": "library",
     "license": "MIT",
