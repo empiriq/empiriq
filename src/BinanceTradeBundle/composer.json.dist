@@ -2,7 +2,7 @@
     "name": "empiriq/binance-trade-bundle",
     "minimum-stability": "alpha",
     "prefer-stable": true,
-    "description": "Framework designed for implementing your trading strategies",
+    "description": "Library for real-time trading on Binance via WebSocket and REST APIs",
     "keywords": ["empiriq-exchange-connector", "empiriq-bundle", "binance", "binance-api", "binance-streams", "binance-websockets"],
     "type": "library",
     "license": "MIT",
