@@ -1,8 +1,8 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Common\Clients\Websocket;
+namespace Empiriq\BinanceTradeBundle\Common\Clients\WebSocket;
 
-use Empiriq\BinanceTradeBundle\Common\Clients\Websocket\Dto\PendingRequest;
+use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\Dto\PendingRequest;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Binance\BinanceException;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Network\DisconnectedException;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Network\TimeoutException;
@@ -93,12 +93,6 @@ abstract class ResponseResolver extends RequestSender
             $item->deferred->reject($reason);
         }
         $this->pending = [];
-    }
-
-    #[\Override]
-    public function shutdown(): void
-    {
-        $this->connection->close();
     }
 
     #[\Override]

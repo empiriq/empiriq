@@ -8,8 +8,8 @@ use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationExce
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesCoinMStreamInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\TransportInterface;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\RestApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WebsocketApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WebsocketStreams;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WebSocketApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WebSocketStreams;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\AccountMethods;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\AuthenticationMethods;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\GeneralMethods;
@@ -34,14 +34,14 @@ readonly class FuturesCoinMTransport implements TransportInterface
     /**
      * @param FuturesCoinMStreamInterface[] $streams
      * @param RestApi $restApi
-     * @param WebsocketApi $websocketApi
-     * @param WebsocketStreams $websocketStreams
+     * @param WebSocketApi $websocketApi
+     * @param WebSocketStreams $websocketStreams
      */
     public function __construct(
         private array $streams,
         private RestApi $restApi,
-        private WebsocketApi $websocketApi,
-        private WebsocketStreams $websocketStreams,
+        private WebSocketApi $websocketApi,
+        private WebSocketStreams $websocketStreams,
     ) {
         foreach ($this->streams as $stream) {
             if (!$stream instanceof FuturesCoinMStreamInterface) {
@@ -53,7 +53,7 @@ readonly class FuturesCoinMTransport implements TransportInterface
     public function run(): PromiseInterface
     {
         return all([
-            $this->websocketApi->run()->then(function () {
+            $this->websocketApi->initialize()->then(function () {
                 return $this->time();
             })->then(function (TimeResponse $response) {
                 $this->restApi->calculateTimeOffset($response->result->serverTime);
@@ -65,7 +65,7 @@ readonly class FuturesCoinMTransport implements TransportInterface
                 $this->websocketApi->setLoggedIn((bool)$response);
                 return $this;
             }),
-            $this->websocketStreams->run(),
+            $this->websocketStreams->initialize(),
         ])
             ->then(fn() => all(
                 array_map(
@@ -78,8 +78,8 @@ readonly class FuturesCoinMTransport implements TransportInterface
 
     public function shutdown(): void
     {
-        $this->websocketApi->shutdown();
-        $this->websocketStreams->shutdown();
+        $this->websocketApi->deinitialize();
+        $this->websocketStreams->deinitialize();
     }
 
     public function isLoggedIn(): bool

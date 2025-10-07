@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Common\Clients\Websocket;
+namespace Empiriq\BinanceTradeBundle\Common\Clients\WebSocket;
 
 use DateTime;
 use DateTimeZone;

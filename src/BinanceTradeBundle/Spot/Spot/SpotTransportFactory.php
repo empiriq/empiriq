@@ -10,8 +10,8 @@ use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\TransportInterface;
 use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\RestApi;
-use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WebsocketApi;
-use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WebsocketStreams;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WebSocketApi;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WebSocketStreams;
 use Empiriq\Contracts\SerializerInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
@@ -67,7 +67,7 @@ readonly class SpotTransportFactory
                 $this->sanitizer,
                 $this->resolverTimeout,
             ),
-            new WebsocketApi(
+            new WebSocketApi(
                 $this->dispatcher,
                 $this->websocketApiUri,
                 $this->apiKey,
@@ -77,7 +77,7 @@ readonly class SpotTransportFactory
                 $this->sanitizer,
                 $this->resolverTimeout,
             ),
-            new WebsocketStreams(
+            new WebSocketStreams(
                 $this->dispatcher,
                 $this->websocketStreamsUri,
                 $this->serializer,

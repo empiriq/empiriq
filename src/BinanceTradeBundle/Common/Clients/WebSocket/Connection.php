@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Common\Clients\Websocket;
+namespace Empiriq\BinanceTradeBundle\Common\Clients\WebSocket;
 
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Network\ConnectionFailedException;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Network\DisconnectedException;
@@ -14,6 +14,7 @@ use Throwable;
 
 use function Ratchet\Client\connect;
 use function React\Promise\reject;
+use function React\Promise\resolve;
 
 abstract class Connection
 {
@@ -22,7 +23,7 @@ abstract class Connection
     protected LoggerInterface $logger;
     protected ?WebSocket $connection = null;
 
-    public function run(): PromiseInterface
+    public function initialize(): PromiseInterface
     {
         return connect($this->uri)->then(function (WebSocket $connection) {
             $this->logger->info(sprintf('WebSocket connected (uri: %s)', $this->uri));
@@ -40,10 +41,12 @@ abstract class Connection
         });
     }
 
-    public function shutdown(): void
+    public function deinitialize(): PromiseInterface
     {
         $this->logger->info(sprintf('WebSocket disconnect requested (uri: %s)', $this->uri));
         $this->connection?->close();
+
+        return resolve($this);
     }
 
     protected function getConnection(): WebSocket

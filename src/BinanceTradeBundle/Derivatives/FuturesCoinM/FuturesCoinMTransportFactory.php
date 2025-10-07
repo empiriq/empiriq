@@ -10,8 +10,8 @@ use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesCoinMStreamInter
 use Empiriq\BinanceTradeBundle\Common\Interfaces\TransportInterface;
 use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\RestApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WebsocketApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WebsocketStreams;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WebSocketApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WebSocketStreams;
 use Empiriq\Contracts\SerializerInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
@@ -68,7 +68,7 @@ readonly class FuturesCoinMTransportFactory
                 $this->sanitizer,
                 $this->resolverTimeout,
             ),
-            new WebsocketApi(
+            new WebSocketApi(
                 $this->dispatcher,
                 $this->websocketApiUri,
                 $this->apiKey,
@@ -78,7 +78,7 @@ readonly class FuturesCoinMTransportFactory
                 $this->sanitizer,
                 $this->resolverTimeout,
             ),
-            new WebsocketStreams(
+            new WebSocketStreams(
                 $this->dispatcher,
                 $this->websocketStreamsUri,
                 $this->serializer,

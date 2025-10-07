@@ -6,8 +6,8 @@ use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationExce
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\TransportInterface;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\RestApi;
-use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WebsocketApi;
-use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WebsocketStreams;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WebSocketApi;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WebSocketStreams;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\AccountMethods;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\AuthenticationMethods;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\GeneralMethods;
@@ -34,14 +34,14 @@ readonly class SpotTransport implements TransportInterface
     /**
      * @param SpotStreamInterface[] $streams
      * @param RestApi $restApi
-     * @param WebsocketApi $websocketApi
-     * @param WebsocketStreams $websocketStreams
+     * @param WebSocketApi $websocketApi
+     * @param WebSocketStreams $websocketStreams
      */
     public function __construct(
         private array $streams,
         private RestApi $restApi,
-        private WebsocketApi $websocketApi,
-        private WebsocketStreams $websocketStreams,
+        private WebSocketApi $websocketApi,
+        private WebSocketStreams $websocketStreams,
     ) {
         foreach ($this->streams as $stream) {
             if (!$stream instanceof SpotStreamInterface) {
@@ -53,7 +53,7 @@ readonly class SpotTransport implements TransportInterface
     public function run(): PromiseInterface
     {
         return all([
-            $this->websocketApi->run()->then(function () {
+            $this->websocketApi->initialize()->then(function () {
                 return $this->time();
             })->then(function (TimeResponse $response) {
                 $this->restApi->calculateTimeOffset($response->result->serverTime);
@@ -65,7 +65,7 @@ readonly class SpotTransport implements TransportInterface
                 $this->websocketApi->setLoggedIn((bool)$response);
                 return $this;
             }),
-            $this->websocketStreams->run(),
+            $this->websocketStreams->initialize(),
         ])
             ->then(fn() => all(array_map(fn(SpotStreamInterface $stream) => $stream->subscribe($this), $this->streams)))
             ->then(fn() => $this);
@@ -73,8 +73,8 @@ readonly class SpotTransport implements TransportInterface
 
     public function shutdown(): void
     {
-        $this->websocketApi->shutdown();
-        $this->websocketStreams->shutdown();
+        $this->websocketApi->deinitialize();
+        $this->websocketStreams->deinitialize();
     }
 
     public function isLoggedIn(): bool

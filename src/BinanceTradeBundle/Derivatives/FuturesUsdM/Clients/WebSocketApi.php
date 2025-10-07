@@ -1,36 +1,36 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients;
+namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients;
 
-use Empiriq\BinanceTradeBundle\Common\Clients\Websocket\ResponseResolver;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\ClientInterface;
+use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
-use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Common\EventInterface;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
+use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\EventInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Handles WebSocket connections to Binance USD Margined Futures market streams.
- *
- * Aggregates multiple FuturesCmStreamInterface implementations into a single web socket connection,
- * deserializes incoming messages into FuturesCmEvent objects, and dispatch via EventDispatcher.
- *
- * @see https://developers.binance.com/docs/derivatives/coin-margined-futures/websocket-market-streams
+ * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-api-general-info
  */
-final class WebsocketStreams extends ResponseResolver implements ClientInterface
+final class WebSocketApi extends ResponseResolver implements WebSocketClientInterface
 {
     /**
      * @param EventDispatcherInterface $dispatcher
-     * @param string $uri
-     * @param SerializerInterface $serializer
-     * @param LoggerInterface $logger
-     * @param SanitizerInterface $sanitizer
+     * @param string $apiKey
+     * @param SignerInterface $signer
+     * @param string $uri Testnet by default, the main: wss://ws-fapi.binance.com/ws-fapi/v1
      * @param float $resolverTimeout
+     * @param SerializerInterface $serializer
+     * @param SanitizerInterface $sanitizer
+     * @param LoggerInterface $logger
      */
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
         protected string $uri,
+        protected string $apiKey,
+        protected SignerInterface $signer,
         protected SerializerInterface $serializer,
         protected LoggerInterface $logger,
         protected SanitizerInterface $sanitizer,
@@ -47,7 +47,7 @@ final class WebsocketStreams extends ResponseResolver implements ClientInterface
     #[\Override]
     protected static function extractRawEvent(array $data): ?array
     {
-        return isset($data['e']) ? $data : null;
+        return $data['event'] ?? null;
     }
 
     #[\Override]

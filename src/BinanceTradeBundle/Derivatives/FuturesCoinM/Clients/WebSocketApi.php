@@ -1,29 +1,26 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Spot\Spot\Clients;
+namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients;
 
-use Empiriq\BinanceTradeBundle\Common\Clients\Websocket\ResponseResolver;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\ClientInterface;
+use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
-use Empiriq\BinanceContracts\Spot\Spot\Common\EventInterface;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
+use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Common\EventInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Handles WebSocket connections to Binance Spot market streams.
- *
- * Aggregates multiple SpotStreamInterface implementations into a single WebSocket connection,
- * deserializes incoming messages into SpotEvent objects, and dispatch via EventDispatcher.
- *
- * @see https://developers.binance.com/docs/binance-spot-api-docs/testnet/web-socket-streams
- * @see https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams
+ * @see https://developers.binance.com/docs/derivatives/coin-margined-futures/websocket-api-general-info
  */
-final class WebsocketStreams extends ResponseResolver implements ClientInterface
+final class WebSocketApi extends ResponseResolver implements WebSocketClientInterface
 {
     /**
      * @param EventDispatcherInterface $dispatcher
      * @param string $uri
+     * @param string $apiKey
+     * @param SignerInterface $signer
      * @param SerializerInterface $serializer
      * @param LoggerInterface $logger
      * @param SanitizerInterface $sanitizer
@@ -32,6 +29,8 @@ final class WebsocketStreams extends ResponseResolver implements ClientInterface
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
         protected string $uri,
+        protected string $apiKey,
+        protected SignerInterface $signer,
         protected SerializerInterface $serializer,
         protected LoggerInterface $logger,
         protected SanitizerInterface $sanitizer,
@@ -48,7 +47,7 @@ final class WebsocketStreams extends ResponseResolver implements ClientInterface
     #[\Override]
     protected static function extractRawEvent(array $data): ?array
     {
-        return isset($data['e']) ? $data : null;
+        return $data['event'] ?? null;
     }
 
     #[\Override]

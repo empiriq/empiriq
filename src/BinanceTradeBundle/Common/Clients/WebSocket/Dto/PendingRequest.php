@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Common\Clients\Websocket\Dto;
+namespace Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\Dto;
 
 use React\Promise\Deferred;
 

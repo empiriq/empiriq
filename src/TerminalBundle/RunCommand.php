@@ -21,7 +21,7 @@ use const SIGTERM;
  * @api Console command to run and gracefully stop runnable services.
  */
 #[AsCommand('run', 'Run all runnable services')]
-final class RunCommand extends Command // implements SignalableCommandInterface
+final class RunCommand extends Command implements SignalableCommandInterface
 {
     /**
      * @param iterable<RunnableInterface> $runners
@@ -47,30 +47,30 @@ final class RunCommand extends Command // implements SignalableCommandInterface
         return Command::SUCCESS;
     }
 
-//    #[\Override]
-//    public function getSubscribedSignals(): array
-//    {
-//        return [
-//            SIGINT, // Ctrl+C
-//            SIGTERM, // kill
-//        ];
-//    }
+    #[\Override]
+    public function getSubscribedSignals(): array
+    {
+        return [
+            SIGINT, // Ctrl+C
+            SIGTERM, // kill
+        ];
+    }
 
-//    #[\Override]
-//    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
-//    {
-//        $name = $signal === SIGINT ? 'SIGINT' : 'SIGTERM';
-//        $this->logger->info(sprintf('Received %s, shutting down...', $name));
-//        try {
-//            $this->shutdownByPriority($this->runners);
-//        } catch (Throwable $e) {
-//            $this->logger->error(sprintf('Shutdown error: %s', $e->getMessage()));
-//            return Command::FAILURE;
-//        }
-//        $this->logger->info('Shutdown complete');
-//
-//        return $previousExitCode;
-//    }
+    #[\Override]
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    {
+        $name = $signal === SIGINT ? 'SIGINT' : 'SIGTERM';
+        $this->logger->info(sprintf('Received %s, shutting down...', $name));
+        try {
+            $this->shutdownByPriority($this->runners);
+        } catch (Throwable $e) {
+            $this->logger->error(sprintf('Shutdown error: %s', $e->getMessage()));
+            return Command::FAILURE;
+        }
+        $this->logger->info('Shutdown complete');
+
+        return $previousExitCode;
+    }
 
     /**
      * @throws Throwable

@@ -1,24 +1,24 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients;
+namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients;
 
-use Empiriq\BinanceTradeBundle\Common\Clients\Websocket\ResponseResolver;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\ClientInterface;
+use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
-use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\EventInterface;
+use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Common\EventInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Handles WebSocket connections to Binance Coin Margined Futures market streams.
+ * Handles WebSocket connections to Binance USD Margined Futures market streams.
  *
- * Aggregates multiple FuturesUmStreamInterface implementations into a single WebSocket connection,
- * deserializes incoming messages into FuturesUmEvent objects, and dispatch via EventDispatcher.
+ * Aggregates multiple FuturesCmStreamInterface implementations into a single web socket connection,
+ * deserializes incoming messages into FuturesCmEvent objects, and dispatch via EventDispatcher.
  *
- * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-market-streams
+ * @see https://developers.binance.com/docs/derivatives/coin-margined-futures/websocket-market-streams
  */
-final class WebsocketStreams extends ResponseResolver implements ClientInterface
+final class WebSocketStreams extends ResponseResolver implements WebSocketClientInterface
 {
     /**
      * @param EventDispatcherInterface $dispatcher

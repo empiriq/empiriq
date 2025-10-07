@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Common\Clients\Websocket;
+namespace Empiriq\BinanceTradeBundle\Common\Clients\WebSocket;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Throwable;

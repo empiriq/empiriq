@@ -1,34 +1,31 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients;
+namespace Empiriq\BinanceTradeBundle\Spot\Spot\Clients;
 
-use Empiriq\BinanceTradeBundle\Common\Clients\Websocket\ResponseResolver;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\ClientInterface;
+use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
-use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\EventInterface;
+use Empiriq\BinanceContracts\Spot\Spot\Common\EventInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Serializer\Encoder\DecoderInterface;
-use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-api-general-info
+ * @see https://developers.binance.com/docs/binance-spot-api-docs/testnet/websocket-api/general-api-information
+ * @see https://developers.binance.com/docs/binance-spot-api-docs/websocket-api/general-api-information
  */
-final class WebsocketApi extends ResponseResolver implements ClientInterface
+final class WebSocketApi extends ResponseResolver implements WebSocketClientInterface
 {
     /**
      * @param EventDispatcherInterface $dispatcher
+     * @param string $uri
      * @param string $apiKey
      * @param SignerInterface $signer
-     * @param string $uri Testnet by default, the main: wss://ws-fapi.binance.com/ws-fapi/v1
-     * @param float $resolverTimeout
      * @param SerializerInterface $serializer
-     * @param SanitizerInterface $sanitizer
      * @param LoggerInterface $logger
+     * @param SanitizerInterface $sanitizer
+     * @param float $resolverTimeout
      */
     public function __construct(
         protected EventDispatcherInterface $dispatcher,

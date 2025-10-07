@@ -10,6 +10,7 @@ use Empiriq\BinanceTradeBundle\Spot\Spot\SpotTransport;
 use Empiriq\Contracts\ExchangeConnectorInterface;
 use Empiriq\Contracts\RunnableInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use React\Promise\PromiseInterface;
 use Throwable;
 
@@ -27,7 +28,7 @@ readonly class Connector implements ExchangeConnectorInterface, RunnableInterfac
      */
     public function __construct(
         private array $transports,
-        private LoggerInterface $logger,
+        private LoggerInterface $logger = new NullLogger(),
     ) {
         foreach ($this->transports as $transport) {
             if (!$transport instanceof TransportInterface) {

@@ -3,8 +3,8 @@
 namespace Empiriq\BinanceTradeBundle\DependencyInjection;
 
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebsocketApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebsocketStreams;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketStreams;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMTransport;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\TradeStream;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -43,9 +43,9 @@ final class Configuration implements ConfigurationInterface
                             'transport_class'              => FuturesUsdMTransport::class,
                             'rest_api_class'               => RestApi::class,
                             'rest_api_uri'                 => 'https://fapi.binance.com',
-                            'websocket_api_class'          => WebsocketApi::class,
+                            'websocket_api_class'          => WebSocketApi::class,
                             'websocket_api_uri'            => 'wss://ws-fapi.binance.com/ws-fapi/v1',
-                            'websocket_streams_class'      => WebsocketStreams::class,
+                            'websocket_streams_class'      => WebSocketStreams::class,
                             'websocket_market_streams_uri' => 'wss://fstream.binance.com/ws',
                             'streams' => [
                                 'trade' => TradeStream::class,
@@ -75,13 +75,13 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue($defaults['rest_api_uri'] ?? 'https://fapi.binance.com')
                 ->end()
                 ->scalarNode('websocket_api_class')
-                    ->defaultValue($defaults['websocket_api_class'] ?? WebsocketApi::class)
+                    ->defaultValue($defaults['websocket_api_class'] ?? WebSocketApi::class)
                 ->end()
                 ->scalarNode('websocket_api_uri')
                     ->defaultValue($defaults['websocket_api_uri'] ?? 'wss://ws-fapi.binance.com/ws-fapi/v1')
                 ->end()
                 ->scalarNode('websocket_streams_class')
-                    ->defaultValue($defaults['websocket_streams_class'] ?? WebsocketStreams::class)
+                    ->defaultValue($defaults['websocket_streams_class'] ?? WebSocketStreams::class)
                 ->end()
                 ->scalarNode('websocket_market_streams_uri')
                     ->defaultValue($defaults['websocket_market_streams_uri'] ?? 'wss://fstream.binance.com/ws')

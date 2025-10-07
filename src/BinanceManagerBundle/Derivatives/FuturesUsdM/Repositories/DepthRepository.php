@@ -2,7 +2,7 @@
 
 namespace Empiriq\BinanceManagerBundle\Derivatives\FuturesUsdM\Repositories;
 
-use Empiriq\BinanceTradeBundle\Common\Interfaces\ClientInterface;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
 use Empiriq\BinanceTradeBundle\Connector;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\Market\DepthEvent;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\MarketData\Results\DepthResult;
