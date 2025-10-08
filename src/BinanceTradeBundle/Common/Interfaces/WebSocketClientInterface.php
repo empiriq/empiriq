@@ -9,10 +9,10 @@ interface WebSocketClientInterface
     /**
      * @return PromiseInterface<self>
      */
-    public function initialize(): PromiseInterface;
+    public function connect(): PromiseInterface;
 
     /**
      * @return PromiseInterface<self>
      */
-    public function deinitialize(): PromiseInterface;
+    public function disconnect(): PromiseInterface;
 }

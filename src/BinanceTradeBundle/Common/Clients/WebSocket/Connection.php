@@ -23,7 +23,7 @@ abstract class Connection
     protected LoggerInterface $logger;
     protected ?WebSocket $connection = null;
 
-    public function initialize(): PromiseInterface
+    public function connect(): PromiseInterface
     {
         return connect($this->uri)->then(function (WebSocket $connection) {
             $this->logger->info(sprintf('WebSocket connected (uri: %s)', $this->uri));
@@ -41,7 +41,7 @@ abstract class Connection
         });
     }
 
-    public function deinitialize(): PromiseInterface
+    public function disconnect(): PromiseInterface
     {
         $this->logger->info(sprintf('WebSocket disconnect requested (uri: %s)', $this->uri));
         $this->connection?->close();

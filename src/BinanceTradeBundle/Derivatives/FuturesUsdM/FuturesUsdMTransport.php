@@ -55,7 +55,7 @@ readonly class FuturesUsdMTransport implements TransportInterface
     public function run(): PromiseInterface
     {
         return all([
-            $this->websocketApi->initialize()->then(function () {
+            $this->websocketApi->connect()->then(function () {
                 return $this->time();
             })->then(function (TimeResponse $response) {
                 $this->restApi->calculateTimeOffset($response->result->serverTime);
@@ -67,7 +67,7 @@ readonly class FuturesUsdMTransport implements TransportInterface
                 $this->websocketApi->setLoggedIn((bool)$response);
                 return $this;
             }),
-            $this->websocketStreams->initialize(),
+            $this->websocketStreams->connect(),
         ])
             ->then(
                 fn() => all(
@@ -79,8 +79,8 @@ readonly class FuturesUsdMTransport implements TransportInterface
 
     public function shutdown(): void
     {
-        $this->websocketApi->deinitialize();
-        $this->websocketStreams->deinitialize();
+        $this->websocketApi->disconnect();
+        $this->websocketStreams->disconnect();
     }
 
     public function isLoggedIn(): bool
