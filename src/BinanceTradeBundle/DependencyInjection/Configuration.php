@@ -22,7 +22,7 @@ final class Configuration implements ConfigurationInterface
         $root
             ->children()
                 ->scalarNode('api_key')->defaultNull()->end()
-                ->integerNode('resolver_timeout')->defaultValue(10)->end()
+                ->integerNode('resolver_timeout')->defaultValue(5)->end()
                 ->arrayNode('signer')
                     ->isRequired()
                     ->children()

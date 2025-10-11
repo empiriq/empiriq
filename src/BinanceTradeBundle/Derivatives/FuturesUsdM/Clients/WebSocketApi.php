@@ -3,13 +3,17 @@
 namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients;
 
 use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
+use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
+use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\EventInterface;
+use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-api-general-info
@@ -18,23 +22,23 @@ final class WebSocketApi extends ResponseResolver implements WebSocketClientInte
 {
     /**
      * @param EventDispatcherInterface $dispatcher
+     * @param string $uri Testnet: wss://testnet.binancefuture.com/ws-fapi/v1
      * @param string $apiKey
      * @param SignerInterface $signer
-     * @param string $uri Testnet by default, the main: wss://ws-fapi.binance.com/ws-fapi/v1
-     * @param float $resolverTimeout
      * @param SerializerInterface $serializer
-     * @param SanitizerInterface $sanitizer
      * @param LoggerInterface $logger
+     * @param SanitizerInterface $sanitizer
+     * @param float $resolverTimeout
      */
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
-        protected string $uri,
-        protected string $apiKey,
-        protected SignerInterface $signer,
-        protected SerializerInterface $serializer,
-        protected LoggerInterface $logger,
-        protected SanitizerInterface $sanitizer,
-        protected float $resolverTimeout,
+        protected string $uri = 'wss://ws-fapi.binance.com/ws-fapi/v1',
+        protected string $apiKey = '',
+        protected SignerInterface $signer = new NullSigner(),
+        protected SerializerInterface $serializer = new Serializer(),
+        protected LoggerInterface $logger = new NullLogger(),
+        protected SanitizerInterface $sanitizer = new Sanitizer(),
+        protected float $resolverTimeout = 5,
     ) {
     }
 

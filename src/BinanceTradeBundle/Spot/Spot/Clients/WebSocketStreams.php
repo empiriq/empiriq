@@ -3,12 +3,15 @@
 namespace Empiriq\BinanceTradeBundle\Spot\Spot\Clients;
 
 use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
+use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
+use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceContracts\Spot\Spot\Common\EventInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Handles WebSocket connections to Binance Spot market streams.
@@ -31,11 +34,11 @@ final class WebSocketStreams extends ResponseResolver implements WebSocketClient
      */
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
-        protected string $uri,
-        protected SerializerInterface $serializer,
-        protected LoggerInterface $logger,
-        protected SanitizerInterface $sanitizer,
-        protected float $resolverTimeout,
+        protected string $uri = '', // todo set main net
+        protected SerializerInterface $serializer = new Serializer(),
+        protected LoggerInterface $logger = new NullLogger(),
+        protected SanitizerInterface $sanitizer = new Sanitizer(),
+        protected float $resolverTimeout = 5,
     ) {
     }
 

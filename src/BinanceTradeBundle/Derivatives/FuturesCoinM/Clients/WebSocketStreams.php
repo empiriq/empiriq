@@ -3,12 +3,15 @@
 namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients;
 
 use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
+use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
+use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Common\EventInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Handles WebSocket connections to Binance USD Margined Futures market streams.
@@ -22,7 +25,7 @@ final class WebSocketStreams extends ResponseResolver implements WebSocketClient
 {
     /**
      * @param EventDispatcherInterface $dispatcher
-     * @param string $uri
+     * @param string $uri testnet wss://dstream.binancefuture.com/ws
      * @param SerializerInterface $serializer
      * @param LoggerInterface $logger
      * @param SanitizerInterface $sanitizer
@@ -30,11 +33,11 @@ final class WebSocketStreams extends ResponseResolver implements WebSocketClient
      */
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
-        protected string $uri,
-        protected SerializerInterface $serializer,
-        protected LoggerInterface $logger,
-        protected SanitizerInterface $sanitizer,
-        protected float $resolverTimeout,
+        protected string $uri = 'wss://dstream.binance.com/ws',
+        protected SerializerInterface $serializer = new Serializer(),
+        protected LoggerInterface $logger = new NullLogger(),
+        protected SanitizerInterface $sanitizer = new Sanitizer(),
+        protected float $resolverTimeout = 5,
     ) {
     }
 
