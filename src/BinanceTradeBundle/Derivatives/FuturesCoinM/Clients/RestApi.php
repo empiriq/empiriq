@@ -3,9 +3,7 @@
 namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients;
 
 use Empiriq\BinanceTradeBundle\Common\Clients\Rest\RestClient;
-use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
 use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
 use Empiriq\Contracts\SerializerInterface;
@@ -24,21 +22,17 @@ final class RestApi extends RestClient
      * @param SignerInterface $signer
      * @param SerializerInterface $serializer
      * @param LoggerInterface $logger
-     * @param SanitizerInterface $sanitizer
+     * @param Browser $client
      * @param float $resolverTimeout
      */
     public function __construct(
-        string $uri = 'https://dapi.binance.com',
+        protected string $uri = 'https://dapi.binance.com',
         protected string $apiKey = '',
         protected SignerInterface $signer = new NullSigner(),
         protected SerializerInterface $serializer = new Serializer(),
         protected LoggerInterface $logger = new NullLogger(),
-        protected SanitizerInterface $sanitizer = new Sanitizer(),
-        float $resolverTimeout = 5,
+        protected Browser $client = new Browser(),
+        protected float $resolverTimeout = 5,
     ) {
-        $this->client = (new Browser())
-            ->withBase($uri)
-            ->withTimeout($resolverTimeout)
-            ->withHeader('Content-Type', 'application/x-www-form-urlencoded');
     }
 }

@@ -9,9 +9,7 @@ use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationExce
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Network\DisconnectedException;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\RuntimeException;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Serialization\SerializationException;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
-use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
 use Empiriq\Contracts\SerializerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -26,12 +24,13 @@ use function React\Promise\reject;
 
 abstract class RestClient
 {
-    protected Browser $client;
-    protected string $apiKey = '';
+    protected string $uri;
+    protected string $apiKey;
     protected SignerInterface $signer;
     protected SerializerInterface $serializer;
     protected LoggerInterface $logger;
-    protected SanitizerInterface $sanitizer;
+    protected Browser $client;
+    protected float $resolverTimeout = 5;
     private int $timeOffsetMs = 0;
 
     /**
@@ -56,6 +55,7 @@ abstract class RestClient
         $id = bin2hex(random_bytes(8));
         $headers = [];
         $params = [];
+        $body = '';
         try {
             if (!is_null($payload)) {
                 $params = (array)$this->serializer->normalize($payload);
@@ -70,22 +70,25 @@ abstract class RestClient
                 $params['timestamp'] = $this->calculateTimestamp();
                 $params['signature'] = $this->signer->createSignature($params);
             }
-            $this->logger->info(
-                sprintf('Sending request (id: %s) %s %s', $id, $method, $path),
-                $this->sanitizer->sanitize($params)
-            );
+            if ($method === 'GET') {
+                $path .= '?' . http_build_query($params);
+            } else {
+                $headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                $body .= http_build_query($params);
+            }
+            $this->logger->info(sprintf('Sending request (id: %s) %s %s %s', $id, $method, $path, $body));
 
-            return $this->client->request($method, $path, $headers, http_build_query($params))
+            return $this->client
+                ->withBase($this->uri)
+                ->withTimeout($this->resolverTimeout)
+                ->request($method, $path, $headers, $body)
                 ->then(function (Response $response) use ($id, $type): mixed {
                     $data = [
                         'id' => $id,
                         'status' => 200,
                         'result' => $this->serializer->decode($response->getBody()->getContents(), JsonEncoder::FORMAT),
                     ];
-                    $this->logger->info(
-                        sprintf('Received response (id: %s)', $id),
-                        $data['result'] ?? []
-                    );
+                    $this->logger->info(sprintf('Received response (id: %s)', $id), $data['result']);
 
                     return $this->serializer->denormalize($data, $type);
                 });
