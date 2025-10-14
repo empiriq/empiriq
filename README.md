@@ -1,20 +1,21 @@
 Empiriq Framework
 ===
 
-## Introduction
-
-High-performance algorithmic trading PHP framework providing quantitative traders with the ability to backtest 
-portfolios of automated trading strategies on historical data with an event-driven engine, and also deploy those 
+High-performance algorithmic trading PHP framework providing quantitative traders with the ability to backtest
+portfolios of automated trading strategies on historical data with an event-driven engine, and also deploy those
 same strategies live, with no code changes.
 
-## Features
+### Features
 
-- **Non-blocking**: Asynchronous, promise-based requests powered by [react/promise](https://github.com/reactphp/promise).
-- **Event-driven**: Exchange events are published directly into the [Symfony EventDispatcher](https://symfony.com/doc/current/components/event_dispatcher.html).
-- **Typed**: Strongly-typed entities and event objects via [empiriq/contracts](src/Contracts).
-- **WebSocket-native**: Requests and responses flow through the Binance WebSocket API for efficient real-time communication.
+- **Non-blocking:** Asynchronous, promise-based requests powered
+  by [react/promise](https://github.com/reactphp/promise).
+- **Event-driven:** Exchange events are published directly into
+  the [symfony/event-dispatcher](https://symfony.com/doc/current/components/event_dispatcher.html).
+- **Typed:** Strongly-typed request, response, and event objects
+  via [empiriq/binance-contracts](src/BinanceContracts).
+- **Fast:** Uses WebSocket endpoints when available to ensure speed, and falls back to REST when not.
 
-## Installation
+# Installation
 
 ```bash
 composer require empiriq/empiriq
