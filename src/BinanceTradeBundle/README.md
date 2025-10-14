@@ -65,7 +65,9 @@ Creating Binance API Credentials:
 - [For Testnet](https://www.binance.com/en/support/faq/detail/ab78f9a1b8824cf0a106b4229c76496d)
 
 ```php
-$signer = new Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner();
+$signer = new Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner(
+    secretKey: 'xxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXx'
+);
 ```
 
 ### REST API
@@ -79,9 +81,7 @@ signed requests with an `apiKey` and `secretKey`:
 $restApi = new Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi(
     uri: 'https://testnet.binancefuture.com',
     apiKey: 'XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0x',
-    signer: new Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner(
-        secretKey: 'xxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXx'
-    ),
+    signer: $signer,
 );
 ```
 
@@ -102,7 +102,8 @@ $restApi->send(
 
 <details>
 <summary>Response Example</summary>
-```php
+<pre>
+<code>
 class Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\AccountBalanceResponse#241 (4) {
   public readonly string $id =>
   string(16) "35d8cfe26a5618ca"
@@ -262,7 +263,8 @@ class Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\Account
   array(0) {
   }
 }
-```
+</code>
+</pre>
 </details>
 
 ### WebSocket API
