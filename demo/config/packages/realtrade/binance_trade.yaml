@@ -1,8 +1,8 @@
 binance_trade:
-    api_key: '%env(BINANCE_API_KEY)%'
+    api_key: '%env(TEST_HMAC_SHA_256_API_KEY)%'
     signer:
         class: 'Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner'
-        arguments: ['%env(BINANCE_API_SECRET)%']
+        arguments: ['%env(TEST_HMAC_SHA_256_SECRET_KEY)%']
 #        class: 'Empiriq\BinanceTradeBundle\Common\Signers\Ed25519Signer'
 #        arguments: ['%env(EMPIRIQ_BINANCE_CONNECTOR_WEBSOCKET_SIGNER_PRIVATE_KEY_PATH)%']
     transports:

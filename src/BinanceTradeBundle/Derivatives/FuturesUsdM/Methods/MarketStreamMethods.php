@@ -15,6 +15,7 @@ use React\Promise\PromiseInterface;
 trait MarketStreamMethods
 {
     /**
+     * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-market-streams/Live-Subscribing-Unsubscribing-to-streams#subscribe-to-a-stream
      * @param array $streams like ["btcusdt@aggTrade", "btcusdt@depth"]
      * @return PromiseInterface
      */

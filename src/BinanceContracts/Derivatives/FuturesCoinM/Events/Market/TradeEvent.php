@@ -6,6 +6,7 @@ use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Common\EventInterface;
 
 /**
  * @link https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams#trade-streams
+ * @link https://developers.binance.com/docs/derivatives/coin-margined-futures/websocket-market-streams/Aggregate-Trade-Streams
  */
 readonly class TradeEvent implements EventInterface
 {

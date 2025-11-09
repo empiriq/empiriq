@@ -65,7 +65,7 @@ Creating Binance API Credentials:
 - [For Testnet](https://www.binance.com/en/support/faq/detail/ab78f9a1b8824cf0a106b4229c76496d)
 
 ```php
-$signer = new Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner(
+$hmacSigner = new Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner(
     secretKey: 'xxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXxxxXxx0xXx'
 );
 ```
@@ -78,17 +78,18 @@ Let’s create a `RestApi` instance configured for the Binance Futures Testnet. 
 signed requests with an `apiKey` and `secretKey`:
 
 ```php
-$restApi = new Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi(
+$restFuturesUsdMApi = new Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi(
     uri: 'https://testnet.binancefuture.com',
     apiKey: 'XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0x',
-    signer: $signer,
+    signer: $hmacSigner,
 );
 ```
 
-Here’s an example of how to send a request to fetch your account balance:
+Here’s an example of how to send a request to fetch
+your [Futures account balance](https://developers.binance.com/docs/derivatives/usds-margined-futures/account/rest-api/Futures-Account-Balance-V3):
 
 ```php
-$restApi->send(
+$restFuturesUsdMApi->send(
     method: 'GET',
     path: '/fapi/v3/balance',
     permission: \Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\Permission::USER_DATA,
@@ -273,23 +274,229 @@ The WebsocketApi client manages request/response calls through the Binance WebSo
 This enables real-time commands and data exchange without additional HTTP overhead.
 
 ```php
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketApi;
-use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\Permission;
-use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\AccountBalanceResponse;
-
-$api = new WebSocketApi(
-    uri: '',
-    apiKey: '',
-    signer:,
+$dispatcher = new Symfony\Component\EventDispatcher\EventDispatcher();
+$webSocketFuturesUsdMApi = new \Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketApi(
+    dispatcher: $dispatcher,
+    uri: 'wss://testnet.binancefuture.com/ws-fapi/v1',
+    apiKey: 'XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0XxXXxXXX0x',
+    signer: $hmacSigner,
 );
-$api->connect()
-    ->then(fn(WebSocketApi $api) => $api->send(
-        method: 'v2/account.balance',
-        permission: Permission::USER_DATA,
-        type: AccountBalanceResponse::class,
-    ))
-    ->then(var_dump);
 ```
+
+Here’s an example of how to send a request to fetch
+your [Futures account balance](https://developers.binance.com/docs/derivatives/usds-margined-futures/account/websocket-api):
+
+```php
+$webSocketFuturesUsdMApi->connect()
+->then(fn(\Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketApi $api) => $api->send(
+    method: 'v2/account.balance',
+    permission: \Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\Permission::USER_DATA,
+    type: \Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\AccountBalanceResponse::class,
+))
+->then(function (\Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\AccountBalanceResponse $data) {
+    var_dump($data);
+})
+->catch(function (\React\Http\Message\ResponseException $data) {
+    var_dump($data);
+});
+```
+
+<details>
+<summary>Response Example</summary>
+<pre>
+<code>
+class Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\AccountBalanceResponse#664 (4) {
+  public readonly string $id =>
+  string(16) "7cfc6f212d9a3e48"
+  public readonly int $status =>
+  int(200)
+  public readonly array $result =>
+  array(7) {
+    [0] =>
+    class Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\Results\Balance#558 (9) {
+      public readonly string $accountAlias =>
+      string(14) "fWAufWmYfWAuTi"
+      public readonly string $asset =>
+      string(5) "FDUSD"
+      public readonly float $balance =>
+      double(0)
+      public readonly float $crossWalletBalance =>
+      double(0)
+      public readonly float $crossUnPnl =>
+      double(0)
+      public readonly float $availableBalance =>
+      double(0)
+      public readonly float $maxWithdrawAmount =>
+      double(0)
+      public readonly bool $marginAvailable =>
+      bool(true)
+      public readonly string $updateTime =>
+      string(1) "0"
+    }
+    [1] =>
+    class Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\Results\Balance#676 (9) {
+      public readonly string $accountAlias =>
+      string(14) "fWAufWmYfWAuTi"
+      public readonly string $asset =>
+      string(5) "BFUSD"
+      public readonly float $balance =>
+      double(0)
+      public readonly float $crossWalletBalance =>
+      double(0)
+      public readonly float $crossUnPnl =>
+      double(0)
+      public readonly float $availableBalance =>
+      double(0)
+      public readonly float $maxWithdrawAmount =>
+      double(0)
+      public readonly bool $marginAvailable =>
+      bool(true)
+      public readonly string $updateTime =>
+      string(1) "0"
+    }
+    [2] =>
+    class Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\Results\Balance#677 (9) {
+      public readonly string $accountAlias =>
+      string(14) "fWAufWmYfWAuTi"
+      public readonly string $asset =>
+      string(3) "BNB"
+      public readonly float $balance =>
+      double(0)
+      public readonly float $crossWalletBalance =>
+      double(0)
+      public readonly float $crossUnPnl =>
+      double(0)
+      public readonly float $availableBalance =>
+      double(0)
+      public readonly float $maxWithdrawAmount =>
+      double(0)
+      public readonly bool $marginAvailable =>
+      bool(true)
+      public readonly string $updateTime =>
+      string(1) "0"
+    }
+    [3] =>
+    class Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\Results\Balance#678 (9) {
+      public readonly string $accountAlias =>
+      string(14) "fWAufWmYfWAuTi"
+      public readonly string $asset =>
+      string(3) "ETH"
+      public readonly float $balance =>
+      double(0)
+      public readonly float $crossWalletBalance =>
+      double(0)
+      public readonly float $crossUnPnl =>
+      double(0)
+      public readonly float $availableBalance =>
+      double(0)
+      public readonly float $maxWithdrawAmount =>
+      double(0)
+      public readonly bool $marginAvailable =>
+      bool(true)
+      public readonly string $updateTime =>
+      string(1) "0"
+    }
+    [4] =>
+    class Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\Results\Balance#679 (9) {
+      public readonly string $accountAlias =>
+      string(14) "fWAufWmYfWAuTi"
+      public readonly string $asset =>
+      string(3) "BTC"
+      public readonly float $balance =>
+      double(0.01)
+      public readonly float $crossWalletBalance =>
+      double(0.01)
+      public readonly float $crossUnPnl =>
+      double(0)
+      public readonly float $availableBalance =>
+      double(0.01)
+      public readonly float $maxWithdrawAmount =>
+      double(0.01)
+      public readonly bool $marginAvailable =>
+      bool(true)
+      public readonly string $updateTime =>
+      string(13) "1760290452642"
+    }
+    [5] =>
+    class Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\Results\Balance#680 (9) {
+      public readonly string $accountAlias =>
+      string(14) "fWAufWmYfWAuTi"
+      public readonly string $asset =>
+      string(4) "USDT"
+      public readonly float $balance =>
+      double(5000)
+      public readonly float $crossWalletBalance =>
+      double(5000)
+      public readonly float $crossUnPnl =>
+      double(0)
+      public readonly float $availableBalance =>
+      double(5000)
+      public readonly float $maxWithdrawAmount =>
+      double(5000)
+      public readonly bool $marginAvailable =>
+      bool(true)
+      public readonly string $updateTime =>
+      string(13) "1760290452631"
+    }
+    [6] =>
+    class Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Account\Results\Balance#681 (9) {
+      public readonly string $accountAlias =>
+      string(14) "fWAufWmYfWAuTi"
+      public readonly string $asset =>
+      string(4) "USDC"
+      public readonly float $balance =>
+      double(5000)
+      public readonly float $crossWalletBalance =>
+      double(5000)
+      public readonly float $crossUnPnl =>
+      double(0)
+      public readonly float $availableBalance =>
+      double(5000)
+      public readonly float $maxWithdrawAmount =>
+      double(5000)
+      public readonly bool $marginAvailable =>
+      bool(true)
+      public readonly string $updateTime =>
+      string(13) "1760290452637"
+    }
+  }
+  public readonly array $rateLimits =>
+  array(1) {
+    [0] =>
+    class Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\RateLimit#665 (5) {
+      public readonly Empiriq\BinanceContracts\Spot\Spot\Common\RateLimitType $rateLimitType =>
+      enum Empiriq\BinanceContracts\Spot\Spot\Common\RateLimitType::REQUEST_WEIGHT : string("REQUEST_WEIGHT");
+      public readonly Empiriq\BinanceContracts\Spot\Spot\Common\RateLimitInterval $interval =>
+      enum Empiriq\BinanceContracts\Spot\Spot\Common\RateLimitInterval::MINUTE : string("MINUTE");
+      public readonly int $intervalNum =>
+      int(1)
+      public readonly int $limit =>
+      int(6000)
+      public readonly int $count =>
+      int(10)
+    }
+  }
+}
+</code>
+</pre>
+</details>
+
+https://developers.binance.com/docs/binance-spot-api-docs/websocket-api/user-data-stream-requests#subscribe-to-user-data-stream-user_stream
+```php
+$webSocketFuturesUsdMApi->send(
+    method: 'userDataStream.subscribe',
+    permission: \Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\Permission::USER_DATA,
+    type: \Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\UserData\SubscribeResponse::class,
+);
+
+return $transport->createListenKey()->then(function (SubscribeResponse $response) use ($transport) {
+    Loop::addPeriodicTimer(30 * 60, function () use ($transport, $response) {
+        $transport->updateListenKey($response->result->listenKey);
+    });
+
+    return $transport->subscribe([$response->result->listenKey]);
+});
+``` 
 
 ### Streams
 
