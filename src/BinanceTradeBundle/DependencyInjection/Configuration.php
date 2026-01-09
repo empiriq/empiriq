@@ -7,6 +7,7 @@ use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketStreams;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMTransport;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\TradeStream;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\UserDataStream;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -49,6 +50,7 @@ final class Configuration implements ConfigurationInterface
                             'websocket_market_streams_uri' => 'wss://fstream.binance.com/ws',
                             'streams' => [
                                 'trade' => TradeStream::class,
+                                'user_data' => UserDataStream::class,
                             ],
                         ]))
                     ->end()
