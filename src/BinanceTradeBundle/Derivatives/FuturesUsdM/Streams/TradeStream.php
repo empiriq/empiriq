@@ -7,9 +7,25 @@ use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMTransport;
 use React\Promise\PromiseInterface;
 
 /**
- * Represents a Binance stream for Coin Margined Futures market messages.
+ * Trade stream for Binance USD-M Futures market.
  *
- * Constructs a stream name like "btcusdt@trade" based on the given symbol.
+ * This stream subscribes to Binance **trade** events for the specified
+ * USD-M Futures symbols.
+ *
+ * This stream is enabled via the bundle configuration under the
+ * `streams.trade` section of the `futures_usd` transport:
+ *
+ * ```yaml
+ * binance_trade:
+ *   transports:
+ *     futures_usd:
+ *       streams:
+ *         trade: [['BTCUSDT']]
+ * ```
+ *
+ * This stream emits:
+ *
+ * - {@see \Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\Market\TradeEvent}
  */
 final readonly class TradeStream implements FuturesUsdMStreamInterface
 {
