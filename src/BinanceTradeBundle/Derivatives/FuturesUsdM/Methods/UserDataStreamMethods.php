@@ -6,8 +6,6 @@ use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\Permission;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\UserData\SubscribeResponse;
 use React\Promise\PromiseInterface;
 
-use function React\Promise\resolve;
-
 /**
  * User Data Stream sender methods
  *
@@ -61,6 +59,7 @@ trait UserDataStreamMethods
             type: SubscribeResponse::class,
         );
     }
+
     public function updateListenKey(string $listenKey): PromiseInterface
     {
         return $this->restApi->send(
@@ -71,6 +70,7 @@ trait UserDataStreamMethods
             payload: ['listenKey' => $listenKey],
         );
     }
+
     public function deleteListenKey(string $listenKey): PromiseInterface
     {
         return $this->restApi->send(

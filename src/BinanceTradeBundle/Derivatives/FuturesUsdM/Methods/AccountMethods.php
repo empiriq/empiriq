@@ -15,10 +15,9 @@ use React\Promise\PromiseInterface;
 trait AccountMethods
 {
     /**
-     * Query account balance info
+     * Account balance info
      *
      * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/account/websocket-api
-     * @see \Empiriq\Tests\BinanceApiConnector\Derivatives\FuturesUsdM\TransportTest::accountBalanceV2()
      */
     public function accountBalanceV2(): PromiseInterface
     {
