@@ -5,6 +5,7 @@ namespace Empiriq\BinanceTradeBundle\DependencyInjection;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceTradeBundle\Connector;
+use React\Http\Browser;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -19,6 +20,7 @@ final class BinanceTradeExtension extends Extension
 
         $container->setDefinition('empiriq.binance.serializer', new Definition(Serializer::class));
         $container->setDefinition('empiriq.binance.sanitizer', new Definition(Sanitizer::class));
+        $container->setDefinition('empiriq.binance.browser', new Definition(Browser::class));
         $container->setDefinition(
             'empiriq.binance.signer',
             new Definition($config['signer']['class'], $config['signer']['arguments'])
@@ -45,7 +47,7 @@ final class BinanceTradeExtension extends Extension
                                     new Reference('empiriq.binance.signer'),
                                     new Reference('empiriq.binance.serializer'),
                                     new Reference('logger'),
-                                    new Reference('empiriq.binance.sanitizer'),
+                                    new Reference('empiriq.binance.browser'),
                                     $config['resolver_timeout'],
                                 ]),
                                 new Definition($transport['websocket_api_class'], [
