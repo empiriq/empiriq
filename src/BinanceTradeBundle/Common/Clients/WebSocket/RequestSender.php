@@ -13,6 +13,7 @@ use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
 use Empiriq\BinanceTradeBundle\Common\Signers\Ed25519Signer;
 use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
+use Exception;
 use React\Promise\PromiseInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerBaseException;
@@ -46,26 +47,30 @@ abstract class RequestSender extends EventDispatcher
         ?int $recvWindow = null
     ): PromiseInterface {
         try {
+            $params = [];
+            if (!is_null($payload)) {
+                $params = $this->serializer->normalize($payload);
+            }
+            if (!is_null($recvWindow)) {
+                $params['recvWindow'] = $recvWindow;
+            }
+            if (!$this->isLoggedIn() && $permission->requiresApiKey()) {
+                $params['apiKey'] = $this->getApiKey();
+            }
+            if (!$this->isLoggedIn() && $permission->requiresSignature()) {
+                $params['timestamp'] = $this->calculateTimestamp();
+                $params['signature'] = $this->getSigner()->createSignature($params);
+            }
             $request = [
                 'id' => bin2hex(random_bytes(8)),
                 'method' => $method,
             ];
-            if (!is_null($payload)) {
-                $request['params'] = $this->serializer->normalize($payload);
-            }
-            if (!is_null($recvWindow)) {
-                $request['params']['recvWindow'] = $recvWindow;
-            }
-            if (!$this->isLoggedIn() && $permission->requiresApiKey()) {
-                $request['params']['apiKey'] = $this->getApiKey();
-            }
-            if (!$this->isLoggedIn() && $permission->requiresSignature()) {
-                $request['params']['timestamp'] = $this->calculateTimestamp();
-                $request['params']['signature'] = $this->getSigner()->createSignature($request['params']);
+            if ($params) {
+                $request['params'] = $params;
             }
             $this->logger->info(
                 sprintf('Sending request (method: %s, id: %s)', $method, $request['id']),
-                $this->sanitizer->sanitize($request['params'] ?? [])
+                $this->sanitizer->sanitize($params)
             );
             $this->getConnection()->send($this->serializer->encode($request, JsonEncoder::FORMAT));
 
@@ -108,11 +113,17 @@ abstract class RequestSender extends EventDispatcher
         return $this->isLoggedIn;
     }
 
+    /**
+     * @throws Exception
+     */
     public function calculateTimeOffset(int $serverTime): void
     {
         $this->timeOffsetMs = $serverTime - (int)(new DateTime('now', new DateTimeZone('UTC')))->format('Uv');
     }
 
+    /**
+     * @throws Exception
+     */
     private function calculateTimestamp(): int
     {
         return (int)(new DateTime('now', new DateTimeZone('UTC')))->format('Uv') + $this->timeOffsetMs;

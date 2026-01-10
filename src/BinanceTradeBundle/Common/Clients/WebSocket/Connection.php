@@ -31,12 +31,14 @@ abstract class Connection
             $connection->on('close', [$this, '__close']);
             $connection->on('error', [$this, '__error']);
             $this->connection = $connection;
+
             return $this;
         })->catch(function (Throwable $exception) {
             //vendor/react/socket/src/TimeoutConnector.php:60
             $this->logger->error(
                 sprintf('WebSocket connection failed (uri: %s, exception: %s)', $this->uri, $exception->getMessage())
             );
+
             return reject(new ConnectionFailedException($exception->getMessage(), $exception->getCode(), $exception));
         });
     }
@@ -54,6 +56,7 @@ abstract class Connection
         if (is_null($this->connection)) {
             throw new DisconnectedException('No active connection');
         }
+
         return $this->connection;
     }
 

@@ -96,11 +96,13 @@ abstract class RestClient
             $this->logger->error(
                 sprintf('Failed to send request (id: %s query: %s %s) %s', $id, $method, $path, $e->getMessage())
             );
+
             return reject($e);
         } catch (DisconnectedException $e) {
             $this->logger->error(
                 sprintf('Failed to send request (id: %s query: %s %s) %s', $id, $method, $path, $e->getMessage())
             );
+
             return reject($e);
         } catch (SerializerBaseException $e) {
             $this->logger->error(
@@ -112,6 +114,7 @@ abstract class RestClient
                     $e->getMessage()
                 )
             );
+
             return reject(new SerializationException($e->getMessage(), $e->getCode(), $e));
         } catch (Throwable $e) {
             $this->logger->error(
@@ -123,6 +126,7 @@ abstract class RestClient
                     $e->getMessage()
                 )
             );
+
             return reject(new RuntimeException($e->getMessage(), (int)$e->getCode(), $e));
         }
     }

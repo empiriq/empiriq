@@ -72,14 +72,12 @@ abstract class ResponseResolver extends RequestSender
 
     private function ejectPending(string $id): ?PendingRequest
     {
-        if (isset($this->pending[$id])) {
-            $pending = $this->pending[$id];
+        $pending = $this->pending[$id] ?? null;
+        if (!is_null($pending)) {
             unset($this->pending[$id]);
-
-            return $pending;
         }
 
-        return null;
+        return $pending;
     }
 
     private function rejectAllPending(RuntimeException $reason): void
