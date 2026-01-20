@@ -3,37 +3,40 @@
 namespace Empiriq\BinanceTradeBundle\Spot\Spot\Clients;
 
 use Empiriq\BinanceTradeBundle\Common\Clients\Rest\RestClient;
-use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
+use Empiriq\BinanceTradeBundle\Common\Configs\RestApiConfig;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
-use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use React\Http\Browser;
 
 /**
- * @see https://developers.binance.com/docs/binance-spot-api-docs/testnet/rest-api/general-api-information
- * @see https://developers.binance.com/docs/binance-spot-api-docs/rest-api/general-api-information
+ * REST API client for Spot.
+ *
+ * API endpoints:
+ * - Production: https://api.binance.com
+ * - Test: https://testnet.binance.vision/api
+ *
+ * The actual base URI is provided via {@see RestApiConfig}.
+ *
+ * Documentation:
+ *  - Production: {@link https://developers.binance.com/docs/binance-spot-api-docs/rest-api/general-api-information}
+ *  - Test: {@link https://developers.binance.com/docs/binance-spot-api-docs/testnet/rest-api/general-api-information}
  */
 final class RestApi extends RestClient
 {
     /**
-     * @param string $uri testnet https://testnet.binance.vision/api
-     * @param string $apiKey
-     * @param SignerInterface $signer
-     * @param SerializerInterface $serializer
-     * @param LoggerInterface $logger
-     * @param Browser $client
-     * @param float $resolverTimeout
+     * @param SignerInterface $signer Request signer.
+     * @param SerializerInterface $serializer Payload serializer.
+     * @param LoggerInterface $logger PSR-3 logger instance.
+     * @param Browser $client ReactPHP HTTP client.
+     * @param RestApiConfig $config REST API configuration.
      */
     public function __construct(
-        protected string $uri = 'https://api.binance.com',
-        protected string $apiKey = '',
-        protected SignerInterface $signer = new NullSigner(),
-        protected SerializerInterface $serializer = new Serializer(),
-        protected LoggerInterface $logger = new NullLogger(),
-        protected Browser $client = new Browser(),
-        protected float $resolverTimeout = 5,
+        protected SignerInterface $signer,
+        protected SerializerInterface $serializer,
+        protected LoggerInterface $logger,
+        protected Browser $client,
+        protected RestApiConfig $config,
     ) {
     }
 }

@@ -5,6 +5,7 @@ namespace Empiriq\BinanceTradeBundle\Common\Clients\Rest;
 use DateTime;
 use DateTimeZone;
 use Empiriq\BinanceContracts\Common\PermissionInterface;
+use Empiriq\BinanceTradeBundle\Common\Configs\RestApiConfig;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Network\DisconnectedException;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\RuntimeException;
@@ -24,13 +25,11 @@ use function React\Promise\reject;
 
 abstract class RestClient
 {
-    protected string $uri;
-    protected string $apiKey;
     protected SignerInterface $signer;
     protected SerializerInterface $serializer;
     protected LoggerInterface $logger;
     protected Browser $client;
-    protected float $resolverTimeout = 5;
+    protected RestApiConfig $config;
     private int $timeOffsetMs = 0;
 
     /**
@@ -43,6 +42,7 @@ abstract class RestClient
      * @param int|null $recvWindow
      *
      * @return PromiseInterface<T>
+     * @throws Exception
      */
     public function send(
         string $method,
@@ -64,7 +64,7 @@ abstract class RestClient
                 $params['recvWindow'] = $recvWindow;
             }
             if ($permission->requiresApiKey()) {
-                $headers['X-MBX-APIKEY'] = $this->getApiKey();
+                $headers['X-MBX-APIKEY'] = $this->config->apiKey;
             }
             if ($permission->requiresSignature()) {
                 $params['timestamp'] = $this->calculateTimestamp();
@@ -79,8 +79,8 @@ abstract class RestClient
             $this->logger->info(sprintf('Sending request (id: %s) %s %s %s', $id, $method, $path, $body));
 
             return $this->client
-                ->withBase($this->uri)
-                ->withTimeout($this->resolverTimeout)
+                ->withBase($this->config->uri)
+                ->withTimeout($this->config->resolverTimeout)
                 ->request($method, $path, $headers, $body)
                 ->then(function (Response $response) use ($id, $type): mixed {
                     $data = [
@@ -142,13 +142,5 @@ abstract class RestClient
     private function calculateTimestamp(): int
     {
         return (int)(new DateTime('now', new DateTimeZone('UTC')))->format('Uv') + $this->timeOffsetMs;
-    }
-
-    private function getApiKey(): string
-    {
-        if (!$this->apiKey) {
-            throw new ConfigurationException('ApiKey required');
-        }
-        return $this->apiKey;
     }
 }
