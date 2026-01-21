@@ -2,7 +2,7 @@
 
 namespace Empiriq\BinanceTradeBundle\DependencyInjection;
 
-use Empiriq\BinanceTradeBundle\Common\Configs\RestApiConfig;
+use Empiriq\BinanceTradeBundle\Common\Configs\RestConfig;
 use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
@@ -48,7 +48,7 @@ final class BinanceTradeExtension extends Extension
                                     new Reference('empiriq.binance.serializer'),
                                     new Reference('logger'),
                                     new Reference('empiriq.binance.browser'),
-                                    new Definition(RestApiConfig::class, [
+                                    new Definition(RestConfig::class, [
                                         $transport['rest_api_uri'],
                                         $config['api_key'],
                                         $config['resolver_timeout'],

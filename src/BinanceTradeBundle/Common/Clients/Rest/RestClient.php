@@ -5,7 +5,7 @@ namespace Empiriq\BinanceTradeBundle\Common\Clients\Rest;
 use DateTime;
 use DateTimeZone;
 use Empiriq\BinanceContracts\Common\PermissionInterface;
-use Empiriq\BinanceTradeBundle\Common\Configs\RestApiConfig;
+use Empiriq\BinanceTradeBundle\Common\Configs\RestConfig;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Network\DisconnectedException;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\RuntimeException;
@@ -29,7 +29,7 @@ abstract class RestClient
     protected SerializerInterface $serializer;
     protected LoggerInterface $logger;
     protected Browser $client;
-    protected RestApiConfig $config;
+    protected RestConfig $config;
     private int $timeOffsetMs = 0;
 
     /**
@@ -80,7 +80,7 @@ abstract class RestClient
 
             return $this->client
                 ->withBase($this->config->uri)
-                ->withTimeout($this->config->resolverTimeout)
+                ->withTimeout($this->config->timeout)
                 ->request($method, $path, $headers, $body)
                 ->then(function (Response $response) use ($id, $type): mixed {
                     $data = [
