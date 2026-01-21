@@ -12,7 +12,7 @@ final class WebSocketConfig
     public function __construct(
         public string $uri,
         public string $apiKey,
-        public float $resolverTimeout = 5.0,
+        public float $timeout = 5.0,
     ) {
     }
 }

@@ -7,17 +7,17 @@ namespace Empiriq\BinanceTradeBundle\Common\Configs;
  *
  * Encapsulates all runtime configuration required to communicate with Binance REST endpoints.
  */
-final class RestApiConfig
+final class RestConfig
 {
     /**
      * @param string $uri Base REST API URI.
      * @param string $apiKey Binance API key used for authenticated requests.
-     * @param float $resolverTimeout Connection resolver timeout in seconds.
+     * @param float $timeout Connection timeout in seconds.
      */
     public function __construct(
         public string $uri,
         public string $apiKey,
-        public float $resolverTimeout = 5.0,
+        public float $timeout = 5.0,
     ) {
     }
 }
