@@ -2,42 +2,37 @@
 
 namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients;
 
-use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
-use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
-use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\EventInterface;
+use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
+use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 /**
- * Handles WebSocket connections to Binance Coin Margined Futures market streams.
- *
- * Aggregates multiple FuturesUmStreamInterface implementations into a single WebSocket connection,
- * deserializes incoming messages into FuturesUmEvent objects, and dispatch via EventDispatcher.
+ * API endpoints:
+ *  - Production: wss://fstream.binance.com/ws
+ *  - Testnet: wss://fstream.binancefuture.com/ws
  *
  * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-market-streams
  */
 final class WebSocketStreams extends ResponseResolver implements WebSocketClientInterface
 {
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param string $uri testnet wss://fstream.binancefuture.com/ws
-     * @param SerializerInterface $serializer
-     * @param LoggerInterface $logger
-     * @param SanitizerInterface $sanitizer
-     * @param float $resolverTimeout
+     * @param EventDispatcherInterface $dispatcher Event dispatcher.
+     * @param SerializerInterface $serializer Payload serializer.
+     * @param LoggerInterface $logger PSR-3 logger instance.
+     * @param SanitizerInterface $sanitizer Sanitizer for sensitive data before logging.
+     * @param WebSocketConfig $config WebSocket configuration.
      */
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
-        protected string $uri = 'wss://fstream.binance.com/ws',
-        protected SerializerInterface $serializer = new Serializer(),
-        protected LoggerInterface $logger = new NullLogger(),
-        protected SanitizerInterface $sanitizer = new Sanitizer(),
-        protected float $resolverTimeout = 5,
+        protected SerializerInterface $serializer,
+        protected LoggerInterface $logger,
+        protected SanitizerInterface $sanitizer,
+        protected WebSocketConfig $config,
     ) {
     }
 

@@ -12,7 +12,6 @@ use Empiriq\BinanceTradeBundle\Common\Exceptions\Serialization\SerializationExce
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
 use Empiriq\BinanceTradeBundle\Common\Signers\Ed25519Signer;
-use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
 use Exception;
 use React\Promise\PromiseInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -23,7 +22,6 @@ use function React\Promise\reject;
 
 abstract class RequestSender extends EventDispatcher
 {
-    protected string $apiKey = '';
     protected SignerInterface $signer;
     protected SanitizerInterface $sanitizer;
     private bool $isLoggedIn = false;
@@ -55,11 +53,11 @@ abstract class RequestSender extends EventDispatcher
                 $params['recvWindow'] = $recvWindow;
             }
             if (!$this->isLoggedIn() && $permission->requiresApiKey()) {
-                $params['apiKey'] = $this->getApiKey();
+                $params['apiKey'] = $this->config->apiKey;
             }
             if (!$this->isLoggedIn() && $permission->requiresSignature()) {
                 $params['timestamp'] = $this->calculateTimestamp();
-                $params['signature'] = $this->getSigner()->createSignature($params);
+                $params['signature'] = $this->signer->createSignature($params);
             }
             $request = [
                 'id' => bin2hex(random_bytes(8)),
@@ -79,21 +77,25 @@ abstract class RequestSender extends EventDispatcher
             $this->logger->error(
                 sprintf('Failed to send request (method: %s): %s', $method, $exception->getMessage())
             );
+
             return reject($exception);
         } catch (DisconnectedException $exception) {
             $this->logger->error(
                 sprintf('Failed to send request (method: %s): %s', $method, $exception->getMessage())
             );
+
             return reject($exception);
         } catch (SerializerBaseException $exception) {
             $this->logger->error(
                 sprintf('Serialization failed for request (method: %s): %s', $method, $exception->getMessage())
             );
+
             return reject(new SerializationException($exception->getMessage(), $exception->getCode(), $exception));
         } catch (Throwable $exception) {
             $this->logger->error(
                 sprintf('Unexpected error while sending request (method: %s): %s', $method, $exception->getMessage())
             );
+
             return reject(new RuntimeException($exception->getMessage(), $exception->getCode(), $exception));
         }
     }
@@ -127,18 +129,5 @@ abstract class RequestSender extends EventDispatcher
     private function calculateTimestamp(): int
     {
         return (int)(new DateTime('now', new DateTimeZone('UTC')))->format('Uv') + $this->timeOffsetMs;
-    }
-
-    private function getSigner(): SignerInterface
-    {
-        return $this->signer ??= new NullSigner();
-    }
-
-    private function getApiKey(): string
-    {
-        if (!$this->apiKey) {
-            throw new ConfigurationException('apiKey required');
-        }
-        return $this->apiKey;
     }
 }

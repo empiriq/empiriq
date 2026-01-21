@@ -2,44 +2,48 @@
 
 namespace Empiriq\BinanceTradeBundle\Spot\Spot\Clients;
 
+use Empiriq\BinanceContracts\Spot\Spot\Common\EventInterface;
 use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
-use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
-use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
+use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
-use Empiriq\BinanceContracts\Spot\Spot\Common\EventInterface;
-use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 /**
- * @see https://developers.binance.com/docs/binance-spot-api-docs/testnet/websocket-api/general-api-information
- * @see https://developers.binance.com/docs/binance-spot-api-docs/websocket-api/general-api-information
+ * WebSocket API client for Spot.
+ *
+ * API endpoints:
+ * - Production:
+ * - Testnet: wss://ws-api.testnet.binance.vision/ws-api/v3
+ *
+ * The actual WebSocket URI is configurable via {@see WebSocketConfig}.
+ *
+ * Documentation:
+ *   - Production:
+ * {@link https://developers.binance.com/docs/binance-spot-api-docs/websocket-api/general-api-information}
+ *   - Testnet:
+ * {@link https://developers.binance.com/docs/binance-spot-api-docs/testnet/websocket-api/general-api-information}
  */
 final class WebSocketApi extends ResponseResolver implements WebSocketClientInterface
 {
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param string $uri testnet wss://ws-api.testnet.binance.vision/ws-api/v3
-     * @param string $apiKey
-     * @param SignerInterface $signer
-     * @param SerializerInterface $serializer
-     * @param LoggerInterface $logger
-     * @param SanitizerInterface $sanitizer
-     * @param float $resolverTimeout
+     * @param EventDispatcherInterface $dispatcher Event dispatcher.
+     * @param SignerInterface $signer Request signer.
+     * @param SerializerInterface $serializer Payload serializer.
+     * @param LoggerInterface $logger PSR-3 logger instance.
+     * @param SanitizerInterface $sanitizer Sanitizer for sensitive data before logging.
+     * @param WebSocketConfig $config WebSocket API configuration.
      */
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
-        protected string $uri = '', // todo set main net
-        protected string $apiKey = '',
-        protected SignerInterface $signer = new NullSigner(),
-        protected SerializerInterface $serializer = new Serializer(),
-        protected LoggerInterface $logger = new NullLogger(),
-        protected SanitizerInterface $sanitizer = new Sanitizer(),
-        protected float $resolverTimeout = 5,
+        protected SignerInterface $signer,
+        protected SerializerInterface $serializer,
+        protected LoggerInterface $logger,
+        protected SanitizerInterface $sanitizer,
+        protected WebSocketConfig $config,
     ) {
     }
 

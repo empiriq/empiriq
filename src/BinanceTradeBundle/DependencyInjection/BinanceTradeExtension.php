@@ -3,6 +3,7 @@
 namespace Empiriq\BinanceTradeBundle\DependencyInjection;
 
 use Empiriq\BinanceTradeBundle\Common\Configs\RestApiConfig;
+use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceTradeBundle\Connector;
@@ -55,21 +56,26 @@ final class BinanceTradeExtension extends Extension
                                 ]),
                                 new Definition($transport['websocket_api_class'], [
                                     new Reference('event_dispatcher'),
-                                    $transport['websocket_api_uri'],
-                                    $config['api_key'],
                                     new Reference('empiriq.binance.signer'),
                                     new Reference('empiriq.binance.serializer'),
                                     new Reference('logger'),
                                     new Reference('empiriq.binance.sanitizer'),
-                                    $config['resolver_timeout'],
+                                    new Definition(WebSocketConfig::class, [
+                                        $transport['websocket_api_uri'],
+                                        $config['api_key'],
+                                        $config['resolver_timeout'],
+                                    ]),
                                 ]),
                                 new Definition($transport['websocket_streams_class'], [
                                     new Reference('event_dispatcher'),
-                                    $transport['websocket_market_streams_uri'],
                                     new Reference('empiriq.binance.serializer'),
                                     new Reference('logger'),
                                     new Reference('empiriq.binance.sanitizer'),
-                                    $config['resolver_timeout'],
+                                    new Definition(WebSocketConfig::class, [
+                                        $transport['websocket_market_streams_uri'],
+                                        $config['api_key'],
+                                        $config['resolver_timeout'],
+                                    ]),
                                 ]),
                             ]
                         ),

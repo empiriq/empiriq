@@ -2,6 +2,7 @@
 
 namespace Empiriq\BinanceTradeBundle\Common\Clients\WebSocket;
 
+use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Network\ConnectionFailedException;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Network\DisconnectedException;
 use Empiriq\Contracts\SerializerInterface;
@@ -18,15 +19,15 @@ use function React\Promise\resolve;
 
 abstract class Connection
 {
-    protected string $uri;
     protected SerializerInterface $serializer;
     protected LoggerInterface $logger;
+    protected WebSocketConfig $config;
     protected ?WebSocket $connection = null;
 
     public function connect(): PromiseInterface
     {
-        return connect($this->uri)->then(function (WebSocket $connection) {
-            $this->logger->info(sprintf('WebSocket connected (uri: %s)', $this->uri));
+        return connect($this->config->uri)->then(function (WebSocket $connection) {
+            $this->logger->info(sprintf('WebSocket connected (uri: %s)', $this->config->uri));
             $connection->on('message', [$this, '__message']);
             $connection->on('close', [$this, '__close']);
             $connection->on('error', [$this, '__error']);
@@ -34,9 +35,12 @@ abstract class Connection
 
             return $this;
         })->catch(function (Throwable $exception) {
-            //vendor/react/socket/src/TimeoutConnector.php:60
             $this->logger->error(
-                sprintf('WebSocket connection failed (uri: %s, exception: %s)', $this->uri, $exception->getMessage())
+                sprintf(
+                    'WebSocket connection failed (uri: %s, exception: %s)',
+                    $this->config->uri,
+                    $exception->getMessage()
+                )
             );
 
             return reject(new ConnectionFailedException($exception->getMessage(), $exception->getCode(), $exception));
@@ -45,7 +49,7 @@ abstract class Connection
 
     public function disconnect(): PromiseInterface
     {
-        $this->logger->info(sprintf('WebSocket disconnect requested (uri: %s)', $this->uri));
+        $this->logger->info(sprintf('WebSocket disconnect requested (uri: %s)', $this->config->uri));
         $this->connection?->close();
 
         return resolve($this);
@@ -70,17 +74,21 @@ abstract class Connection
             $data = $this->serializer->decode($payload, JsonEncoder::FORMAT);
             if (is_array($data)) {
                 $this->logger->debug(
-                    sprintf('WebSocket message received (uri: %s, payload: %s)', $this->uri, $payload)
+                    sprintf('WebSocket message received (uri: %s, payload: %s)', $this->config->uri, $payload)
                 );
                 $this->message($data);
             } else {
                 $this->logger->warning(
-                    sprintf('WebSocket decode failed (uri: %s, reason: non-array data)', $this->uri)
+                    sprintf('WebSocket decode failed (uri: %s, reason: non-array data)', $this->config->uri)
                 );
             }
         } catch (Throwable $exception) {
             $this->logger->warning(
-                sprintf('WebSocket decode failed (uri: %s, exception: %s)', $this->uri, $exception->getMessage())
+                sprintf(
+                    'WebSocket decode failed (uri: %s, exception: %s)',
+                    $this->config->uri,
+                    $exception->getMessage()
+                )
             );
         }
     }
@@ -91,7 +99,7 @@ abstract class Connection
     public function __close(): void
     {
         $this->connection = null;
-        $this->logger->info(sprintf('WebSocket closed (uri: %s)', $this->uri));
+        $this->logger->info(sprintf('WebSocket closed (uri: %s)', $this->config->uri));
         $this->close();
     }
 
@@ -102,7 +110,7 @@ abstract class Connection
     {
         $this->connection = null;
         $this->logger->error(
-            sprintf('WebSocket error (uri: %s, exception: %s)', $this->uri, $exception->getMessage())
+            sprintf('WebSocket error (uri: %s, exception: %s)', $this->config->uri, $exception->getMessage())
         );
         $this->error(new DisconnectedException($exception->getMessage(), $exception->getCode(), $exception));
     }

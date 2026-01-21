@@ -17,8 +17,6 @@ use function React\Promise\Timer\timeout;
 
 abstract class ResponseResolver extends RequestSender
 {
-    protected float $resolverTimeout = 10;
-
     /* @var array<string, PendingRequest> */
     private array $pending = [];
 
@@ -58,7 +56,7 @@ abstract class ResponseResolver extends RequestSender
         $pending = new PendingRequest($request['id'], new Deferred(), $request, $type);
         $this->pending[$pending->id] = $pending;
 
-        return timeout($pending->deferred->promise(), $this->resolverTimeout)
+        return timeout($pending->deferred->promise(), $this->config->resolverTimeout)
             ->catch(function (ReactTimeoutException $exception) use ($pending) {
                 if (!isset($this->pending[$pending->id])) {
                     return;
