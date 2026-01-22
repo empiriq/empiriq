@@ -7,7 +7,7 @@ namespace Empiriq\BinanceTradeBundle\Common\Configs;
  *
  * Encapsulates all runtime configuration required to communicate with Binance Web Socket API endpoints.
  */
-final class WebSocketConfig
+final readonly class WebSocketConfig
 {
     public function __construct(
         public string $uri,

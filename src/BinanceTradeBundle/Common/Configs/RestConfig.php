@@ -7,7 +7,7 @@ namespace Empiriq\BinanceTradeBundle\Common\Configs;
  *
  * Encapsulates all runtime configuration required to communicate with Binance REST endpoints.
  */
-final class RestConfig
+final readonly class RestConfig
 {
     /**
      * @param string $uri Base REST API URI.
