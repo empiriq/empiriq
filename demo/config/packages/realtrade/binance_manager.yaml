@@ -1,8 +1,0 @@
-binance_manager:
-    futures_usd:
-        balance:
-            arguments:
-                connector: '@connector'
-                dispatcher: '@event_dispatcher'
-
-

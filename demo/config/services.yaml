@@ -19,10 +19,8 @@ services:
     Symfony\Component\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
     Psr\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
     Psr\Container\ContainerInterface: '@service_container'
+    Psr\Log\LoggerInterface: '@logger'
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
-    Empiriq\Demo\:
+    App\:
         resource: '../src/'
-        exclude:
-            - '../src/Exclude/'
-

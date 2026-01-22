@@ -1,4 +1,0 @@
-binance_back_trade:
-    symbol: 'BTCUSDT'
-    start: '2024-01-01'
-    end: '2024-01-02'

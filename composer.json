@@ -66,7 +66,7 @@
     "autoload": {
         "psr-4": {
             "Empiriq\\": "src",
-            "Empiriq\\Demo\\": "demo/src"
+            "App\\": "demo/src"
         }
     },
     "scripts": {

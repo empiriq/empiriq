@@ -1,0 +1,13 @@
+binance_trade:
+    api_key: IQpGsLVM3gRKrdZ8DGwk4mUqaHa7McEyzpl5DQBqhnVeX9j4VZD30r7wMCnyjdHs
+    signer:
+        class: Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner
+        arguments: ["ngtDdiAzjragCSRjjNUi0SET2KJK6BseW7k5oxtVfyvrp9og3LxRVyNS8n39G8HO"]
+    transports:
+        futures_usd:
+            rest_api_uri: '%env(BINANCE_TRANSPORTS_FUTURES_USD_REST_API_URI)%'
+            websocket_api_uri: '%env(BINANCE_TRANSPORTS_FUTURES_USD_WEBSOCKET_API_URI)%'
+            websocket_market_streams_uri: '%env(BINANCE_TRANSPORTS_FUTURES_USD_WEBSOCKET_MARKET_STREAMS_URI)%'
+            streams:
+                trade: [['BTCUSDT']]
+#                user_data: []

@@ -1,22 +1,7 @@
 monolog:
-    channels:
-        - deprecation
     handlers:
-        console:
-            type: console
-            channels: ["!deprecation"]
-            process_psr_3_messages: false
-            console_formatter_options:
-                date_format: 'H:i:s.v'
-                format: "%%start_tag%%%%datetime%% %%level_name%% %%message%%%%context%%%%extra%%%%end_tag%%\n"
-                ignore_empty_context_and_extra: true
-                level_name_format: '%s'
-                multiline: false
-                colors: false
-
-        deprecation:
+        stdout:
             type: stream
-            path: "%kernel.logs_dir%/deprecation.log"
-            level: info
-            channels: ["deprecation"]
-            formatter: monolog.formatter.line
+            path: php://stdout
+            level: debug
+            formatter: monolog.formatter.json

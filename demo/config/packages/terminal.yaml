@@ -1,8 +1,0 @@
-terminal:
-    uri: '0.0.0.0:2009'
-    context:
-        tcp:
-            backlog: 200
-            so_reuseport: false
-            ipv6_v6only: true
-

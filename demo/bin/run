@@ -1,24 +1,21 @@
 #!/usr/bin/env php
 <?php
 
-$monorepoDir = dirname(__DIR__, 2);
+$monorepo = dirname(__DIR__, 2);
 
-if (!is_dir($monorepoDir . '/vendor')) {
+if (!is_dir($monorepo . '/vendor')) {
     throw new LogicException('Dependencies are missing. Try running "composer install".');
 }
-if (!is_file($monorepoDir . '/vendor/autoload_runtime.php')) {
+if (!is_file($monorepo . '/vendor/autoload_runtime.php')) {
     throw new LogicException('Symfony Runtime is missing. Try running "composer require symfony/runtime".');
 }
 
-$_SERVER['APP_RUNTIME_OPTIONS']['project_dir'] = $monorepoDir . '/demo';
+$_SERVER['APP_RUNTIME_OPTIONS']['project_dir'] = $monorepo . '/demo';
 
-require_once $monorepoDir . '/vendor/autoload_runtime.php';
+require_once $monorepo . '/vendor/autoload_runtime.php';
 
 return function (array $context) {
-    $kernel = new Empiriq\Demo\Kernel($context['APP_ENV'], (bool)$context['APP_DEBUG']);
-    $application = new Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
-    $application->setDefaultCommand('run', true);
-//    $application->setDefaultCommand($_SERVER['argv'][0], true);
-
-    return $application;
+    return new \Symfony\Bundle\FrameworkBundle\Console\Application(
+        new \App\Kernel($context['APP_ENV'], (bool)$context['APP_DEBUG'])
+    );
 };
