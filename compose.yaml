@@ -1,6 +1,6 @@
 services:
     php-cli:
-        image: php:8.4-cli
+        build: demo/etc/php-cli
         container_name: php-cli
         command: php /app/demo/bin/run trade
         volumes:
