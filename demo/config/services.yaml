@@ -22,5 +22,12 @@ services:
     Psr\Log\LoggerInterface: '@logger'
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
+    Prometheus\Storage\InMemory: ~
+    Prometheus\CollectorRegistry:
+        arguments:
+            $storageAdapter: '@Prometheus\Storage\InMemory'
+    PrometheusPushGateway\PushGateway:
+        arguments:
+            $address: 'http://pushgateway:9091'
     App\:
         resource: '../src/'

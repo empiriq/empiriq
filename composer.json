@@ -45,7 +45,9 @@
         "symfony/http-kernel": "^7.3",
         "symfony/monolog-bundle": "^3.10",
         "symfony/framework-bundle": "^7.3",
-        "symfony/runtime": "^7.3"
+        "symfony/runtime": "^7.3",
+        "promphp/prometheus_client_php": "^2.14",
+        "promphp/prometheus_push_gateway_php": "^1.1"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.10",
