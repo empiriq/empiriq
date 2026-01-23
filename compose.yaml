@@ -11,6 +11,9 @@ services:
     loki:
         image: grafana/loki:3.4.6
         container_name: loki
+        command: -config.file=/etc/loki/config.yml
+        volumes:
+            - ./demo/etc/loki/config.yml:/etc/loki/config.yml
         ports:
             - 3100:3100
     promtail:
