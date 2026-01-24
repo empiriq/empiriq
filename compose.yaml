@@ -6,8 +6,7 @@ services:
         volumes:
             - .:/app
         depends_on:
-            - loki
-            - prometheus
+            - pushgateway
     loki:
         image: grafana/loki:3.4.6
         container_name: loki
@@ -26,8 +25,20 @@ services:
         command: -config.file=/etc/promtail/config.yaml
         depends_on:
             - loki
+    prometheus:
+        image: prom/prometheus:v3.9.1
+        container_name: prometheus
+        ports:
+            - 9090:9090
+        volumes:
+            - ./demo/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    pushgateway:
+        image: prom/pushgateway:v1.11.2
+        container_name: pushgateway
+        ports:
+            - 9091:9091
     grafana:
-        image: grafana/grafana:12.4.0-20977568970-ubuntu
+        image: grafana/grafana:12.3.1
         container_name: grafana
         ports:
             - 3000:3000
@@ -39,15 +50,3 @@ services:
         environment:
             - GF_SECURITY_ADMIN_USER=user346246
             - GF_SECURITY_ADMIN_PASSWORD=user346246
-    prometheus:
-        image: prom/prometheus:v3.0.0-beta.0
-        container_name: prometheus
-        ports:
-            - 9090:9090
-        volumes:
-            - ./demo/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    pushgateway:
-        image: prom/pushgateway:v1.9.0
-        container_name: pushgateway
-        ports:
-            - 9091:9091
