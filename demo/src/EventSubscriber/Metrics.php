@@ -21,7 +21,7 @@ readonly class Metrics implements EventSubscriberInterface
     {
         return [
             TradeEvent::class => 'handleTrade',
-            OrderTradeUpdateEvent::class => 'handleOrderTradeUpdateTrade',
+            OrderTradeUpdateEvent::class => 'handleOrderTradeUpdate',
             AccountUpdateEvent::class => 'handleAccountUpdateEvent',
         ];
     }
@@ -32,7 +32,7 @@ readonly class Metrics implements EventSubscriberInterface
         $this->gateway->push($this->registry, 'trade_workers');
     }
 
-    public function handleOrderTradeUpdateTrade(OrderTradeUpdateEvent $event): void
+    public function handleOrderTradeUpdate(OrderTradeUpdateEvent $event): void
     {
         $this->registry->getOrRegisterCounter('user_events', 'order_trade_update_count', 'help')->inc();
         $this->gateway->push($this->registry, 'trade_workers');

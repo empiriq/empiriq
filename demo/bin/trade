@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+use App\Kernel;
+use App\Runtime\SignalManager;
+use App\Runtime\RuntimeManager;
+
+require dirname(__DIR__, 2) . '/vendor/autoload.php';
+
+
+$kernel = new Kernel('trade', false);
+$kernel->boot();
+
+/** @var SignalManager $signals */
+$signals = $kernel->getContainer()->get(SignalManager::class);
+$signals->register();
+
+/** @var RuntimeManager $runtime */
+$runtime = $kernel->getContainer()->get(RuntimeManager::class);
+$runtime->run();

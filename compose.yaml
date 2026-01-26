@@ -2,7 +2,9 @@ services:
     php-cli:
         build: demo/etc/php-cli
         container_name: php-cli
-        command: php /app/demo/bin/run trade
+        command: /app/demo/bin/trade
+        env_file:
+            - demo/.env
         volumes:
             - .:/app
         depends_on:
