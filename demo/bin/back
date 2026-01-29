@@ -7,7 +7,7 @@ use App\Runtime\RuntimeManager;
 
 require dirname(__DIR__, 2) . '/vendor/autoload.php';
 
-$kernel = new Kernel('back', false);
+$kernel = new Kernel('back', true);
 $kernel->boot();
 
 /** @var SignalManager $signals */
