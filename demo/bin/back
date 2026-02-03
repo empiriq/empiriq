@@ -2,18 +2,13 @@
 <?php
 
 use App\Kernel;
-use App\Runtime\SignalManager;
-use App\Runtime\RuntimeManager;
+use Empiriq\Contracts\Entrypoint;
 
 require dirname(__DIR__, 2) . '/vendor/autoload.php';
 
 $kernel = new Kernel('back', true);
 $kernel->boot();
 
-/** @var SignalManager $signals */
-$signals = $kernel->getContainer()->get(SignalManager::class);
-$signals->register();
-
-/** @var RuntimeManager $runtime */
-$runtime = $kernel->getContainer()->get(RuntimeManager::class);
-$runtime->run();
+/** @var Entrypoint $entrypoint */
+$entrypoint = $kernel->getContainer()->get(Entrypoint::class);
+$entrypoint->run();

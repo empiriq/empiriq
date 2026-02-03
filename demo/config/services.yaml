@@ -29,5 +29,9 @@ services:
     PrometheusPushGateway\PushGateway:
         arguments:
             $address: 'http://pushgateway:9091'
+    Empiriq\Contracts\Entrypoint:
+        public: true
+        arguments:
+            $runners: !tagged_iterator empiriq.runnable
     App\:
         resource: '../src/'
