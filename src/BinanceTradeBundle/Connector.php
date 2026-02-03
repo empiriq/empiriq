@@ -11,11 +11,10 @@ use Empiriq\Contracts\ExchangeConnectorInterface;
 use Empiriq\Contracts\RunnableInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use React\Promise\PromiseInterface;
 use Throwable;
 
+use function React\Async\await;
 use function React\Promise\all;
-use function React\Promise\resolve;
 
 /**
  * @api
@@ -38,11 +37,10 @@ readonly class Connector implements ExchangeConnectorInterface, RunnableInterfac
     }
 
     /**
-     * @return PromiseInterface
      * @throws Throwable
      */
     #[\Override]
-    public function run(): PromiseInterface
+    public function run(): void
     {
         $this->logger->info('Starting connector run loop...');
         $connections = [];
@@ -50,37 +48,25 @@ readonly class Connector implements ExchangeConnectorInterface, RunnableInterfac
             $this->logger->info(sprintf('Connecting receiver: %s', get_class($transport)));
             $connections[] = $transport->run();
         }
-
-        return all($connections)->catch(function (Throwable $exception) {
+        try {
+            await(all($connections));
+        } catch (Throwable $exception) {
             $this->logger->critical(
                 sprintf('Error in connector (code: %s, message: %s)', $exception->getCode(), $exception->getMessage())
             );
-            throw $exception;
-        })->then(function () {
-            return $this;
-        });
+        }
     }
 
-    /**
-     * @return PromiseInterface
-     */
     #[\Override]
-    public function shutdown(): PromiseInterface
+    public function shutdown(): void
     {
         $this->logger->info('Shutting down connector...');
+        $connections = [];
         foreach ($this->transports as $transport) {
-            $this->logger->info(sprintf('Disconnecting receiver: %s', get_class($transport)));
-            $transport->shutdown();
+            $connections[] = $transport->shutdown();
         }
+        await(all($connections));
         $this->logger->info('Connector stopped successfully');
-
-        return resolve($this);
-    }
-
-    #[\Override]
-    public function getPriority(): int
-    {
-        return RunnableInterface::EXCHANGE_CONNECTOR_PRIORITY;
     }
 
     /**

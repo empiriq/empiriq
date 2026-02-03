@@ -8,7 +8,7 @@ interface TransportInterface
 {
     public function run(): PromiseInterface;
 
-    public function shutdown(): void;
+    public function shutdown(): PromiseInterface;
 
     public function isLoggedIn(): bool;
 }

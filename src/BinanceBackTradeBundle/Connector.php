@@ -7,10 +7,7 @@ use Empiriq\BinanceBackTradeBundle\Common\Interfaces\ReceiverInterface;
 use Empiriq\Contracts\ExchangeConnectorInterface;
 use Empiriq\Contracts\RunnableInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use React\Promise\PromiseInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-
-use function React\Promise\resolve;
 
 class Connector implements ExchangeConnectorInterface, RunnableInterface
 {
@@ -37,7 +34,7 @@ class Connector implements ExchangeConnectorInterface, RunnableInterface
     }
 
     #[\Override]
-    public function run(): PromiseInterface
+    public function run(): void
     {
         // todo resolve immediately
         $eventIterator = new ParallelIterator(
@@ -53,19 +50,10 @@ class Connector implements ExchangeConnectorInterface, RunnableInterface
             $i++;
             $this->dispatcher->dispatch($event);
         }
-
-        return resolve($this);
     }
 
     #[\Override]
-    public function shutdown(): PromiseInterface
+    public function shutdown(): void
     {
-        return resolve($this);
-    }
-
-    #[\Override]
-    public function getPriority(): int
-    {
-        return RunnableInterface::EXCHANGE_CONNECTOR_PRIORITY;
     }
 }

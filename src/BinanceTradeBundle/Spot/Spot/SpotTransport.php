@@ -71,10 +71,12 @@ readonly class SpotTransport implements TransportInterface
             ->then(fn() => $this);
     }
 
-    public function shutdown(): void
+    public function shutdown(): PromiseInterface
     {
-        $this->websocketApi->disconnect();
-        $this->websocketStreams->disconnect();
+        return all([
+            $this->websocketApi->disconnect(),
+            $this->websocketStreams->disconnect(),
+        ]);
     }
 
     public function isLoggedIn(): bool

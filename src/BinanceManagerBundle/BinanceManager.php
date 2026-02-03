@@ -10,7 +10,6 @@ use LogicException;
 use React\Promise\PromiseInterface;
 
 use function React\Promise\all;
-use function React\Promise\resolve;
 
 readonly class BinanceManager implements ManagerInterface, RunnableInterface
 {
@@ -27,13 +26,10 @@ readonly class BinanceManager implements ManagerInterface, RunnableInterface
         }
     }
 
-    /**
-     * @return PromiseInterface
-     */
     #[\Override]
-    public function run(): PromiseInterface
+    public function run(): void
     {
-        return all(
+        all(
             array_map(
                 static fn(RegistryInterface $registry): PromiseInterface => $registry->__synchronize(),
                 $this->registries
@@ -41,19 +37,9 @@ readonly class BinanceManager implements ManagerInterface, RunnableInterface
         );
     }
 
-    /**
-     * @return PromiseInterface
-     */
     #[\Override]
-    public function shutdown(): PromiseInterface
+    public function shutdown(): void
     {
-        return resolve($this);
-    }
-
-    #[\Override]
-    public function getPriority(): int
-    {
-        return RunnableInterface::REPOSITORY_PRIORITY;
     }
 
     /**

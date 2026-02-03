@@ -3,13 +3,10 @@
 namespace Empiriq\TerminalBundle;
 
 use Empiriq\Contracts\RunnableInterface;
-use React\Promise\PromiseInterface;
 use React\Socket\ConnectionInterface;
 use React\Socket\SocketServer as ReactSocketServer;
 use SplObjectStorage;
 use Throwable;
-
-use function React\Promise\resolve;
 
 /**
  * @api SocketServer runs a ReactPHP socket server that accepts client connections
@@ -29,35 +26,23 @@ final class SocketServer implements RunnableInterface
 
     /**
      * Start the socket server and listen for connections.
-     * @return PromiseInterface<self>
      */
     #[\Override]
-    public function run(): PromiseInterface
+    public function run(): void
     {
         $this->server = new ReactSocketServer($this->uri, $this->context);
         $this->server->on('connection', [$this, '__connection']);
         $this->server->on('close', [$this, '__close']);
         $this->server->on('error', [$this, '__error']);
-
-        return resolve($this);
     }
 
     /**
      * Gracefully shut down the server.
-     * @return PromiseInterface<self>
      */
     #[\Override]
-    public function shutdown(): PromiseInterface
+    public function shutdown(): void
     {
         $this->server->close();
-
-        return resolve($this);
-    }
-
-    #[\Override]
-    public function getPriority(): int
-    {
-        return RunnableInterface::SOCKET_SERVER_PRIORITY;
     }
 
     /**
