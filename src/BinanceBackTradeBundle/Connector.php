@@ -6,7 +6,7 @@ use Empiriq\BinanceBackTradeBundle\Common\Helpers\ParallelIterator;
 use Empiriq\BinanceBackTradeBundle\Common\Interfaces\ReceiverInterface;
 use Empiriq\Contracts\ExchangeConnectorInterface;
 use Empiriq\Contracts\RunnableInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class Connector implements ExchangeConnectorInterface, RunnableInterface

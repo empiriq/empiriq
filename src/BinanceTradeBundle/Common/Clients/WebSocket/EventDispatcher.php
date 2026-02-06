@@ -2,7 +2,7 @@
 
 namespace Empiriq\BinanceTradeBundle\Common\Clients\WebSocket;
 
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Throwable;
 
 abstract class EventDispatcher extends Connection

@@ -7,7 +7,7 @@ use Empiriq\BinanceContracts\Spot\Spot\Events\User\ExecutionReportEvent;
 use Empiriq\BinanceManagerBundle\Common\Interfaces\Repositories\SpotRepositoryInterface;
 use Empiriq\BinanceManagerBundle\Spot\Spot\Repositories\Synchronizers\OrderSynchronizer;
 use Empiriq\Contracts\Entities\OrderEntity;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderRepository implements SpotRepositoryInterface
 {

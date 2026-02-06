@@ -5,7 +5,7 @@ namespace Empiriq\BinanceManagerBundle\Spot\Spot\Repositories;
 use Empiriq\BinanceTradeBundle\Connector;
 use Empiriq\BinanceManagerBundle\Common\Interfaces\Repositories\SpotRepositoryInterface;
 use Empiriq\BinanceManagerBundle\Spot\Spot\Repositories\Synchronizers\OrderHistorySynchronizer;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderHistoryRepository implements SpotRepositoryInterface
 {

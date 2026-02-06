@@ -7,7 +7,7 @@ use Empiriq\BinanceManagerBundle\Common\Interfaces\Repositories\SpotRepositoryIn
 use Empiriq\BinanceManagerBundle\Spot\Spot\Repositories\Synchronizers\TradeSynchronizer;
 use Empiriq\Contracts\Entities\TradeEntity;
 use Empiriq\Contracts\Events\TradeAddedEvent;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TradeRepository implements SpotRepositoryInterface
 {
