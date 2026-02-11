@@ -57,14 +57,3 @@ $collector = new Collector([
 
 $events = $collector->collect($container);
 ```
-
-Result format:
-
-```php
-[
-    'App\Event\FooEvent' => [
-        'App\Listener\FooListener',
-        'App\Subscriber\FooSubscriber',
-    ],
-]
-```

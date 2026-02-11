@@ -13,23 +13,23 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 readonly class Collector
 {
     /**
-     * @param iterable<HandlerInterface> $extractors
+     * @param iterable<HandlerInterface> $handlers
      */
     public function __construct(
-        private iterable $extractors
+        private iterable $handlers
     ) {
     }
 
     /**
-     * Collects and merges declared events from all extractors.
+     * Collects declared event names from all handlers.
      *
-     * @return array<string, string[]> Map of event name to declaring classes
+     * @return string[] Event names.
      */
     public function collect(ContainerBuilder $container): array
     {
         $events = [];
-        foreach ($this->extractors as $extractor) {
-            foreach ($extractor->collect($container) as $event => $classes) {
+        foreach ($this->handlers as $handler) {
+            foreach ($handler->collect($container) as $event => $classes) {
                 $events[$event] ??= [];
                 $events[$event] = array_merge($events[$event], $classes);
             }
@@ -37,7 +37,10 @@ readonly class Collector
         foreach ($events as &$classes) {
             $classes = array_values(array_unique($classes));
         }
+        unset($classes);
 
-        return $events;
+        ksort($events);
+
+        return array_keys($events);
     }
 }

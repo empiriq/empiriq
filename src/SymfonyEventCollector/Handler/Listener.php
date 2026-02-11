@@ -4,6 +4,7 @@ namespace Empiriq\SymfonyEventCollector\Handler;
 
 use Empiriq\SymfonyEventCollector\HandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * Extracts events declared via AsEventListener attributes.
@@ -26,11 +27,7 @@ final class Listener implements HandlerInterface
 
             $reflection = new \ReflectionClass($class);
 
-            foreach ($reflection->getAttributes() as $attribute) {
-                if ($attribute->getName() !== 'Symfony\Component\EventDispatcher\Attribute\AsEventListener') {
-                    continue;
-                }
-
+            foreach ($reflection->getAttributes(AsEventListener::class) as $attribute) {
                 $args = $attribute->getArguments();
 
                 if (!isset($args['event'])) {

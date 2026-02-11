@@ -21,7 +21,7 @@ readonly class BundleBuildPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $clockType = $container->getParameter('ticker.clock_type');
-        $eventNames = array_keys($this->collector->collect($container));
+        $eventNames = $this->collector->collect($container);
         $intervals = [];
         foreach ($eventNames as $eventName) {
             if (preg_match('/^ticker\.tick\.(\d+(?:\.\d+)?(?:us|ms|s|m|h))$/i', $eventName, $matches)) {
