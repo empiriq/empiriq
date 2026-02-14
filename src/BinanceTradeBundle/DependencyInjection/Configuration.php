@@ -2,13 +2,6 @@
 
 namespace Empiriq\BinanceTradeBundle\DependencyInjection;
 
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketStreams;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMTransport;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\TradeStream;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\UserDataStream;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -18,112 +11,67 @@ final class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('binance_trade');
-        /** @psalm-suppress UndefinedMethod */
         $root = $treeBuilder->getRootNode();
         $root
             ->children()
-                ->scalarNode('api_key')->defaultNull()->end()
-                ->integerNode('resolver_timeout')->defaultValue(5)->end()
+                ->scalarNode('api_key')
+                    ->defaultNull()
+                ->end()
+                ->enumNode('environment')
+                    ->values(['mainnet', 'testnet'])
+                    ->defaultValue('mainnet')
+                ->end()
                 ->arrayNode('signer')
-                    ->isRequired()
                     ->children()
-                        ->scalarNode('class')
-                            ->isRequired()
-                            ->cannotBeEmpty()
+                        ->enumNode('type')
+                            ->values(['hmac', 'ed25519', 'rsa', null])
+                            ->defaultNull()
                         ->end()
-                        ->arrayNode('arguments')
-                            ->prototype('variable')->end()
-                            ->defaultValue([])
+                        ->scalarNode('secret_key')
+                            ->defaultNull()
+                        ->end()
+                        ->scalarNode('private_key_path')
+                            ->defaultNull()
+                        ->end()
+                        ->scalarNode('passphrase')
+                            ->defaultNull()
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('transports')
-                    ->isRequired()
+                ->arrayNode('endpoints')
                     ->children()
-                        ->append($this->addTransportNode('futures_usd', [
-                            'transport_class'              => FuturesUsdMTransport::class,
-                            'rest_api_class'               => RestApi::class,
-                            'rest_api_uri'                 => 'https://fapi.binance.com',
-                            'websocket_api_class'          => WebSocketApi::class,
-                            'websocket_api_uri'            => 'wss://ws-fapi.binance.com/ws-fapi/v1',
-                            'websocket_streams_class'      => WebSocketStreams::class,
-                            'websocket_market_streams_uri' => 'wss://fstream.binance.com/ws',
-                            'streams' => [
-                                'trade' => TradeStream::class,
-                                'user_data' => UserDataStream::class,
-                            ],
-                        ]))
+                        ->arrayNode('spot')
+                            ->children()
+                                ->scalarNode('rest_api')->defaultNull()->end()
+                                ->scalarNode('websocket_api')->defaultNull()->end()
+                                ->scalarNode('websocket_market_streams')->defaultNull()->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('futures_usdm')
+                            ->children()
+                                ->scalarNode('rest_api')->defaultNull()->end()
+                                ->scalarNode('websocket_api')->defaultNull()->end()
+                                ->scalarNode('websocket_market_streams')->defaultNull()->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('futures_coinm')
+                            ->children()
+                                ->scalarNode('rest_api')->defaultNull()->end()
+                                ->scalarNode('websocket_api')->defaultNull()->end()
+                                ->scalarNode('websocket_market_streams')->defaultNull()->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('options')
+                            ->children()
+                                ->scalarNode('rest_api')->defaultNull()->end()
+                                ->scalarNode('websocket_api')->defaultNull()->end()
+                                ->scalarNode('websocket_market_streams')->defaultNull()->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end();
 
         return $treeBuilder;
-    }
-
-    private function addTransportNode(string $name, array $defaults): NodeDefinition
-    {
-        $builder = new TreeBuilder($name);
-        /** @psalm-suppress UndefinedMethod */
-        $node = $builder->getRootNode();
-        $node
-            ->children()
-                ->scalarNode('transport_class')
-                    ->defaultValue($defaults['transport_class'] ?? FuturesUsdMTransport::class)
-                ->end()
-                ->scalarNode('rest_api_class')
-                    ->defaultValue($defaults['rest_api_class'] ?? RestApi::class)
-                ->end()
-                ->scalarNode('rest_api_uri')
-                    ->defaultValue($defaults['rest_api_uri'] ?? 'https://fapi.binance.com')
-                ->end()
-                ->scalarNode('websocket_api_class')
-                    ->defaultValue($defaults['websocket_api_class'] ?? WebSocketApi::class)
-                ->end()
-                ->scalarNode('websocket_api_uri')
-                    ->defaultValue($defaults['websocket_api_uri'] ?? 'wss://ws-fapi.binance.com/ws-fapi/v1')
-                ->end()
-                ->scalarNode('websocket_streams_class')
-                    ->defaultValue($defaults['websocket_streams_class'] ?? WebSocketStreams::class)
-                ->end()
-                ->scalarNode('websocket_market_streams_uri')
-                    ->defaultValue($defaults['websocket_market_streams_uri'] ?? 'wss://fstream.binance.com/ws')
-                ->end()
-                ->arrayNode('streams')
-                    ->children()
-                    // append stream nodes
-                    ->end()
-                ->end()
-            ->end();
-
-        $streamsChildren = $node->find('streams')->children();
-        foreach ($defaults['streams'] ?? [] as $streamName => $streamClass) {
-            $streamsChildren->append($this->addStreamNode($streamName, (string)$streamClass));
-        }
-
-        return $node;
-    }
-
-    private function addStreamNode(string $name, string $class): NodeDefinition
-    {
-        $builder = new TreeBuilder($name);
-        /** @psalm-suppress UndefinedMethod */
-        $node = $builder->getRootNode();
-
-        $node
-            ->beforeNormalization()
-                ->always(fn ($v) => is_array($v) && array_is_list($v) ? ['arguments' => $v] : $v)
-            ->end()
-            ->children()
-                ->scalarNode('class')
-                    ->defaultValue($class)
-                    ->cannotBeEmpty()
-                ->end()
-                ->arrayNode('arguments')
-                    ->prototype('variable')->end()
-                    ->defaultValue([])
-                ->end()
-            ->end();
-
-        return $node;
     }
 }

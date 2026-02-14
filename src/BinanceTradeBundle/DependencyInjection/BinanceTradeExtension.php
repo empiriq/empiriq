@@ -2,88 +2,63 @@
 
 namespace Empiriq\BinanceTradeBundle\DependencyInjection;
 
-use Empiriq\BinanceTradeBundle\Common\Configs\RestConfig;
-use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
-use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
-use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
-use Empiriq\BinanceTradeBundle\Connector;
-use React\Http\Browser;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Reference;
 
 final class BinanceTradeExtension extends Extension
 {
+    public const  CONFIG = 'binance_trade.config';
+    public const  DEFAULTS = 'binance_trade.defaults';
+
     #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
-
-        $container->setDefinition('empiriq.binance.serializer', new Definition(Serializer::class));
-        $container->setDefinition('empiriq.binance.sanitizer', new Definition(Sanitizer::class));
-        $container->setDefinition('empiriq.binance.browser', new Definition(Browser::class));
-        $container->setDefinition(
-            'empiriq.binance.signer',
-            new Definition($config['signer']['class'], $config['signer']['arguments'])
-        );
-        $container->setDefinition(
-            'connector',
-            new Definition(
-                class: Connector::class,
-                arguments: [
-                    array_map(
-                        callback: static fn(array $transport): Definition => new Definition(
-                            class: $transport['transport_class'],
-                            arguments: [
-                                array_map(
-                                    fn(array $stream): Definition => new Definition(
-                                        $stream['class'],
-                                        $stream['arguments']
-                                    ),
-                                    $transport['streams']
-                                ),
-                                new Definition($transport['rest_api_class'], [
-                                    new Reference('empiriq.binance.signer'),
-                                    new Reference('empiriq.binance.serializer'),
-                                    new Reference('logger'),
-                                    new Reference('empiriq.binance.browser'),
-                                    new Definition(RestConfig::class, [
-                                        $transport['rest_api_uri'],
-                                        $config['api_key'],
-                                        $config['resolver_timeout'],
-                                    ]),
-                                ]),
-                                new Definition($transport['websocket_api_class'], [
-                                    new Reference('event_dispatcher'),
-                                    new Reference('empiriq.binance.signer'),
-                                    new Reference('empiriq.binance.serializer'),
-                                    new Reference('logger'),
-                                    new Reference('empiriq.binance.sanitizer'),
-                                    new Definition(WebSocketConfig::class, [
-                                        $transport['websocket_api_uri'],
-                                        $config['api_key'],
-                                        $config['resolver_timeout'],
-                                    ]),
-                                ]),
-                                new Definition($transport['websocket_streams_class'], [
-                                    new Reference('event_dispatcher'),
-                                    new Reference('empiriq.binance.serializer'),
-                                    new Reference('logger'),
-                                    new Reference('empiriq.binance.sanitizer'),
-                                    new Definition(WebSocketConfig::class, [
-                                        $transport['websocket_market_streams_uri'],
-                                        $config['api_key'],
-                                        $config['resolver_timeout'],
-                                    ]),
-                                ]),
-                            ]
-                        ),
-                        array: $config['transports']
-                    ),
-                    new Reference('logger'),
-                ]
-            )
-        )->addTag('empiriq.runnable');
+        $container->setParameter(self::CONFIG, $this->processConfiguration(new Configuration(), $configs));
+        $container->setParameter(self::DEFAULTS, [
+            'mainnet' => [
+                'spot' => [
+                    'rest_api' => 'https://api.binance.com',
+                    'websocket_api' => 'wss://ws-api.binance.com/ws-api/v3',
+                    'websocket_market_streams' => 'wss://stream.binance.com:9443/ws',
+                ],
+                'futures_usdm' => [
+                    'rest_api' => 'https://fapi.binance.com',
+                    'websocket_api' => 'wss://ws-fapi.binance.com/ws-fapi/v1',
+                    'websocket_market_streams' => 'wss://fstream.binance.com/ws',
+                ],
+                'futures_coinm' => [
+                    'rest_api' => 'https://dapi.binance.com',
+                    'websocket_api' => 'wss://ws-dapi.binance.com/ws-dapi/v1',
+                    'websocket_market_streams' => 'wss://dstream.binance.com/ws',
+                ],
+                'options' => [
+                    'rest_api' => 'https://eapi.binance.com',
+                    'websocket_api' => 'wss://ws-eapi.binance.com/ws-eapi/v1',
+                    'websocket_market_streams' => 'wss://estream.binance.com/ws',
+                ],
+            ],
+            'testnet' => [
+                'spot' => [
+                    'rest_api' => 'https://testnet.binance.vision',
+                    'websocket_api' => 'wss://testnet.binance.vision/ws-api/v3',
+                    'websocket_market_streams' => 'wss://testnet.binance.vision/ws',
+                ],
+                'futures_usdm' => [
+                    'rest_api' => 'https://testnet.binancefuture.com',
+                    'websocket_api' => 'wss://testnet.binancefuture.com/ws-fapi/v1',
+                    'websocket_market_streams' => 'wss://fstream.binancefuture.com/ws',
+                ],
+                'futures_coinm' => [
+                    'rest_api' => 'https://testnet.binancefuture.com/dapi',
+                    'websocket_api' => 'wss://testnet.binancefuture.com/ws-dapi/v1',
+                    'websocket_market_streams' => 'wss://dstream.binancefuture.com/ws',
+                ],
+                'options' => [
+                    'rest_api' => 'https://testnet.binancefuture.com/eapi',
+                    'websocket_api' => 'wss://testnet.binancefuture.com/ws-eapi/v1',
+                    'websocket_market_streams' => 'wss://testnet.binancefuture.com/ws',
+                ],
+            ],
+        ]);
     }
 }
