@@ -32,16 +32,16 @@ readonly class FuturesCoinMTransport implements TransportInterface, RunnableInte
     use MarketStreamMethods;
 
     /**
-     * @param FuturesCoinMStreamInterface[] $streams
      * @param RestApi $restApi
      * @param WebSocketApi $websocketApi
      * @param WebSocketStreams $websocketStreams
+     * @param iterable<FuturesCoinMStreamInterface> $streams
      */
     public function __construct(
-        private array $streams,
         private RestApi $restApi,
         private WebSocketApi $websocketApi,
         private WebSocketStreams $websocketStreams,
+        private iterable $streams,
     ) {
         foreach ($this->streams as $stream) {
             if (!$stream instanceof FuturesCoinMStreamInterface) {

@@ -32,16 +32,16 @@ readonly class FuturesUsdMTransport implements TransportInterface, RunnableInter
     use MarketStreamMethods;
 
     /**
-     * @param FuturesUsdMStreamInterface[] $streams
      * @param RestApi $restApi
      * @param WebSocketApi $websocketApi
      * @param WebSocketStreams $websocketStreams
+     * @param iterable<FuturesUsdMStreamInterface> $streams
      */
     public function __construct(
-        private array $streams,
         private RestApi $restApi,
         private WebSocketApi $websocketApi,
         private WebSocketStreams $websocketStreams,
+        private iterable $streams,
     ) {
         foreach ($this->streams as $stream) {
             if (!$stream instanceof FuturesUsdMStreamInterface) {
@@ -71,7 +71,10 @@ readonly class FuturesUsdMTransport implements TransportInterface, RunnableInter
         ])
             ->then(
                 fn() => all(
-                    array_map(fn(FuturesUsdMStreamInterface $stream) => $stream->subscribe($this), $this->streams)
+                    array_map(
+                        fn(FuturesUsdMStreamInterface $stream) => $stream->subscribe($this),
+                        is_array($this->streams) ? $this->streams : iterator_to_array($this->streams)
+                    )
                 )
             );
     }

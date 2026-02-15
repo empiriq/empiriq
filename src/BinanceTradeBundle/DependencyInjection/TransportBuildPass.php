@@ -15,16 +15,16 @@ use Empiriq\BinanceTradeBundle\FuturesUsdMTransport;
 use Empiriq\SymfonyEventCollector\Collector;
 use Empiriq\SymfonyInjectionCollector\Injection;
 use React\Http\Browser;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-//todo split to StreamBuildPass and TransportBuildPass
-final class BundleBuildPass implements CompilerPassInterface
+//todo split BundleBuildPass to StreamBuildPass and TransportBuildPass
+final class TransportBuildPass implements CompilerPassInterface
 {
     public function __construct(
-        private Collector $collector,
         private Injection $injection
     ) {
     }
@@ -62,12 +62,6 @@ final class BundleBuildPass implements CompilerPassInterface
     private function getTransport(array $config): Definition
     {
         return new Definition(FuturesUsdMTransport::class, [
-            [
-                new Definition(TradeStream::class, [
-                    ['BTCUSDT']
-                ]),
-//                new Definition(UserDataStream::class),
-            ],
             new Definition(RestApi::class, [
                 new Reference('empiriq.binance.signer'),
                 new Reference('empiriq.binance.serializer'),
@@ -102,6 +96,7 @@ final class BundleBuildPass implements CompilerPassInterface
                     5.0,
                 ]),
             ]),
+            new TaggedIteratorArgument('empiriq.binance.futures_usdm.stream'),
         ]);
     }
 }

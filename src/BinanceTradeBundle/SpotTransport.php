@@ -32,16 +32,16 @@ readonly class SpotTransport implements TransportInterface, RunnableInterface
     use MarketStreamMethods;
 
     /**
-     * @param SpotStreamInterface[] $streams
      * @param RestApi $restApi
      * @param WebSocketApi $websocketApi
      * @param WebSocketStreams $websocketStreams
+     * @param iterable<SpotStreamInterface> $streams
      */
     public function __construct(
-        private array $streams,
         private RestApi $restApi,
         private WebSocketApi $websocketApi,
         private WebSocketStreams $websocketStreams,
+        private iterable $streams,
     ) {
         foreach ($this->streams as $stream) {
             if (!$stream instanceof SpotStreamInterface) {
