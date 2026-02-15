@@ -2,13 +2,13 @@
 <?php
 
 use App\Kernel;
-use Empiriq\Contracts\Entrypoint;
+use Empiriq\Contracts\Runner;
 
 require dirname(__DIR__, 2) . '/vendor/autoload.php';
 
 $kernel = new Kernel('back', true);
 $kernel->boot();
 
-/** @var Entrypoint $entrypoint */
-$entrypoint = $kernel->getContainer()->get(Entrypoint::class);
+/** @var Runner $entrypoint */
+$entrypoint = $kernel->getContainer()->get(Runner::class);
 $entrypoint->run();

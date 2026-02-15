@@ -5,7 +5,7 @@ namespace Empiriq\Contracts;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
 use Psr\Log\LoggerInterface;
 
-readonly class Entrypoint
+readonly class Runner
 {
     /**
      * @param iterable<RunnableInterface> $runners
