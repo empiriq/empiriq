@@ -13,8 +13,8 @@ use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketStreams;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMTransport;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\TradeStream;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\UserDataStream;
 use Empiriq\SymfonyEventCollector\Collector;
+use Empiriq\SymfonyInjectionCollector\Injection;
 use React\Http\Browser;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,7 +24,8 @@ use Symfony\Component\DependencyInjection\Reference;
 final class BundleBuildPass implements CompilerPassInterface
 {
     public function __construct(
-        private Collector $collector
+        private Collector $collector,
+        private Injection $injection
     ) {
     }
 

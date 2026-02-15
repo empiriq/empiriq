@@ -7,6 +7,7 @@ use Empiriq\BinanceTradeBundle\DependencyInjection\BundleBuildPass;
 use Empiriq\SymfonyEventCollector\Collector;
 use Empiriq\SymfonyEventCollector\Handler\Listener;
 use Empiriq\SymfonyEventCollector\Handler\Subscriber;
+use Empiriq\SymfonyInjectionCollector\Injection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -32,7 +33,8 @@ final class BinanceTradeBundle extends Bundle
                 new Collector([
                     new Subscriber(),
                     new Listener(),
-                ])
+                ]),
+                new Injection()
             )
         );
     }
