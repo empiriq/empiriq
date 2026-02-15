@@ -3,6 +3,7 @@
 namespace Empiriq\BinanceTradeBundle\DependencyInjection;
 
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\TradeStream;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\UserDataStream;
 use Empiriq\SymfonyEventCollector\Collector;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,6 +25,10 @@ final class StreamBuildPass implements CompilerPassInterface
                 ['BTCUSDT'],
             ])
         )->addTag('empiriq.binance.futures_usdm.stream');
-        //new Definition(UserDataStream::class),
+
+//        $container->setDefinition(
+//            'empiriq.binance.futures_usdm.stream.user_data',
+//            new Definition(UserDataStream::class)
+//        )->addTag('empiriq.binance.futures_usdm.stream');
     }
 }
