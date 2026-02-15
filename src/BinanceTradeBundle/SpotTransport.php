@@ -1,7 +1,9 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Spot\Spot;
+namespace Empiriq\BinanceTradeBundle;
 
+use Empiriq\BinanceContracts\Spot\Spot\Responses\Account\AccountStatusResponse;
+use Empiriq\BinanceContracts\Spot\Spot\Responses\General\TimeResponse;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\TransportInterface;
@@ -15,13 +17,11 @@ use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\MarketDataMethods;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\MarketStreamMethods;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\TradingMethods;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\UserDataStreamMethods;
-use Empiriq\BinanceContracts\Spot\Spot\Responses\Account\AccountStatusResponse;
-use Empiriq\BinanceContracts\Spot\Spot\Responses\General\TimeResponse;
-use React\Promise\PromiseInterface;
+use Empiriq\Contracts\RunnableInterface;
 
 use function React\Promise\all;
 
-readonly class SpotTransport implements TransportInterface
+readonly class SpotTransport implements TransportInterface, RunnableInterface
 {
     use GeneralMethods;
     use MarketDataMethods;
@@ -50,9 +50,9 @@ readonly class SpotTransport implements TransportInterface
         }
     }
 
-    public function run(): PromiseInterface
+    public function run(): void
     {
-        return all([
+        all([
             $this->websocketApi->connect()->then(function () {
                 return $this->time();
             })->then(function (TimeResponse $response) {
@@ -67,13 +67,12 @@ readonly class SpotTransport implements TransportInterface
             }),
             $this->websocketStreams->connect(),
         ])
-            ->then(fn() => all(array_map(fn(SpotStreamInterface $stream) => $stream->subscribe($this), $this->streams)))
-            ->then(fn() => $this);
+        ->then(fn() => all(array_map(fn(SpotStreamInterface $stream) => $stream->subscribe($this), $this->streams)));
     }
 
-    public function shutdown(): PromiseInterface
+    public function shutdown(): void
     {
-        return all([
+        all([
             $this->websocketApi->disconnect(),
             $this->websocketStreams->disconnect(),
         ]);

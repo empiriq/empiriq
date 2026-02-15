@@ -7,12 +7,11 @@ use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner;
-use Empiriq\BinanceTradeBundle\Connector;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketStreams;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMTransport;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\TradeStream;
+use Empiriq\BinanceTradeBundle\FuturesUsdMTransport;
 use Empiriq\SymfonyEventCollector\Collector;
 use Empiriq\SymfonyInjectionCollector\Injection;
 use React\Http\Browser;
@@ -21,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+//todo split to StreamBuildPass and TransportBuildPass
 final class BundleBuildPass implements CompilerPassInterface
 {
     public function __construct(
@@ -54,14 +54,14 @@ final class BundleBuildPass implements CompilerPassInterface
             ])
         );
         $container->setDefinition(
-            'connector',
-            $this->getConnector($config)
+            'FuturesUsdMTransport',
+            $this->getTransport($config)
         )->addTag('empiriq.runnable');
     }
 
-    private function getConnector(array $config): Definition
+    private function getTransport(array $config): Definition
     {
-        $transportDefinition = new Definition(FuturesUsdMTransport::class, [
+        return new Definition(FuturesUsdMTransport::class, [
             [
                 new Definition(TradeStream::class, [
                     ['BTCUSDT']
@@ -102,13 +102,6 @@ final class BundleBuildPass implements CompilerPassInterface
                     5.0,
                 ]),
             ]),
-        ]);
-
-        return new Definition(Connector::class, [
-            [
-                $transportDefinition,
-            ],
-            new Reference('logger'),
         ]);
     }
 }

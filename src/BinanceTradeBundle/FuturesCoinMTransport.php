@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM;
+namespace Empiriq\BinanceTradeBundle;
 
 use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Responses\Account\AccountStatusResponse;
 use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Responses\General\TimeResponse;
@@ -17,11 +17,11 @@ use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\MarketDataMethod
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\MarketStreamMethods;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\TradingMethods;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\UserDataStreamMethods;
-use React\Promise\PromiseInterface;
+use Empiriq\Contracts\RunnableInterface;
 
 use function React\Promise\all;
 
-readonly class FuturesCoinMTransport implements TransportInterface
+readonly class FuturesCoinMTransport implements TransportInterface, RunnableInterface
 {
     use GeneralMethods;
     use MarketDataMethods;
@@ -50,9 +50,9 @@ readonly class FuturesCoinMTransport implements TransportInterface
         }
     }
 
-    public function run(): PromiseInterface
+    public function run(): void
     {
-        return all([
+        all([
             $this->websocketApi->connect()->then(function () {
                 return $this->time();
             })->then(function (TimeResponse $response) {
@@ -72,13 +72,12 @@ readonly class FuturesCoinMTransport implements TransportInterface
                     fn(FuturesCoinMStreamInterface $stream) => $stream->subscribe($this),
                     $this->streams
                 )
-            ))
-            ->then(fn() => $this);
+            ));
     }
 
-    public function shutdown(): PromiseInterface
+    public function shutdown(): void
     {
-        return all([
+        all([
             $this->websocketApi->disconnect(),
             $this->websocketStreams->disconnect(),
         ]);

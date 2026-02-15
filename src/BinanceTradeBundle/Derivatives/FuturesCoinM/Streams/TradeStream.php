@@ -3,7 +3,7 @@
 namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Streams;
 
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesCoinMStreamInterface;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\FuturesCoinMTransport;
+use Empiriq\BinanceTradeBundle\FuturesCoinMTransport;
 use React\Promise\PromiseInterface;
 
 /**

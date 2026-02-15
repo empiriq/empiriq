@@ -2,9 +2,9 @@
 
 namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Streams;
 
-use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesCoinMStreamInterface;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\FuturesCoinMTransport;
 use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Responses\UserData\SubscribeResponse;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesCoinMStreamInterface;
+use Empiriq\BinanceTradeBundle\FuturesCoinMTransport;
 use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 

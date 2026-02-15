@@ -3,7 +3,7 @@
 namespace Empiriq\BinanceTradeBundle\Spot\Spot\Streams;
 
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
-use Empiriq\BinanceTradeBundle\Spot\Spot\SpotTransport;
+use Empiriq\BinanceTradeBundle\SpotTransport;
 use React\Promise\PromiseInterface;
 
 /**

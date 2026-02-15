@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM;
+namespace Empiriq\BinanceTradeBundle;
 
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Authentication\AccountStatusResponse;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\TimeResponse;
@@ -17,11 +17,11 @@ use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\MarketDataMethods
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\MarketStreamMethods;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\TradingMethods;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\UserDataStreamMethods;
-use React\Promise\PromiseInterface;
+use Empiriq\Contracts\RunnableInterface;
 
 use function React\Promise\all;
 
-readonly class FuturesUsdMTransport implements TransportInterface
+readonly class FuturesUsdMTransport implements TransportInterface, RunnableInterface
 {
     use GeneralMethods;
     use MarketDataMethods;
@@ -52,9 +52,9 @@ readonly class FuturesUsdMTransport implements TransportInterface
 
     //todo share send() method for custom send
 
-    public function run(): PromiseInterface
+    public function run(): void
     {
-        return all([
+        all([
             $this->websocketApi->connect()->then(function () {
                 return $this->time();
             })->then(function (TimeResponse $response) {
@@ -73,13 +73,12 @@ readonly class FuturesUsdMTransport implements TransportInterface
                 fn() => all(
                     array_map(fn(FuturesUsdMStreamInterface $stream) => $stream->subscribe($this), $this->streams)
                 )
-            )
-            ->then(fn() => $this);
+            );
     }
 
-    public function shutdown(): PromiseInterface
+    public function shutdown(): void
     {
-        return all([
+        all([
             $this->websocketApi->disconnect(),
             $this->websocketStreams->disconnect(),
         ]);

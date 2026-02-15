@@ -2,7 +2,7 @@
 
 namespace Empiriq\BinanceTradeBundle\Common\Interfaces\Streams;
 
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMTransport;
+use Empiriq\BinanceTradeBundle\FuturesUsdMTransport;
 use React\Promise\PromiseInterface;
 
 interface FuturesUsdMStreamInterface

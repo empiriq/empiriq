@@ -2,9 +2,9 @@
 
 namespace Empiriq\BinanceTradeBundle\Spot\Spot\Streams;
 
-use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
-use Empiriq\BinanceTradeBundle\Spot\Spot\SpotTransport;
 use Empiriq\BinanceContracts\Spot\Spot\Responses\UserData\SubscribeResponse;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
+use Empiriq\BinanceTradeBundle\SpotTransport;
 use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 
