@@ -19,7 +19,7 @@ readonly class MetricCollector implements EventSubscriberInterface
     {
         return [
             'ticker.tick?interval=1s' => 'handleTicker',
-            TradeEvent::class => 'handleTrade',
+            'binance.futures_usd.market.trade?symbol=btcusdt' => 'handleTrade',
             OrderTradeUpdateEvent::class => 'handleOrderTradeUpdate',
             AccountUpdateEvent::class => 'handleAccountUpdateEvent',
         ];

@@ -80,8 +80,10 @@ Use the event class names below in `getSubscribedEvents()` to enable the
 corresponding streams.
 
 Spot (market):
-- `binance.spot.market.trade.btcusdt`
-- `binance.spot.market.depth.btcusdt`
+- `binance.spot.market.trade?symbol=btcusdt`
+- `binance.spot.market.depth?symbol=btcusdt`
+You can pass multiple symbols separated by commas, for example:
+- `binance.spot.market.trade?symbol=btcusdt,ethusdt`
 
 Spot (user):
 - `binance.spot.user.balance_update`
@@ -90,8 +92,8 @@ Spot (user):
 - `binance.spot.user.external_lock_update`
 
 Futures USD-M (market):
-- `binance.futures_usd.market.trade.btcusdt`
-- `binance.futures_usd.market.depth.btcusdt`
+- `binance.futures_usd.market.trade?symbol=btcusdt`
+- `binance.futures_usd.market.depth?symbol=btcusdt`
 
 Futures USD-M (user):
 - `binance.futures_usd.user.balance_update`
@@ -100,8 +102,8 @@ Futures USD-M (user):
 - `binance.futures_usd.user.external_lock_update`
 
 Futures COIN-M (market):
-- `binance.futures_coin.market.trade.btcusdt`
-- `binance.futures_coin.market.depth.btcusdt`
+- `binance.futures_coin.market.trade?symbol=btcusdt`
+- `binance.futures_coin.market.depth?symbol=btcusdt`
 
 Futures COIN-M (user):
 - `binance.futures_coin.user.balance_update`
