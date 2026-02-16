@@ -7,10 +7,18 @@ use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsSubscriptions;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi as FuturesUsdMRestApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsApi as FuturesUsdMWsApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsSubscriptions as FuturesUsdMWsSubscriptions;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\RestApi as FuturesCoinMRestApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WsApi as FuturesCoinMWsApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WsSubscriptions as FuturesCoinMWsSubscriptions;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\RestApi as SpotRestApi;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsApi as SpotWsApi;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsSubscriptions as SpotWsSubscriptions;
 use Empiriq\BinanceTradeBundle\FuturesUsdMTransport;
+use Empiriq\BinanceTradeBundle\FuturesCoinMTransport;
+use Empiriq\BinanceTradeBundle\SpotTransport;
 use Empiriq\SymfonyDependencyDiscovery\DependencyDiscovery;
 use React\Http\Browser;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -21,6 +29,42 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class TransportBuildPass implements CompilerPassInterface
 {
+    private const TRANSPORT_MAPPINGS = [
+        [
+            'tag' => StreamBuildPass::TAG_FUTURES_USDM,
+            'service_id' => 'FuturesUsdMTransport',
+            'class' => FuturesUsdMTransport::class,
+            'endpoint_key' => 'futures_usdm',
+            'clients' => [
+                'rest' => FuturesUsdMRestApi::class,
+                'ws' => FuturesUsdMWsApi::class,
+                'subscriptions' => FuturesUsdMWsSubscriptions::class,
+            ],
+        ],
+        [
+            'tag' => StreamBuildPass::TAG_FUTURES_COINM,
+            'service_id' => 'FuturesCoinMTransport',
+            'class' => FuturesCoinMTransport::class,
+            'endpoint_key' => 'futures_coinm',
+            'clients' => [
+                'rest' => FuturesCoinMRestApi::class,
+                'ws' => FuturesCoinMWsApi::class,
+                'subscriptions' => FuturesCoinMWsSubscriptions::class,
+            ],
+        ],
+        [
+            'tag' => StreamBuildPass::TAG_SPOT,
+            'service_id' => 'SpotTransport',
+            'class' => SpotTransport::class,
+            'endpoint_key' => 'spot',
+            'clients' => [
+                'rest' => SpotRestApi::class,
+                'ws' => SpotWsApi::class,
+                'subscriptions' => SpotWsSubscriptions::class,
+            ],
+        ],
+    ];
+
     public function __construct(
         private DependencyDiscovery $dependency
     ) {
@@ -50,50 +94,65 @@ final class TransportBuildPass implements CompilerPassInterface
                 $config['signer']['secret_key']
             ])
         );
-        $container->setDefinition(
-            'FuturesUsdMTransport',
-            $this->getTransport($config)
-        )->addTag('empiriq.runnable');
+
+        $dependencies = $this->dependency->discover($container);
+
+        foreach (self::TRANSPORT_MAPPINGS as $mapping) {
+            $hasTaggedStreams = $container->findTaggedServiceIds($mapping['tag']) !== [];
+            $isRequested = in_array($mapping['class'], $dependencies, true);
+
+            if (!$hasTaggedStreams && !$isRequested) {
+                continue;
+            }
+
+            $container->setDefinition(
+                $mapping['service_id'],
+                $this->getTransport($config, $mapping)
+            )->addTag('empiriq.runnable');
+        }
     }
 
-    private function getTransport(array $config): Definition
+    private function getTransport(array $config, array $mapping): Definition
     {
-        return new Definition(FuturesUsdMTransport::class, [
-            new Definition(RestApi::class, [
+        $endpointKey = $mapping['endpoint_key'];
+        $clients = $mapping['clients'];
+
+        return new Definition($mapping['class'], [
+            new Definition($clients['rest'], [
                 new Reference('empiriq.binance.signer'),
                 new Reference('empiriq.binance.serializer'),
                 new Reference('logger'),
                 new Reference('empiriq.binance.browser'),
                 new Definition(RestConfig::class, [
-                    $config['endpoints']['futures_usdm']['rest_api'],
+                    $config['endpoints'][$endpointKey]['rest_api'],
                     $config['api_key'],
                     5.0,
                 ]),
             ]),
-            new Definition(WsApi::class, [
+            new Definition($clients['ws'], [
                 new Reference('event_dispatcher'),
                 new Reference('empiriq.binance.signer'),
                 new Reference('empiriq.binance.serializer'),
                 new Reference('logger'),
                 new Reference('empiriq.binance.sanitizer'),
                 new Definition(WebSocketConfig::class, [
-                    $config['endpoints']['futures_usdm']['websocket_api'],
+                    $config['endpoints'][$endpointKey]['websocket_api'],
                     $config['api_key'],
                     5.0,
                 ]),
             ]),
-            new Definition(WsSubscriptions::class, [
+            new Definition($clients['subscriptions'], [
                 new Reference('event_dispatcher'),
                 new Reference('empiriq.binance.serializer'),
                 new Reference('logger'),
                 new Reference('empiriq.binance.sanitizer'),
                 new Definition(WebSocketConfig::class, [
-                    $config['endpoints']['futures_usdm']['websocket_market_streams'],
+                    $config['endpoints'][$endpointKey]['websocket_market_streams'],
                     $config['api_key'],
                     5.0,
                 ]),
             ]),
-            new TaggedIteratorArgument('empiriq.binance.futures_usdm.stream'),
+            new TaggedIteratorArgument($mapping['tag']),
         ]);
     }
 }

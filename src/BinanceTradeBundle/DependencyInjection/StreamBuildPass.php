@@ -15,54 +15,55 @@ use Symfony\Component\DependencyInjection\Definition;
 
 final class StreamBuildPass implements CompilerPassInterface
 {
+    public const TAG_FUTURES_USDM = 'empiriq.binance.futures_usdm.stream';
+    public const TAG_FUTURES_COINM = 'empiriq.binance.futures_coinm.stream';
+    public const TAG_SPOT = 'empiriq.binance.spot.stream';
+
     private const STREAM_MAPPINGS = [
-        'futures_usd' => [
-            [
-                'pattern' => '/^binance\.futures_usd\.market\.trade\?symbol=(.+)$/i',
-                'service_id' => 'empiriq.binance.futures_usdm.stream.trade',
-                'class' => FuturesUsdMTradeStream::class,
-                'tag' => 'empiriq.binance.futures_usdm.stream',
-                'requires_symbols' => true,
-            ],
-            [
-                'pattern' => '/^binance\.futures_usd\.user\.(balance_update|outbound_account_position|execution_report|external_lock_update)$/i',
-                'service_id' => 'empiriq.binance.futures_usdm.stream.user_data',
-                'class' => FuturesUsdMUserDataStream::class,
-                'tag' => 'empiriq.binance.futures_usdm.stream',
-                'requires_symbols' => false,
-            ],
+        // Futures USD-M
+        [
+            'pattern' => '/^binance\.futures_usd\.market\.trade\?symbol=(.+)$/i',
+            'service_id' => 'empiriq.binance.futures_usdm.stream.trade',
+            'class' => FuturesUsdMTradeStream::class,
+            'tag' => self::TAG_FUTURES_USDM,
+            'requires_symbols' => true,
         ],
-        'futures_coin' => [
-            [
-                'pattern' => '/^binance\.futures_coin\.market\.trade\?symbol=(.+)$/i',
-                'service_id' => 'empiriq.binance.futures_coinm.stream.trade',
-                'class' => FuturesCoinMTradeStream::class,
-                'tag' => 'empiriq.binance.futures_coinm.stream',
-                'requires_symbols' => true,
-            ],
-            [
-                'pattern' => '/^binance\.futures_coin\.user\.(balance_update|outbound_account_position|execution_report|external_lock_update)$/i',
-                'service_id' => 'empiriq.binance.futures_coinm.stream.user_data',
-                'class' => FuturesCoinMUserDataStream::class,
-                'tag' => 'empiriq.binance.futures_coinm.stream',
-                'requires_symbols' => false,
-            ],
+        [
+            'pattern' => '/^binance\.futures_usd\.user\.(balance_update|outbound_account_position|execution_report|external_lock_update)$/i',
+            'service_id' => 'empiriq.binance.futures_usdm.stream.user_data',
+            'class' => FuturesUsdMUserDataStream::class,
+            'tag' => self::TAG_FUTURES_USDM,
+            'requires_symbols' => false,
         ],
-        'spot' => [
-            [
-                'pattern' => '/^binance\.spot\.market\.trade\?symbol=(.+)$/i',
-                'service_id' => 'empiriq.binance.spot.stream.trade',
-                'class' => SpotTradeStream::class,
-                'tag' => 'empiriq.binance.spot.stream',
-                'requires_symbols' => true,
-            ],
-            [
-                'pattern' => '/^binance\.spot\.user\.(balance_update|outbound_account_position|execution_report|external_lock_update)$/i',
-                'service_id' => 'empiriq.binance.spot.stream.user_data',
-                'class' => SpotUserDataStream::class,
-                'tag' => 'empiriq.binance.spot.stream',
-                'requires_symbols' => false,
-            ],
+        // Futures COIN-M
+        [
+            'pattern' => '/^binance\.futures_coin\.market\.trade\?symbol=(.+)$/i',
+            'service_id' => 'empiriq.binance.futures_coinm.stream.trade',
+            'class' => FuturesCoinMTradeStream::class,
+            'tag' => self::TAG_FUTURES_COINM,
+            'requires_symbols' => true,
+        ],
+        [
+            'pattern' => '/^binance\.futures_coin\.user\.(balance_update|outbound_account_position|execution_report|external_lock_update)$/i',
+            'service_id' => 'empiriq.binance.futures_coinm.stream.user_data',
+            'class' => FuturesCoinMUserDataStream::class,
+            'tag' => self::TAG_FUTURES_COINM,
+            'requires_symbols' => false,
+        ],
+        // Spot
+        [
+            'pattern' => '/^binance\.spot\.market\.trade\?symbol=(.+)$/i',
+            'service_id' => 'empiriq.binance.spot.stream.trade',
+            'class' => SpotTradeStream::class,
+            'tag' => self::TAG_SPOT,
+            'requires_symbols' => true,
+        ],
+        [
+            'pattern' => '/^binance\.spot\.user\.(balance_update|outbound_account_position|execution_report|external_lock_update)$/i',
+            'service_id' => 'empiriq.binance.spot.stream.user_data',
+            'class' => SpotUserDataStream::class,
+            'tag' => self::TAG_SPOT,
+            'requires_symbols' => false,
         ],
     ];
 
@@ -75,11 +76,9 @@ final class StreamBuildPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $events = $this->event->discover($container);
-
-        $mappings = $this->flattenMappings();
         $symbolsByService = [];
         $enabledByService = [];
-        foreach ($mappings as $mapping) {
+        foreach (self::STREAM_MAPPINGS as $mapping) {
             $serviceId = $mapping['service_id'];
             if (($mapping['requires_symbols'] ?? false) === true) {
                 $symbolsByService[$serviceId] = [];
@@ -89,7 +88,7 @@ final class StreamBuildPass implements CompilerPassInterface
         }
 
         foreach ($events as $eventName) {
-            foreach ($mappings as $mapping) {
+            foreach (self::STREAM_MAPPINGS as $mapping) {
                 $serviceId = $mapping['service_id'];
                 if (($mapping['requires_symbols'] ?? false) === true) {
                     $symbols = $this->extractSymbolsByPattern($eventName, $mapping['pattern']);
@@ -108,7 +107,7 @@ final class StreamBuildPass implements CompilerPassInterface
             }
         }
 
-        foreach ($mappings as $mapping) {
+        foreach (self::STREAM_MAPPINGS as $mapping) {
             $serviceId = $mapping['service_id'];
             if (($mapping['requires_symbols'] ?? false) === true) {
                 $symbols = $this->normalizeSymbols($symbolsByService[$serviceId]);
@@ -132,21 +131,6 @@ final class StreamBuildPass implements CompilerPassInterface
                 new Definition($mapping['class'])
             )->addTag($mapping['tag']);
         }
-    }
-
-    /**
-     * @return array<int, array<string, mixed>>
-     */
-    private function flattenMappings(): array
-    {
-        $flat = [];
-        foreach (self::STREAM_MAPPINGS as $group) {
-            foreach ($group as $mapping) {
-                $flat[] = $mapping;
-            }
-        }
-
-        return $flat;
     }
 
     /**
