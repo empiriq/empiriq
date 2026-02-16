@@ -4,7 +4,7 @@ namespace Empiriq\BinanceTradeBundle\Common\Interfaces;
 
 use React\Promise\PromiseInterface;
 
-interface WebSocketClientInterface
+interface WsClientInterface
 {
     /**
      * @return PromiseInterface<self>

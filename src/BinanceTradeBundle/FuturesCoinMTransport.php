@@ -6,7 +6,6 @@ use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Responses\Account\AccountS
 use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Responses\General\TimeResponse;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesCoinMStreamInterface;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\TransportInterface;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\RestApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WsApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WsSubscriptions;
@@ -21,7 +20,7 @@ use Empiriq\Contracts\RunnableInterface;
 
 use function React\Promise\all;
 
-readonly class FuturesCoinMTransport implements TransportInterface, RunnableInterface
+readonly class FuturesCoinMTransport implements RunnableInterface
 {
     use GeneralMethods;
     use MarketDataMethods;

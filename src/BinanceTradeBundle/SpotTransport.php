@@ -6,7 +6,6 @@ use Empiriq\BinanceContracts\Spot\Spot\Responses\Account\AccountStatusResponse;
 use Empiriq\BinanceContracts\Spot\Spot\Responses\General\TimeResponse;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\TransportInterface;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\RestApi;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsApi;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsSubscriptions;
@@ -21,7 +20,7 @@ use Empiriq\Contracts\RunnableInterface;
 
 use function React\Promise\all;
 
-readonly class SpotTransport implements TransportInterface, RunnableInterface
+readonly class SpotTransport implements RunnableInterface
 {
     use GeneralMethods;
     use MarketDataMethods;

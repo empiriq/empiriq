@@ -6,7 +6,6 @@ use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Authentication\Ac
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\TimeResponse;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesUsdMStreamInterface;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\TransportInterface;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsSubscriptions;
@@ -21,7 +20,7 @@ use Empiriq\Contracts\RunnableInterface;
 
 use function React\Promise\all;
 
-readonly class FuturesUsdMTransport implements TransportInterface, RunnableInterface
+readonly class FuturesUsdMTransport implements RunnableInterface
 {
     use GeneralMethods;
     use MarketDataMethods;
