@@ -1,8 +1,8 @@
 <?php
 
-namespace Empiriq\SymfonyEventCollector\Handler;
+namespace Empiriq\SymfonyEventDiscovery\Extractor;
 
-use Empiriq\SymfonyEventCollector\HandlerInterface;
+use Empiriq\SymfonyEventDiscovery\ExtractorInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
  * This extractor inspects class-level attributes and does not rely
  * on Symfony autoconfiguration or service tags.
  */
-final class Listener implements HandlerInterface
+final class ListenerExtractor implements ExtractorInterface
 {
     public function collect(ContainerBuilder $container): array
     {

@@ -4,7 +4,7 @@ namespace Empiriq\BinanceTradeBundle\DependencyInjection;
 
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\TradeStream;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\UserDataStream;
-use Empiriq\SymfonyEventCollector\Collector;
+use Empiriq\SymfonyEventDiscovery\EventDiscovery;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Definition;
 final class StreamBuildPass implements CompilerPassInterface
 {
     public function __construct(
-        private Collector $collector
+        private EventDiscovery $eventDiscovery
     ) {
     }
 

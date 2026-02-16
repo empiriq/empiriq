@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\SymfonyEventCollector;
+namespace Empiriq\SymfonyEventDiscovery;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Implementations must operate at design-time and must not rely on
  * service tags or compiler passes.
  */
-interface HandlerInterface
+interface ExtractorInterface
 {
     /**
      * @return string[] Event names.

@@ -1,4 +1,4 @@
-# Symfony Event Collector
+# Symfony Event Discovery
 
 A lightweight design-time event introspection library for Symfony-based applications.
 
@@ -46,14 +46,14 @@ Additional extractors can be added via a simple interface.
 ## Basic Usage
 
 ```php
-use Empiriq\SymfonyEventCollector\Collector;
-use Empiriq\SymfonyEventCollector\Handler\Subscriber;
-use Empiriq\SymfonyEventCollector\Handler\Listener;
+use Empiriq\SymfonyEventDiscovery\EventDiscovery;
+use Empiriq\SymfonyEventDiscovery\Extractor\SubscriberExtractor;
+use Empiriq\SymfonyEventDiscovery\Extractor\ListenerExtractor;
 
-$collector = new Collector([
-    new Subscriber(),
-    new Listener(),
+$collector = new EventDiscovery([
+    new SubscriberExtractor(),
+    new ListenerExtractor(),
 ]);
 
-$events = $collector->collect($container);
+$events = $collector->discover($container);
 ```

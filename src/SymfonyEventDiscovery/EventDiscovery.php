@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\SymfonyEventCollector;
+namespace Empiriq\SymfonyEventDiscovery;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -10,26 +10,26 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * The resulting catalog represents events that the codebase declares
  * it can listen to, not events that are guaranteed to have runtime listeners.
  */
-readonly class Collector
+readonly class EventDiscovery
 {
     /**
-     * @param iterable<HandlerInterface> $handlers
+     * @param iterable<ExtractorInterface> $extractors
      */
     public function __construct(
-        private iterable $handlers
+        private iterable $extractors
     ) {
     }
 
     /**
-     * Collects declared event names from all handlers.
+     * Collects declared event names from all extractors.
      *
      * @return string[] Event names.
      */
-    public function collect(ContainerBuilder $container): array
+    public function discover(ContainerBuilder $container): array
     {
         $events = [];
-        foreach ($this->handlers as $handler) {
-            foreach ($handler->collect($container) as $event) {
+        foreach ($this->extractors as $extractor) {
+            foreach ($extractor->collect($container) as $event) {
                 $events[] = $event;
             }
         }

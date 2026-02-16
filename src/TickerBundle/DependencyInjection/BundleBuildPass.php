@@ -2,7 +2,7 @@
 
 namespace Empiriq\TickerBundle\DependencyInjection;
 
-use Empiriq\SymfonyEventCollector\Collector;
+use Empiriq\SymfonyEventDiscovery\EventDiscovery;
 use Empiriq\TickerBundle\Clock\EventDrivenClock;
 use Empiriq\TickerBundle\Clock\TimeDrivenClock;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Reference;
 readonly class BundleBuildPass implements CompilerPassInterface
 {
     public function __construct(
-        private Collector $collector
+        private EventDiscovery $eventDiscovery
     ) {
     }
 
@@ -21,7 +21,7 @@ readonly class BundleBuildPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $clockType = $container->getParameter('ticker.clock_type');
-        $eventNames = $this->collector->collect($container);
+        $eventNames = $this->eventDiscovery->discover($container);
         $intervals = [];
         foreach ($eventNames as $eventName) {
             if (preg_match('/^ticker\.tick\.(\d+(?:\.\d+)?(?:us|ms|s|m|h))$/i', $eventName, $matches)) {

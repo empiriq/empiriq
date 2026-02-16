@@ -1,8 +1,8 @@
 <?php
 
-namespace Empiriq\SymfonyEventCollector\Handler;
+namespace Empiriq\SymfonyEventDiscovery\Extractor;
 
-use Empiriq\SymfonyEventCollector\HandlerInterface;
+use Empiriq\SymfonyEventDiscovery\ExtractorInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Events are obtained from static getSubscribedEvents() declarations
  * without assuming runtime service registration.
  */
-final class Subscriber implements HandlerInterface
+final class SubscriberExtractor implements ExtractorInterface
 {
     public function collect(ContainerBuilder $container): array
     {
