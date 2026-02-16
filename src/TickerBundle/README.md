@@ -22,22 +22,12 @@ class:
 
 #### Period-based subscriptions
 
-Consumers subscribe to ticks **by event name**, where the event name encodes
-the tick interval:
+Consumers subscribe to ticks **by event name**, passing intervals as query
+parameters to keep the dot-style event prefix intact:
 
 ```
-ticker.tick.<interval>
-```
-
-Examples:
-
-```
-ticker.tick.1s
-ticker.tick.1.5s
-ticker.tick.250ms
-ticker.tick.100us
-ticker.tick.2m
-ticker.tick.1h
+ticker.tick?interval=1.5s
+ticker.tick?interval=1.5s,2s,500ms
 ```
 
 Supported interval formats:
@@ -150,7 +140,7 @@ final class ExampleSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'ticker.tick.1s' => 'onTick',
+            'ticker.tick?interval=1s' => 'onTick',
         ];
     }
 

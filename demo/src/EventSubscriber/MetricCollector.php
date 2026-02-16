@@ -18,7 +18,7 @@ readonly class MetricCollector implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'ticker.tick.1s' => 'handleTicker',
+            'ticker.tick?interval=1s' => 'handleTicker',
             TradeEvent::class => 'handleTrade',
             OrderTradeUpdateEvent::class => 'handleOrderTradeUpdate',
             AccountUpdateEvent::class => 'handleAccountUpdateEvent',

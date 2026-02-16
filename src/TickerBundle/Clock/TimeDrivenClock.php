@@ -36,7 +36,7 @@ class TimeDrivenClock implements RunnableInterface
                             period: $interval,
                             time: new \DateTimeImmutable()
                         ),
-                        sprintf('ticker.tick.%s', $interval)
+                        sprintf('ticker.tick?interval=%s', $interval)
                     );
                 }
             );
