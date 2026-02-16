@@ -1,19 +1,19 @@
 <?php
 
-namespace Empiriq\SymfonyInjectionCollector;
+namespace Empiriq\SymfonyDependencyDiscovery;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-final class Injection
+final class DependencyDiscovery
 {
     /**
      * Collects all injected dependencies referenced in service definitions.
      *
      * @return string[] Dependency identifiers (service ids and/or class names).
      */
-    public function collect(ContainerBuilder $container): array
+    public function discover(ContainerBuilder $container): array
     {
         $dependencies = [];
         foreach ($container->getDefinitions() as $definition) {

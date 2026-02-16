@@ -67,14 +67,14 @@ final class StreamBuildPass implements CompilerPassInterface
     ];
 
     public function __construct(
-        private readonly EventDiscovery $eventDiscovery
+        private readonly EventDiscovery $event
     ) {
     }
 
     #[\Override]
     public function process(ContainerBuilder $container): void
     {
-        $events = $this->eventDiscovery->discover($container);
+        $events = $this->event->discover($container);
 
         $mappings = $this->flattenMappings();
         $symbolsByService = [];

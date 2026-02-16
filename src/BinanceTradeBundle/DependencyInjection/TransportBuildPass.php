@@ -11,7 +11,7 @@ use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsSubscriptions;
 use Empiriq\BinanceTradeBundle\FuturesUsdMTransport;
-use Empiriq\SymfonyInjectionCollector\Injection;
+use Empiriq\SymfonyDependencyDiscovery\DependencyDiscovery;
 use React\Http\Browser;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
 final class TransportBuildPass implements CompilerPassInterface
 {
     public function __construct(
-        private Injection $injection
+        private DependencyDiscovery $dependency
     ) {
     }
 

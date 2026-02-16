@@ -8,7 +8,7 @@ use Empiriq\BinanceTradeBundle\DependencyInjection\TransportBuildPass;
 use Empiriq\SymfonyEventDiscovery\EventDiscovery;
 use Empiriq\SymfonyEventDiscovery\Extractor\ListenerExtractor;
 use Empiriq\SymfonyEventDiscovery\Extractor\SubscriberExtractor;
-use Empiriq\SymfonyInjectionCollector\Injection;
+use Empiriq\SymfonyDependencyDiscovery\DependencyDiscovery;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -38,7 +38,7 @@ final class BinanceTradeBundle extends Bundle
         );
         $container->addCompilerPass(
             new TransportBuildPass(
-                new Injection()
+                new DependencyDiscovery()
             )
         );
     }
