@@ -26,7 +26,7 @@ final class Subscriber implements HandlerInterface
                 continue;
             }
             foreach (array_keys($class::getSubscribedEvents()) as $eventName) {
-                $events[$eventName][] = $class;
+                $events[] = $eventName;
             }
         }
 

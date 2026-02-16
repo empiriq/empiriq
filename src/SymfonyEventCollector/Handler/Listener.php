@@ -34,7 +34,7 @@ final class Listener implements HandlerInterface
                     continue;
                 }
 
-                $events[$args['event']][] = $class;
+                $events[] = $args['event'];
             }
         }
 

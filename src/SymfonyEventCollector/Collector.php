@@ -29,18 +29,14 @@ readonly class Collector
     {
         $events = [];
         foreach ($this->handlers as $handler) {
-            foreach ($handler->collect($container) as $event => $classes) {
-                $events[$event] ??= [];
-                $events[$event] = array_merge($events[$event], $classes);
+            foreach ($handler->collect($container) as $event) {
+                $events[] = $event;
             }
         }
-        foreach ($events as &$classes) {
-            $classes = array_values(array_unique($classes));
-        }
-        unset($classes);
 
-        ksort($events);
+        $events = array_values(array_unique($events));
+        sort($events);
 
-        return array_keys($events);
+        return $events;
     }
 }

@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 interface HandlerInterface
 {
     /**
-     * @return array<string, string[]> Map of event name to declaring classes.
+     * @return string[] Event names.
      */
     public function collect(ContainerBuilder $container): array;
 }
