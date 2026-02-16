@@ -1,8 +1,8 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients;
+namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients;
 
-use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\EventInterface;
+use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Common\EventInterface;
 use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
 use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
@@ -13,12 +13,12 @@ use Psr\Log\LoggerInterface;
 
 /**
  * API endpoints:
- *  - Production: wss://fstream.binance.com/ws
- *  - Testnet: wss://fstream.binancefuture.com/ws
+ *  - Production: wss://dstream.binance.com/ws
+ *  - Testnet: wss://dstream.binancefuture.com/ws
  *
- * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-market-streams
+ * @see https://developers.binance.com/docs/derivatives/coin-margined-futures/websocket-market-streams
  */
-final class WebSocketStreams extends ResponseResolver implements WebSocketClientInterface
+final class WsSubscriptions extends ResponseResolver implements WebSocketClientInterface
 {
     /**
      * @param EventDispatcherInterface $dispatcher Event dispatcher.

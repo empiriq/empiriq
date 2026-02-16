@@ -21,7 +21,7 @@ trait GeneralMethods
      */
     public function ping(): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'ping',
             permission: Permission::NONE,
             type: PingResponse::class,
@@ -34,7 +34,7 @@ trait GeneralMethods
      */
     public function time(): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'time',
             permission: Permission::NONE,
             type: TimeResponse::class,

@@ -16,7 +16,7 @@ trait AuthenticationMethods
 {
     public function sessionLogon(): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'session.logon',
             permission: Permission::SIGNED,
             type: AccountStatusResponse::class,
@@ -26,7 +26,7 @@ trait AuthenticationMethods
 
     public function sessionLogout(): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'session.logout',
             permission: Permission::NONE,
             type: AccountStatusResponse::class,
@@ -35,7 +35,7 @@ trait AuthenticationMethods
 
     public function sessionStatus(): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'session.status',
             permission: Permission::NONE,
             type: AccountStatusResponse::class,

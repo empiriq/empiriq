@@ -22,7 +22,7 @@ trait UserDataStreamMethods
      */
     public function userDataStreamSubscribe(): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'userDataStream.subscribe',
             permission: Permission::USER_STREAM,
             type: SubscribeResponse::class,
@@ -37,7 +37,7 @@ trait UserDataStreamMethods
      */
     public function userDataStreamUnsubscribe(): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'userDataStream.unsubscribe',
             permission: Permission::NONE,
             type: SubscribeResponse::class,
@@ -46,7 +46,7 @@ trait UserDataStreamMethods
 
     public function createListenKey(): PromiseInterface
     {
-        return $this->restApi->send(
+        return $this->rest->send(
             method: 'POST',
             path: '/fapi/v1/listenKey',
             permission: Permission::USER_STREAM,
@@ -56,7 +56,7 @@ trait UserDataStreamMethods
 
     public function updateListenKey(string $listenKey): PromiseInterface
     {
-        return $this->restApi->send(
+        return $this->rest->send(
             method: 'PUT',
             path: '/fapi/v1/listenKey',
             permission: Permission::USER_STREAM,
@@ -67,7 +67,7 @@ trait UserDataStreamMethods
 
     public function deleteListenKey(string $listenKey): PromiseInterface
     {
-        return $this->restApi->send(
+        return $this->rest->send(
             method: 'DELETE',
             path: '/fapi/v1/listenKey',
             permission: Permission::USER_STREAM,

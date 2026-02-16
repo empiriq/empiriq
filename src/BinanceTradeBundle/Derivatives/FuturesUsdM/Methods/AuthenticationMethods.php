@@ -24,7 +24,7 @@ trait AuthenticationMethods
      */
     public function sessionLogon(): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'session.logon',
             permission: Permission::SIGNED,
             type: AccountStatusResponse::class,

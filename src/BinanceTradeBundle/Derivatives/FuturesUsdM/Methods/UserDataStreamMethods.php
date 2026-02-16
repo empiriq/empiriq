@@ -24,7 +24,7 @@ trait UserDataStreamMethods
 //        if (!$this->websocketApi->canLogon()) {
 //            throw new \RuntimeException('!canLogon');
 //        }
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'userDataStream.start',
             permission: Permission::USER_STREAM,
             type: SubscribeResponse::class,
@@ -38,7 +38,7 @@ trait UserDataStreamMethods
      */
     public function userDataStreamUnsubscribe(): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'userDataStream.stop',
             permission: Permission::USER_STREAM,
             type: SubscribeResponse::class,
@@ -52,7 +52,7 @@ trait UserDataStreamMethods
      */
     public function createListenKey(): PromiseInterface
     {
-        return $this->restApi->send(
+        return $this->rest->send(
             method: 'POST',
             path: '/fapi/v1/listenKey',
             permission: Permission::USER_STREAM,
@@ -62,7 +62,7 @@ trait UserDataStreamMethods
 
     public function updateListenKey(string $listenKey): PromiseInterface
     {
-        return $this->restApi->send(
+        return $this->rest->send(
             method: 'PUT',
             path: '/fapi/v1/listenKey',
             permission: Permission::USER_STREAM,
@@ -73,7 +73,7 @@ trait UserDataStreamMethods
 
     public function deleteListenKey(string $listenKey): PromiseInterface
     {
-        return $this->restApi->send(
+        return $this->rest->send(
             method: 'DELETE',
             path: '/fapi/v1/listenKey',
             permission: Permission::USER_STREAM,

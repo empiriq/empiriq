@@ -8,8 +8,8 @@ use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WebSocketStreams;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsSubscriptions;
 use Empiriq\BinanceTradeBundle\FuturesUsdMTransport;
 use Empiriq\SymfonyInjectionCollector\Injection;
 use React\Http\Browser;
@@ -70,7 +70,7 @@ final class TransportBuildPass implements CompilerPassInterface
                     5.0,
                 ]),
             ]),
-            new Definition(WebSocketApi::class, [
+            new Definition(WsApi::class, [
                 new Reference('event_dispatcher'),
                 new Reference('empiriq.binance.signer'),
                 new Reference('empiriq.binance.serializer'),
@@ -82,7 +82,7 @@ final class TransportBuildPass implements CompilerPassInterface
                     5.0,
                 ]),
             ]),
-            new Definition(WebSocketStreams::class, [
+            new Definition(WsSubscriptions::class, [
                 new Reference('event_dispatcher'),
                 new Reference('empiriq.binance.serializer'),
                 new Reference('logger'),

@@ -22,7 +22,7 @@ trait MarketDataMethods
      */
     public function depth(Depth $payload): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'depth',
             permission: Permission::NONE,
             type: DepthResponse::class,

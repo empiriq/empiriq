@@ -23,7 +23,7 @@ use Psr\Log\LoggerInterface;
  *
  * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-api-general-info
  */
-final class WebSocketApi extends ResponseResolver implements WebSocketClientInterface
+final class WsApi extends ResponseResolver implements WebSocketClientInterface
 {
     /**
      * @param EventDispatcherInterface $dispatcher Event dispatcher.

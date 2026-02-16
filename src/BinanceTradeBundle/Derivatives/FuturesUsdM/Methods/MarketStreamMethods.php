@@ -21,7 +21,7 @@ trait MarketStreamMethods
      */
     public function subscribe(array $streams): PromiseInterface
     {
-        return $this->websocketStreams->send(
+        return $this->subscriptions->send(
             method: 'SUBSCRIBE',
             permission: Permission::NONE,
             type: SubscribeResponse::class,
@@ -35,7 +35,7 @@ trait MarketStreamMethods
      */
     public function unsubscribe(array $streams): PromiseInterface
     {
-        return $this->websocketStreams->send(
+        return $this->subscriptions->send(
             method: 'UNSUBSCRIBE',
             permission: Permission::NONE,
             type: SubscribeResponse::class,
@@ -49,7 +49,7 @@ trait MarketStreamMethods
      */
     public function listSubscriptions(): PromiseInterface
     {
-        return $this->websocketStreams->send(
+        return $this->subscriptions->send(
             method: 'LIST_SUBSCRIPTIONS',
             permission: Permission::NONE,
             type: ListSubscriptionsResponse::class,
@@ -62,7 +62,7 @@ trait MarketStreamMethods
      */
     public function setProperty(array $property): PromiseInterface
     {
-        return $this->websocketStreams->send(
+        return $this->subscriptions->send(
             method: 'SET_PROPERTY',
             permission: Permission::NONE,
             type: SetPropertyResponse::class,
@@ -76,7 +76,7 @@ trait MarketStreamMethods
      */
     public function getProperty(array $property): PromiseInterface
     {
-        return $this->websocketStreams->send(
+        return $this->subscriptions->send(
             method: 'GET_PROPERTY',
             permission: Permission::NONE,
             type: GetPropertyResponse::class,

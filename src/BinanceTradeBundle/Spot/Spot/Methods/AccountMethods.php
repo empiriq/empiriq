@@ -22,7 +22,7 @@ trait AccountMethods
      */
     public function accountStatus(): PromiseInterface //todo omitZeroBalances
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'account.status',
             permission: Permission::USER_DATA,
             type: AccountStatusResponse::class,

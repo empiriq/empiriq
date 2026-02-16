@@ -1,41 +1,34 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients;
+namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients;
 
-use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Common\EventInterface;
+use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\EventInterface;
 use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
 use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\WebSocketClientInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * WebSocket API client for COIN-M Futures.
- *
  * API endpoints:
- * - Production: wss://ws-dapi.binance.com/ws-dapi/v1
- * - Testnet: wss://testnet.binancefuture.com/ws-dapi/v1
+ *  - Production: wss://fstream.binance.com/ws
+ *  - Testnet: wss://fstream.binancefuture.com/ws
  *
- * The actual WebSocket URI is configurable via {@see WebSocketConfig}.
- *
- * @see https://developers.binance.com/docs/derivatives/coin-margined-futures/websocket-api-general-info
+ * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-market-streams
  */
-final class WebSocketApi extends ResponseResolver implements WebSocketClientInterface
+final class WsSubscriptions extends ResponseResolver implements WebSocketClientInterface
 {
     /**
      * @param EventDispatcherInterface $dispatcher Event dispatcher.
-     * @param SignerInterface $signer Request signer.
      * @param SerializerInterface $serializer Payload serializer.
      * @param LoggerInterface $logger PSR-3 logger instance.
      * @param SanitizerInterface $sanitizer Sanitizer for sensitive data before logging.
-     * @param WebSocketConfig $config WebSocket API configuration.
+     * @param WebSocketConfig $config WebSocket configuration.
      */
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
-        protected SignerInterface $signer,
         protected SerializerInterface $serializer,
         protected LoggerInterface $logger,
         protected SanitizerInterface $sanitizer,
@@ -52,7 +45,7 @@ final class WebSocketApi extends ResponseResolver implements WebSocketClientInte
     #[\Override]
     protected static function extractRawEvent(array $data): ?array
     {
-        return $data['event'] ?? null;
+        return isset($data['e']) ? $data : null;
     }
 
     #[\Override]

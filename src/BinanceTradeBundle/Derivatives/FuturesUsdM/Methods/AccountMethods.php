@@ -21,7 +21,7 @@ trait AccountMethods
      */
     public function accountBalanceV2(): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'v2/account.balance',
             permission: Permission::USER_DATA,
             type: AccountBalanceResponse::class,

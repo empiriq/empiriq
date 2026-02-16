@@ -21,7 +21,7 @@ trait GeneralMethods
      */
     public function ping(): PromiseInterface
     {
-        return $this->restApi->send(
+        return $this->rest->send(
             method: 'GET',
             path: '/fapi/v1/ping',
             permission: Permission::NONE,
@@ -35,7 +35,7 @@ trait GeneralMethods
      */
     public function time(): PromiseInterface
     {
-        return $this->restApi->send(
+        return $this->rest->send(
             method: 'GET',
             path: '/fapi/v1/time',
             permission: Permission::NONE,
@@ -49,7 +49,7 @@ trait GeneralMethods
      */
     public function exchangeInfo(): PromiseInterface
     {
-        return $this->restApi->send(
+        return $this->rest->send(
             method: 'GET',
             path: '/fapi/v1/exchangeInfo',
             permission: Permission::NONE,

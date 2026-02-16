@@ -27,7 +27,7 @@ trait TradingMethods
 {
     public function orderAmendKeepPriority(OrderAmendKeepPriority $payload, int $recvWindow = 5000): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'order.amend.keepPriority',
             permission: Permission::TRADE,
             type: OrderCancelResponse::class,
@@ -38,7 +38,7 @@ trait TradingMethods
 
     public function orderCancel(OrderCancel $payload, int $recvWindow = 5000): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'order.cancel',
             permission: Permission::TRADE,
             type: OrderCancelResponse::class,
@@ -49,7 +49,7 @@ trait TradingMethods
 
     public function orderCancelAll(OrderCancelAll $payload, int $recvWindow = 5000): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'openOrders.cancelAll',
             permission: Permission::TRADE,
             type: OrderCancelResponse::class,
@@ -65,7 +65,7 @@ trait TradingMethods
      */
     public function orderCancelReplace(OrderCancelReplace $payload, int $recvWindow = 5000): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'order.cancelReplace',
             permission: Permission::TRADE,
             type: OrderCancelResponse::class,
@@ -76,7 +76,7 @@ trait TradingMethods
 
     public function orderFindAll(OrderFindAll $payload, int $recvWindow = 5000): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'allOrders',
             permission: Permission::TRADE,
             type: OrderFindAllResponse::class,
@@ -87,7 +87,7 @@ trait TradingMethods
 
     public function orderPlace(OrderPlace $payload, int $recvWindow = 5000): PromiseInterface
     {
-        return $this->websocketApi->send(
+        return $this->ws->send(
             method: 'order.place',
             permission: Permission::TRADE,
             type: match ($payload->newOrderRespType) {
