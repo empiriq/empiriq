@@ -7,10 +7,9 @@ use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
 use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\WsClientInterface;
 use Empiriq\Contracts\SerializerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * WebSocket API client for Spot.
@@ -27,7 +26,7 @@ use Psr\Log\LoggerInterface;
  *   - Testnet:
  * {@link https://developers.binance.com/docs/binance-spot-api-docs/testnet/websocket-api/general-api-information}
  */
-final class WsApi extends ResponseResolver implements WsClientInterface
+final class WsApi extends ResponseResolver
 {
     /**
      * @param EventDispatcherInterface $dispatcher Event dispatcher.

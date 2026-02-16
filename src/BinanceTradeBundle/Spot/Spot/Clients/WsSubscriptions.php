@@ -6,10 +6,9 @@ use Empiriq\BinanceContracts\Spot\Spot\Common\EventInterface;
 use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
 use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\WsClientInterface;
 use Empiriq\Contracts\SerializerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Handles WebSocket connections to Binance Spot market streams.
@@ -22,7 +21,7 @@ use Psr\Log\LoggerInterface;
  *    - Production: {@link https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams}
  *    - Testnet: {@link https://developers.binance.com/docs/binance-spot-api-docs/testnet/web-socket-streams}
  */
-final class WsSubscriptions extends ResponseResolver implements WsClientInterface
+final class WsSubscriptions extends ResponseResolver
 {
     /**
      * @param EventDispatcherInterface $dispatcher Event dispatcher.

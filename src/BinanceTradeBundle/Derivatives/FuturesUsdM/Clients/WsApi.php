@@ -7,10 +7,9 @@ use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
 use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\WsClientInterface;
 use Empiriq\Contracts\SerializerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * WebSocket API client for USD-M Futures.
@@ -23,7 +22,7 @@ use Psr\Log\LoggerInterface;
  *
  * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-api-general-info
  */
-final class WsApi extends ResponseResolver implements WsClientInterface
+final class WsApi extends ResponseResolver
 {
     /**
      * @param EventDispatcherInterface $dispatcher Event dispatcher.
