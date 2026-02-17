@@ -3,7 +3,7 @@
 namespace Empiriq\BinanceTradeBundle\Spot\Spot\Streams;
 
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
-use Empiriq\BinanceTradeBundle\SpotTransport;
+use Empiriq\BinanceTradeBundle\Spot\Spot\SpotMarket;
 use React\Promise\PromiseInterface;
 
 /**
@@ -22,9 +22,9 @@ final readonly class TradeStream implements SpotStreamInterface
     }
 
     #[\Override]
-    public function subscribe(SpotTransport $transport): PromiseInterface
+    public function subscribe(SpotMarket $market): PromiseInterface
     {
-        return $transport->subscribe(
+        return $market->subscribe(
             array_map(fn(string $symbol): string => strtolower($symbol) . '@trade', $this->symbols)
         );
     }

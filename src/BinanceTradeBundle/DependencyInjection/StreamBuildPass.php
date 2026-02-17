@@ -29,7 +29,7 @@ final class StreamBuildPass implements CompilerPassInterface
             'requires_symbols' => true,
         ],
         [
-            'pattern' => '/^binance\.futures_usd\.user\.(balance_update|outbound_account_position|execution_report|external_lock_update)$/i',
+            'pattern' => '/^binance\.futures_usd\.user\.(account_update|order_trade_update|margin_call|trade_lite)$/i',
             'service_id' => 'empiriq.binance.futures_usdm.stream.user_data',
             'class' => FuturesUsdMUserDataStream::class,
             'tag' => self::TAG_FUTURES_USDM,

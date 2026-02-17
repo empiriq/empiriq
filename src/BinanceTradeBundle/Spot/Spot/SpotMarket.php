@@ -1,26 +1,26 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle;
+namespace Empiriq\BinanceTradeBundle\Spot\Spot;
 
-use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Authentication\AccountStatusResponse;
-use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\TimeResponse;
+use Empiriq\BinanceContracts\Spot\Spot\Responses\Account\AccountStatusResponse;
+use Empiriq\BinanceContracts\Spot\Spot\Responses\General\TimeResponse;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesUsdMStreamInterface;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsSubscriptions;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\AccountMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\AuthenticationMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\GeneralMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\MarketDataMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\MarketStreamMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\TradingMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\UserDataStreamMethods;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\RestApi;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsApi;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsSubscriptions;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\AccountMethods;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\AuthenticationMethods;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\GeneralMethods;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\MarketDataMethods;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\MarketStreamMethods;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\TradingMethods;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\UserDataStreamMethods;
 use Empiriq\Contracts\RunnableInterface;
 
 use function React\Promise\all;
 
-readonly class FuturesUsdMTransport implements RunnableInterface
+readonly class SpotMarket implements RunnableInterface
 {
     use GeneralMethods;
     use MarketDataMethods;
@@ -34,7 +34,7 @@ readonly class FuturesUsdMTransport implements RunnableInterface
      * @param RestApi $rest
      * @param WsApi $ws
      * @param WsSubscriptions $subscriptions
-     * @param iterable<FuturesUsdMStreamInterface> $streams
+     * @param iterable<SpotStreamInterface> $streams
      */
     public function __construct(
         public RestApi $rest,
@@ -43,7 +43,7 @@ readonly class FuturesUsdMTransport implements RunnableInterface
         private iterable $streams,
     ) {
         foreach ($this->streams as $stream) {
-            if (!$stream instanceof FuturesUsdMStreamInterface) {
+            if (!$stream instanceof SpotStreamInterface) {
                 throw new ConfigurationException('Invalid stream');
             }
         }
@@ -66,14 +66,7 @@ readonly class FuturesUsdMTransport implements RunnableInterface
             }),
             $this->subscriptions->connect(),
         ])
-            ->then(
-                fn() => all(
-                    array_map(
-                        fn(FuturesUsdMStreamInterface $stream) => $stream->subscribe($this),
-                        is_array($this->streams) ? $this->streams : iterator_to_array($this->streams)
-                    )
-                )
-            );
+        ->then(fn() => all(array_map(fn(SpotStreamInterface $stream) => $stream->subscribe($this), $this->streams)));
     }
 
     public function shutdown(): void

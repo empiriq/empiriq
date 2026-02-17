@@ -1,26 +1,26 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle;
+namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM;
 
-use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Responses\Account\AccountStatusResponse;
-use Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Responses\General\TimeResponse;
+use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Authentication\AccountStatusResponse;
+use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\TimeResponse;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
-use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesCoinMStreamInterface;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\RestApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WsApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WsSubscriptions;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\AccountMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\AuthenticationMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\GeneralMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\MarketDataMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\MarketStreamMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\TradingMethods;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Methods\UserDataStreamMethods;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesUsdMStreamInterface;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsSubscriptions;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\AccountMethods;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\AuthenticationMethods;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\GeneralMethods;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\MarketDataMethods;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\MarketStreamMethods;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\TradingMethods;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\UserDataStreamMethods;
 use Empiriq\Contracts\RunnableInterface;
 
 use function React\Promise\all;
 
-readonly class FuturesCoinMTransport implements RunnableInterface
+readonly class FuturesUsdMMarket implements RunnableInterface
 {
     use GeneralMethods;
     use MarketDataMethods;
@@ -34,7 +34,7 @@ readonly class FuturesCoinMTransport implements RunnableInterface
      * @param RestApi $rest
      * @param WsApi $ws
      * @param WsSubscriptions $subscriptions
-     * @param iterable<FuturesCoinMStreamInterface> $streams
+     * @param iterable<FuturesUsdMStreamInterface> $streams
      */
     public function __construct(
         public RestApi $rest,
@@ -43,7 +43,7 @@ readonly class FuturesCoinMTransport implements RunnableInterface
         private iterable $streams,
     ) {
         foreach ($this->streams as $stream) {
-            if (!$stream instanceof FuturesCoinMStreamInterface) {
+            if (!$stream instanceof FuturesUsdMStreamInterface) {
                 throw new ConfigurationException('Invalid stream');
             }
         }
@@ -66,12 +66,14 @@ readonly class FuturesCoinMTransport implements RunnableInterface
             }),
             $this->subscriptions->connect(),
         ])
-            ->then(fn() => all(
-                array_map(
-                    fn(FuturesCoinMStreamInterface $stream) => $stream->subscribe($this),
-                    $this->streams
+            ->then(
+                fn() => all(
+                    array_map(
+                        fn(FuturesUsdMStreamInterface $stream) => $stream->subscribe($this),
+                        is_array($this->streams) ? $this->streams : iterator_to_array($this->streams)
+                    )
                 )
-            ));
+            );
     }
 
     public function shutdown(): void

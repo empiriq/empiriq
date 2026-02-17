@@ -3,7 +3,7 @@
 namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Streams;
 
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesCoinMStreamInterface;
-use Empiriq\BinanceTradeBundle\FuturesCoinMTransport;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\FuturesCoinMMarket;
 use React\Promise\PromiseInterface;
 
 /**
@@ -22,9 +22,9 @@ final readonly class TradeStream implements FuturesCoinMStreamInterface
     }
 
     #[\Override]
-    public function subscribe(FuturesCoinMTransport $transport): PromiseInterface
+    public function subscribe(FuturesCoinMMarket $market): PromiseInterface
     {
-        return $transport->subscribe(
+        return $market->subscribe(
             array_map(fn(string $symbol): string => strtolower($symbol) . '@trade', $this->symbols)
         );
     }

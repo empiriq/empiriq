@@ -7,18 +7,18 @@ use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi as FuturesUsdMRestApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsApi as FuturesUsdMWsApi;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsSubscriptions as FuturesUsdMWsSubscriptions;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\RestApi as FuturesCoinMRestApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WsApi as FuturesCoinMWsApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WsSubscriptions as FuturesCoinMWsSubscriptions;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\FuturesCoinMMarket;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi as FuturesUsdMRestApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsApi as FuturesUsdMWsApi;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\WsSubscriptions as FuturesUsdMWsSubscriptions;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMMarket;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\RestApi as SpotRestApi;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsApi as SpotWsApi;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsSubscriptions as SpotWsSubscriptions;
-use Empiriq\BinanceTradeBundle\FuturesUsdMTransport;
-use Empiriq\BinanceTradeBundle\FuturesCoinMTransport;
-use Empiriq\BinanceTradeBundle\SpotTransport;
+use Empiriq\BinanceTradeBundle\Spot\Spot\SpotMarket;
 use Empiriq\SymfonyDependencyDiscovery\DependencyDiscovery;
 use React\Http\Browser;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -33,7 +33,7 @@ final class TransportBuildPass implements CompilerPassInterface
         [
             'tag' => StreamBuildPass::TAG_FUTURES_USDM,
             'service_id' => 'FuturesUsdMTransport',
-            'class' => FuturesUsdMTransport::class,
+            'class' => FuturesUsdMMarket::class,
             'endpoint_key' => 'futures_usdm',
             'clients' => [
                 'rest' => FuturesUsdMRestApi::class,
@@ -44,7 +44,7 @@ final class TransportBuildPass implements CompilerPassInterface
         [
             'tag' => StreamBuildPass::TAG_FUTURES_COINM,
             'service_id' => 'FuturesCoinMTransport',
-            'class' => FuturesCoinMTransport::class,
+            'class' => FuturesCoinMMarket::class,
             'endpoint_key' => 'futures_coinm',
             'clients' => [
                 'rest' => FuturesCoinMRestApi::class,
@@ -55,7 +55,7 @@ final class TransportBuildPass implements CompilerPassInterface
         [
             'tag' => StreamBuildPass::TAG_SPOT,
             'service_id' => 'SpotTransport',
-            'class' => SpotTransport::class,
+            'class' => SpotMarket::class,
             'endpoint_key' => 'spot',
             'clients' => [
                 'rest' => SpotRestApi::class,

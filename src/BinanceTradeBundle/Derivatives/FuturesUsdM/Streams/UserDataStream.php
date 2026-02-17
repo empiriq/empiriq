@@ -4,7 +4,7 @@ namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams;
 
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\UserData\SubscribeResponse;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesUsdMStreamInterface;
-use Empiriq\BinanceTradeBundle\FuturesUsdMTransport;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMMarket;
 use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 
@@ -36,18 +36,18 @@ use React\Promise\PromiseInterface;
 final readonly class UserDataStream implements FuturesUsdMStreamInterface
 {
     #[\Override]
-    public function subscribe(FuturesUsdMTransport $transport): PromiseInterface
+    public function subscribe(FuturesUsdMMarket $market): PromiseInterface
     {
-        if ($transport->isLoggedIn()) {
-            return $transport->userDataStreamSubscribe();
+        if ($market->isLoggedIn()) {
+            return $market->userDataStreamSubscribe();
         }
 
-        return $transport->createListenKey()->then(function (SubscribeResponse $response) use ($transport) {
-            Loop::addPeriodicTimer(30 * 60, function () use ($transport, $response) {
-                $transport->updateListenKey($response->result->listenKey);
+        return $market->createListenKey()->then(function (SubscribeResponse $response) use ($market) {
+            Loop::addPeriodicTimer(30 * 60, function () use ($market, $response) {
+                $market->updateListenKey($response->result->listenKey);
             });
 
-            return $transport->subscribe([$response->result->listenKey]);
+            return $market->subscribe([$response->result->listenKey]);
         });
     }
 }
