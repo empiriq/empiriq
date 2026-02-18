@@ -10,6 +10,9 @@ use React\Promise\PromiseInterface;
  * Represents a Binance stream for USD Margined Futures market messages.
  *
  * Constructs a stream name like "btcusdt@trade" based on the given symbol.
+ * Constructed by the DI container when the stream is enabled via event subscriptions.
+ *
+ * @api
  */
 final readonly class TradeStream implements FuturesCoinMStreamInterface
 {

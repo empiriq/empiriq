@@ -8,6 +8,13 @@ use Empiriq\BinanceTradeBundle\Spot\Spot\SpotMarket;
 use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 
+/**
+ * User data stream for Binance Spot account events.
+ *
+ * Constructed by the DI container when the stream is enabled via event subscriptions.
+ *
+ * @api
+ */
 final readonly class UserDataStream implements SpotStreamInterface
 {
     #[\Override]

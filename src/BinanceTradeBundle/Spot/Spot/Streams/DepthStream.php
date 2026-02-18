@@ -10,6 +10,9 @@ use React\Promise\PromiseInterface;
  * Represents a binance stream for spot market messages.
  *
  * Constructs a stream name like "btcusdt@depth" based on the given symbol.
+ * Constructed by the DI container when the stream is enabled via event subscriptions.
+ *
+ * @api
  */
 final readonly class DepthStream implements SpotStreamInterface
 {

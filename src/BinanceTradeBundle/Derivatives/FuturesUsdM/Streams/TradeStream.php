@@ -26,6 +26,10 @@ use React\Promise\PromiseInterface;
  * This stream emits:
  *
  * - {@see \Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\Market\TradeEvent}
+ *
+ * Constructed by the DI container when the stream is enabled via event subscriptions.
+ *
+ * @api
  */
 final readonly class TradeStream implements FuturesUsdMStreamInterface
 {

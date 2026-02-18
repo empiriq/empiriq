@@ -32,6 +32,10 @@ use React\Promise\PromiseInterface;
  * - {@see \Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\MarginCallEvent}
  * - {@see \Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\OrderTradeUpdateEvent}
  * - {@see \Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\TradeLiteEvent}
+ *
+ * Constructed by the DI container when the stream is enabled via event subscriptions.
+ *
+ * @api
  */
 final readonly class UserDataStream implements FuturesUsdMStreamInterface
 {

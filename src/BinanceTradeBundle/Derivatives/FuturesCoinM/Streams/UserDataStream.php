@@ -8,6 +8,13 @@ use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\FuturesCoinMMarket;
 use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 
+/**
+ * User data stream for Binance COIN-M Futures account events.
+ *
+ * Constructed by the DI container when the stream is enabled via event subscriptions.
+ *
+ * @api
+ */
 final readonly class UserDataStream implements FuturesCoinMStreamInterface
 {
     #[\Override]
