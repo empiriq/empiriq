@@ -19,6 +19,15 @@ final class StreamBuildPass implements CompilerPassInterface
     public const TAG_FUTURES_COINM = 'empiriq.binance.futures_coinm.stream';
     public const TAG_SPOT = 'empiriq.binance.spot.stream';
 
+    /**
+     * @var array<int, array{
+     *     pattern: non-empty-string,
+     *     service_id: string,
+     *     class: class-string,
+     *     tag: string,
+     *     requires_symbols: bool
+     * }>
+     */
     private const STREAM_MAPPINGS = [
         // Futures USD-M
         [
@@ -94,7 +103,7 @@ final class StreamBuildPass implements CompilerPassInterface
                     $symbols = $this->extractSymbolsByPattern($eventName, $mapping['pattern']);
                     if ($symbols !== []) {
                         $symbolsByService[$serviceId] = array_merge(
-                            $symbolsByService[$serviceId],
+                            $symbolsByService[$serviceId] ?? [],
                             $symbols
                         );
                     }
@@ -110,7 +119,7 @@ final class StreamBuildPass implements CompilerPassInterface
         foreach (self::STREAM_MAPPINGS as $mapping) {
             $serviceId = $mapping['service_id'];
             if (($mapping['requires_symbols'] ?? false) === true) {
-                $symbols = $this->normalizeSymbols($symbolsByService[$serviceId]);
+                $symbols = $this->normalizeSymbols($symbolsByService[$serviceId] ?? []);
                 if ($symbols === []) {
                     continue;
                 }
@@ -134,6 +143,7 @@ final class StreamBuildPass implements CompilerPassInterface
     }
 
     /**
+     * @param non-empty-string $pattern
      * @return string[]
      */
     private function extractSymbolsByPattern(string $eventName, string $pattern): array
@@ -149,6 +159,9 @@ final class StreamBuildPass implements CompilerPassInterface
         return $this->splitList($matches[1]);
     }
 
+    /**
+     * @param non-empty-string $pattern
+     */
     private function matchesPattern(string $eventName, string $pattern): bool
     {
         return preg_match($pattern, $eventName) === 1;
