@@ -79,7 +79,20 @@ final class TransportBuildPass implements CompilerPassInterface
         /** @var array<string, mixed> $config */
         $config = $container->getParameter(BinanceTradeExtension::CONFIG);
         $defaults = $container->getParameter(BinanceTradeExtension::DEFAULTS);
-        $config['endpoints'] = array_replace_recursive($defaults[$config['environment']], $config['endpoints'] ?? []);
+        if (!is_array($defaults)) {
+            throw new \RuntimeException('Invalid default endpoints config');
+        }
+        $environment = $config['environment'] ?? null;
+        if (!is_string($environment) || $environment === '') {
+            throw new \RuntimeException('Invalid environment config');
+        }
+        if (!isset($defaults[$environment]) || !is_array($defaults[$environment])) {
+            throw new \RuntimeException(sprintf('Default endpoints not found for environment "%s"', $environment));
+        }
+        if (!isset($config['endpoints']) || !is_array($config['endpoints'])) {
+            $config['endpoints'] = [];
+        }
+        $config['endpoints'] = array_replace_recursive($defaults[$environment], $config['endpoints']);
         $this->load($config, $container);
     }
 
