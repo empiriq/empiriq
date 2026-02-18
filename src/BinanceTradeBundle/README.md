@@ -56,7 +56,7 @@ Creating Binance API Credentials:
 - [For Mainnet](https://www.binance.com/en/support/faq/detail/360002502072)
 - [For Testnet](https://www.binance.com/en/support/faq/detail/ab78f9a1b8824cf0a106b4229c76496d)
 
-## General Principles
+## General Usage Principles
 During container build, the bundle scans Symfony event subscribers and registers only the streams that are actually requested by your event names.
 
 Event names use a query-style format for parameters:
@@ -70,10 +70,10 @@ All market classes expose async methods that return React promises. Inject the m
 
 Methods and events marked as **public** do not require a signer. Set `signer.type: null` for public-only access.
 
-## Bundle API Reference
+## API Reference
 
 ### Spot
-#### Events:
+Events:
 - `binance.spot.market.trade?symbol=btcusdt` [public] [TradeEvent.php](../../src/BinanceContracts/Spot/Spot/Events/Market/TradeEvent.php) Trade updates
 - `binance.spot.market.depth?symbol=btcusdt` [public] [DepthEvent.php](../../src/BinanceContracts/Spot/Spot/Events/Market/DepthEvent.php) Order book updates
 - `binance.spot.user.balance_update` [auth] [BalanceUpdateEvent.php](../../src/BinanceContracts/Spot/Spot/Events/User/BalanceUpdateEvent.php) Balance update
@@ -81,33 +81,33 @@ Methods and events marked as **public** do not require a signer. Set `signer.typ
 - `binance.spot.user.execution_report` [auth] [ExecutionReportEvent.php](../../src/BinanceContracts/Spot/Spot/Events/User/ExecutionReportEvent.php) Order execution report
 - `binance.spot.user.external_lock_update` [auth] [ExternalLockUpdateEvent.php](../../src/BinanceContracts/Spot/Spot/Events/User/ExternalLockUpdateEvent.php) External lock update
 
-#### Methods:
-- `ping()` [public] [WS] [GeneralMethods.php#L22](Spot/Spot/Methods/GeneralMethods.php#L22) Connectivity
-- `time()` [public] [WS] [GeneralMethods.php#L35](Spot/Spot/Methods/GeneralMethods.php#L35) Server time
-- `sessionLogon()` [auth] [WS] [AuthenticationMethods.php#L17](Spot/Spot/Methods/AuthenticationMethods.php#L17) Session logon
-- `sessionLogout()` [auth] [WS] [AuthenticationMethods.php#L27](Spot/Spot/Methods/AuthenticationMethods.php#L27) Session logout
-- `sessionStatus()` [auth] [WS] [AuthenticationMethods.php#L36](Spot/Spot/Methods/AuthenticationMethods.php#L36) Session status
-- `depth(...)` [public] [WS] [MarketDataMethods.php#L23](Spot/Spot/Methods/MarketDataMethods.php#L23) Order book snapshot
-- `accountStatus()` [auth] [WS] [AccountMethods.php#L23](Spot/Spot/Methods/AccountMethods.php#L23) Account info
-- `orderAmendKeepPriority(...)` [auth] [WS] [TradingMethods.php#L28](Spot/Spot/Methods/TradingMethods.php#L28) Amend order (keep priority)
-- `orderCancel(...)` [auth] [WS] [TradingMethods.php#L39](Spot/Spot/Methods/TradingMethods.php#L39) Cancel order
-- `orderCancelAll(...)` [auth] [WS] [TradingMethods.php#L50](Spot/Spot/Methods/TradingMethods.php#L50) Cancel all orders
-- `orderCancelReplace(...)` [auth] [WS] [TradingMethods.php#L66](Spot/Spot/Methods/TradingMethods.php#L66) Cancel/replace order
-- `orderFindAll(...)` [auth] [WS] [TradingMethods.php#L77](Spot/Spot/Methods/TradingMethods.php#L77) List orders
-- `orderPlace(...)` [auth] [WS] [TradingMethods.php#L88](Spot/Spot/Methods/TradingMethods.php#L88) Place order
-- `userDataStreamSubscribe()` [auth] [WS] [UserDataStreamMethods.php#L23](Spot/Spot/Methods/UserDataStreamMethods.php#L23) User stream subscribe
-- `userDataStreamUnsubscribe()` [auth] [WS] [UserDataStreamMethods.php#L38](Spot/Spot/Methods/UserDataStreamMethods.php#L38) User stream unsubscribe
+Methods:
+- `ping()` [public] [WS API] [GeneralMethods.php#L22](Spot/Spot/Methods/GeneralMethods.php#L22) Connectivity
+- `time()` [public] [WS API] [GeneralMethods.php#L35](Spot/Spot/Methods/GeneralMethods.php#L35) Server time
+- `sessionLogon()` [auth] [WS API] [AuthenticationMethods.php#L17](Spot/Spot/Methods/AuthenticationMethods.php#L17) Session logon
+- `sessionLogout()` [auth] [WS API] [AuthenticationMethods.php#L27](Spot/Spot/Methods/AuthenticationMethods.php#L27) Session logout
+- `sessionStatus()` [auth] [WS API] [AuthenticationMethods.php#L36](Spot/Spot/Methods/AuthenticationMethods.php#L36) Session status
+- `depth(...)` [public] [WS API] [MarketDataMethods.php#L23](Spot/Spot/Methods/MarketDataMethods.php#L23) Order book snapshot
+- `accountStatus()` [auth] [WS API] [AccountMethods.php#L23](Spot/Spot/Methods/AccountMethods.php#L23) Account info
+- `orderAmendKeepPriority(...)` [auth] [WS API] [TradingMethods.php#L28](Spot/Spot/Methods/TradingMethods.php#L28) Amend order (keep priority)
+- `orderCancel(...)` [auth] [WS API] [TradingMethods.php#L39](Spot/Spot/Methods/TradingMethods.php#L39) Cancel order
+- `orderCancelAll(...)` [auth] [WS API] [TradingMethods.php#L50](Spot/Spot/Methods/TradingMethods.php#L50) Cancel all orders
+- `orderCancelReplace(...)` [auth] [WS API] [TradingMethods.php#L66](Spot/Spot/Methods/TradingMethods.php#L66) Cancel/replace order
+- `orderFindAll(...)` [auth] [WS API] [TradingMethods.php#L77](Spot/Spot/Methods/TradingMethods.php#L77) List orders
+- `orderPlace(...)` [auth] [WS API] [TradingMethods.php#L88](Spot/Spot/Methods/TradingMethods.php#L88) Place order
+- `userDataStreamSubscribe()` [auth] [WS API] [UserDataStreamMethods.php#L23](Spot/Spot/Methods/UserDataStreamMethods.php#L23) User stream subscribe
+- `userDataStreamUnsubscribe()` [auth] [WS API] [UserDataStreamMethods.php#L38](Spot/Spot/Methods/UserDataStreamMethods.php#L38) User stream unsubscribe
 - `createListenKey()` [auth] [REST] [UserDataStreamMethods.php#L47](Spot/Spot/Methods/UserDataStreamMethods.php#L47) Create listen key
 - `updateListenKey(...)` [auth] [REST] [UserDataStreamMethods.php#L57](Spot/Spot/Methods/UserDataStreamMethods.php#L57) Update listen key
 - `deleteListenKey(...)` [auth] [REST] [UserDataStreamMethods.php#L68](Spot/Spot/Methods/UserDataStreamMethods.php#L68) Delete listen key
-- `subscribe(...)` [public] [WS] [MarketStreamMethods.php#L22](Spot/Spot/Methods/MarketStreamMethods.php#L22) Subscribe streams
-- `unsubscribe(...)` [public] [WS] [MarketStreamMethods.php#L37](Spot/Spot/Methods/MarketStreamMethods.php#L37) Unsubscribe streams
-- `listSubscriptions()` [public] [WS] [MarketStreamMethods.php#L51](Spot/Spot/Methods/MarketStreamMethods.php#L51) List subscriptions
-- `setProperty(...)` [public] [WS] [MarketStreamMethods.php#L65](Spot/Spot/Methods/MarketStreamMethods.php#L65) Set property
-- `getProperty(...)` [public] [WS] [MarketStreamMethods.php#L80](Spot/Spot/Methods/MarketStreamMethods.php#L80) Get property
+- `subscribe(...)` [public] [WS streams] [MarketStreamMethods.php#L22](Spot/Spot/Methods/MarketStreamMethods.php#L22) Subscribe streams
+- `unsubscribe(...)` [public] [WS streams] [MarketStreamMethods.php#L37](Spot/Spot/Methods/MarketStreamMethods.php#L37) Unsubscribe streams
+- `listSubscriptions()` [public] [WS streams] [MarketStreamMethods.php#L51](Spot/Spot/Methods/MarketStreamMethods.php#L51) List subscriptions
+- `setProperty(...)` [public] [WS streams] [MarketStreamMethods.php#L65](Spot/Spot/Methods/MarketStreamMethods.php#L65) Set property
+- `getProperty(...)` [public] [WS streams] [MarketStreamMethods.php#L80](Spot/Spot/Methods/MarketStreamMethods.php#L80) Get property
 
 ### Futures USD-M
-#### Events:
+Events:
 - `binance.futures_usd.market.trade?symbol=btcusdt` [public] [TradeEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/Market/TradeEvent.php) Trade updates
 - `binance.futures_usd.market.depth?symbol=btcusdt` [public] [DepthEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/Market/DepthEvent.php) Order book updates
 - `binance.futures_usd.user.account_update` [auth] [AccountUpdateEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/User/AccountUpdateEvent.php) Account update
@@ -115,28 +115,28 @@ Methods and events marked as **public** do not require a signer. Set `signer.typ
 - `binance.futures_usd.user.margin_call` [auth] [MarginCallEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/User/MarginCallEvent.php) Margin call
 - `binance.futures_usd.user.trade_lite` [auth] [TradeLiteEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/User/TradeLiteEvent.php) Trade lite update
 
-#### Methods:
+Methods:
 - `ping()` [public] [REST] [GeneralMethods.php#L22](Derivatives/FuturesUsdM/Methods/GeneralMethods.php#L22) Connectivity
 - `time()` [public] [REST] [GeneralMethods.php#L36](Derivatives/FuturesUsdM/Methods/GeneralMethods.php#L36) Server time
 - `exchangeInfo()` [public] [REST] [GeneralMethods.php#L50](Derivatives/FuturesUsdM/Methods/GeneralMethods.php#L50) Exchange info
-- `sessionLogon()` [auth] [WS] [AuthenticationMethods.php#L25](Derivatives/FuturesUsdM/Methods/AuthenticationMethods.php#L25) Session logon
-- `sessionLogout()` [auth] [WS] [AuthenticationMethods.php#L41](Derivatives/FuturesUsdM/Methods/AuthenticationMethods.php#L41) Session logout
-- `sessionStatus()` [auth] [WS] [AuthenticationMethods.php#L52](Derivatives/FuturesUsdM/Methods/AuthenticationMethods.php#L52) Session status
-- `depth(...)` [public] [WS] [MarketDataMethods.php#L23](Derivatives/FuturesUsdM/Methods/MarketDataMethods.php#L23) Order book snapshot
-- `accountBalanceV2()` [auth] [WS] [AccountMethods.php#L22](Derivatives/FuturesUsdM/Methods/AccountMethods.php#L22) Account balance
-- `userDataStreamSubscribe()` [auth] [WS] [UserDataStreamMethods.php#L22](Derivatives/FuturesUsdM/Methods/UserDataStreamMethods.php#L22) User stream start
-- `userDataStreamUnsubscribe()` [auth] [WS] [UserDataStreamMethods.php#L39](Derivatives/FuturesUsdM/Methods/UserDataStreamMethods.php#L39) User stream stop
+- `sessionLogon()` [auth] [WS API] [AuthenticationMethods.php#L25](Derivatives/FuturesUsdM/Methods/AuthenticationMethods.php#L25) Session logon
+- `sessionLogout()` [auth] [WS API] [AuthenticationMethods.php#L41](Derivatives/FuturesUsdM/Methods/AuthenticationMethods.php#L41) Session logout
+- `sessionStatus()` [auth] [WS API] [AuthenticationMethods.php#L52](Derivatives/FuturesUsdM/Methods/AuthenticationMethods.php#L52) Session status
+- `depth(...)` [public] [WS API] [MarketDataMethods.php#L23](Derivatives/FuturesUsdM/Methods/MarketDataMethods.php#L23) Order book snapshot
+- `accountBalanceV2()` [auth] [WS API] [AccountMethods.php#L22](Derivatives/FuturesUsdM/Methods/AccountMethods.php#L22) Account balance
+- `userDataStreamSubscribe()` [auth] [WS API] [UserDataStreamMethods.php#L22](Derivatives/FuturesUsdM/Methods/UserDataStreamMethods.php#L22) User stream start
+- `userDataStreamUnsubscribe()` [auth] [WS API] [UserDataStreamMethods.php#L39](Derivatives/FuturesUsdM/Methods/UserDataStreamMethods.php#L39) User stream stop
 - `createListenKey()` [auth] [REST] [UserDataStreamMethods.php#L53](Derivatives/FuturesUsdM/Methods/UserDataStreamMethods.php#L53) Create listen key
 - `updateListenKey(...)` [auth] [REST] [UserDataStreamMethods.php#L63](Derivatives/FuturesUsdM/Methods/UserDataStreamMethods.php#L63) Update listen key
 - `deleteListenKey(...)` [auth] [REST] [UserDataStreamMethods.php#L74](Derivatives/FuturesUsdM/Methods/UserDataStreamMethods.php#L74) Delete listen key
-- `subscribe(...)` [public] [WS] [MarketStreamMethods.php#L22](Derivatives/FuturesUsdM/Methods/MarketStreamMethods.php#L22) Subscribe streams
-- `unsubscribe(...)` [public] [WS] [MarketStreamMethods.php#L36](Derivatives/FuturesUsdM/Methods/MarketStreamMethods.php#L36) Unsubscribe streams
-- `listSubscriptions()` [public] [WS] [MarketStreamMethods.php#L50](Derivatives/FuturesUsdM/Methods/MarketStreamMethods.php#L50) List subscriptions
-- `setProperty(...)` [public] [WS] [MarketStreamMethods.php#L63](Derivatives/FuturesUsdM/Methods/MarketStreamMethods.php#L63) Set property
-- `getProperty(...)` [public] [WS] [MarketStreamMethods.php#L77](Derivatives/FuturesUsdM/Methods/MarketStreamMethods.php#L77) Get property
+- `subscribe(...)` [public] [WS streams] [MarketStreamMethods.php#L22](Derivatives/FuturesUsdM/Methods/MarketStreamMethods.php#L22) Subscribe streams
+- `unsubscribe(...)` [public] [WS streams] [MarketStreamMethods.php#L36](Derivatives/FuturesUsdM/Methods/MarketStreamMethods.php#L36) Unsubscribe streams
+- `listSubscriptions()` [public] [WS streams] [MarketStreamMethods.php#L50](Derivatives/FuturesUsdM/Methods/MarketStreamMethods.php#L50) List subscriptions
+- `setProperty(...)` [public] [WS streams] [MarketStreamMethods.php#L63](Derivatives/FuturesUsdM/Methods/MarketStreamMethods.php#L63) Set property
+- `getProperty(...)` [public] [WS streams] [MarketStreamMethods.php#L77](Derivatives/FuturesUsdM/Methods/MarketStreamMethods.php#L77) Get property
 
 ### Futures COIN-M
-#### Events:
+Events:
 - `binance.futures_coin.market.trade?symbol=btcusdt` [public] [TradeEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/Market/TradeEvent.php) Trade updates
 - `binance.futures_coin.market.depth?symbol=btcusdt` [public] [DepthEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/Market/DepthEvent.php) Order book updates
 - `binance.futures_coin.user.balance_update` [auth] [BalanceUpdateEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/User/BalanceUpdateEvent.php) Balance update
@@ -144,20 +144,25 @@ Methods and events marked as **public** do not require a signer. Set `signer.typ
 - `binance.futures_coin.user.execution_report` [auth] [ExecutionReportEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/User/ExecutionReportEvent.php) Order execution report
 - `binance.futures_coin.user.external_lock_update` [auth] [ExternalLockUpdateEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/User/ExternalLockUpdateEvent.php) External lock update
 
-#### Methods:
-- `ping()` [public] [WS] [GeneralMethods.php#L23](Derivatives/FuturesCoinM/Methods/GeneralMethods.php#L23) Connectivity
-- `time()` [public] [WS] [GeneralMethods.php#L37](Derivatives/FuturesCoinM/Methods/GeneralMethods.php#L37) Server time
-- `sessionLogon()` [auth] [WS] [AuthenticationMethods.php#L18](Derivatives/FuturesCoinM/Methods/AuthenticationMethods.php#L18) Session logon
-- `sessionLogout()` [auth] [WS] [AuthenticationMethods.php#L28](Derivatives/FuturesCoinM/Methods/AuthenticationMethods.php#L28) Session logout
-- `sessionStatus()` [auth] [WS] [AuthenticationMethods.php#L33](Derivatives/FuturesCoinM/Methods/AuthenticationMethods.php#L33) Session status
-- `accountStatus()` [auth] [WS] [AccountMethods.php#L22](Derivatives/FuturesCoinM/Methods/AccountMethods.php#L22) Account info (stub)
-- `userDataStreamSubscribe()` [auth] [WS] [UserDataStreamMethods.php#L23](Derivatives/FuturesCoinM/Methods/UserDataStreamMethods.php#L23) User stream subscribe (stub)
-- `userDataStreamUnsubscribe()` [auth] [WS] [UserDataStreamMethods.php#L32](Derivatives/FuturesCoinM/Methods/UserDataStreamMethods.php#L32) User stream unsubscribe (stub)
+Methods:
+- `ping()` [public] [WS API] [GeneralMethods.php#L23](Derivatives/FuturesCoinM/Methods/GeneralMethods.php#L23) Connectivity
+- `time()` [public] [WS API] [GeneralMethods.php#L37](Derivatives/FuturesCoinM/Methods/GeneralMethods.php#L37) Server time
+- `sessionLogon()` [auth] [WS API] [AuthenticationMethods.php#L18](Derivatives/FuturesCoinM/Methods/AuthenticationMethods.php#L18) Session logon
+- `sessionLogout()` [auth] [WS API] [AuthenticationMethods.php#L28](Derivatives/FuturesCoinM/Methods/AuthenticationMethods.php#L28) Session logout
+- `sessionStatus()` [auth] [WS API] [AuthenticationMethods.php#L33](Derivatives/FuturesCoinM/Methods/AuthenticationMethods.php#L33) Session status
+- `accountStatus()` [auth] [WS API] [AccountMethods.php#L22](Derivatives/FuturesCoinM/Methods/AccountMethods.php#L22) Account info (stub)
+- `userDataStreamSubscribe()` [auth] [WS API] [UserDataStreamMethods.php#L23](Derivatives/FuturesCoinM/Methods/UserDataStreamMethods.php#L23) User stream subscribe (stub)
+- `userDataStreamUnsubscribe()` [auth] [WS API] [UserDataStreamMethods.php#L32](Derivatives/FuturesCoinM/Methods/UserDataStreamMethods.php#L32) User stream unsubscribe (stub)
 - `createListenKey()` [auth] [REST] [UserDataStreamMethods.php#L37](Derivatives/FuturesCoinM/Methods/UserDataStreamMethods.php#L37) Create listen key
 - `updateListenKey(...)` [auth] [REST] [UserDataStreamMethods.php#L47](Derivatives/FuturesCoinM/Methods/UserDataStreamMethods.php#L47) Update listen key
 - `deleteListenKey(...)` [auth] [REST] [UserDataStreamMethods.php#L58](Derivatives/FuturesCoinM/Methods/UserDataStreamMethods.php#L58) Delete listen key
-- `subscribe(...)` [public] [WS] [MarketStreamMethods.php#L21](Derivatives/FuturesCoinM/Methods/MarketStreamMethods.php#L21) Subscribe streams
-- `unsubscribe(...)` [public] [WS] [MarketStreamMethods.php#L35](Derivatives/FuturesCoinM/Methods/MarketStreamMethods.php#L35) Unsubscribe streams
-- `listSubscriptions()` [public] [WS] [MarketStreamMethods.php#L49](Derivatives/FuturesCoinM/Methods/MarketStreamMethods.php#L49) List subscriptions
-- `setProperty(...)` [public] [WS] [MarketStreamMethods.php#L62](Derivatives/FuturesCoinM/Methods/MarketStreamMethods.php#L62) Set property
-- `getProperty(...)` [public] [WS] [MarketStreamMethods.php#L76](Derivatives/FuturesCoinM/Methods/MarketStreamMethods.php#L76) Get property
+- `subscribe(...)` [public] [WS streams] [MarketStreamMethods.php#L21](Derivatives/FuturesCoinM/Methods/MarketStreamMethods.php#L21) Subscribe streams
+- `unsubscribe(...)` [public] [WS streams] [MarketStreamMethods.php#L35](Derivatives/FuturesCoinM/Methods/MarketStreamMethods.php#L35) Unsubscribe streams
+- `listSubscriptions()` [public] [WS streams] [MarketStreamMethods.php#L49](Derivatives/FuturesCoinM/Methods/MarketStreamMethods.php#L49) List subscriptions
+- `setProperty(...)` [public] [WS streams] [MarketStreamMethods.php#L62](Derivatives/FuturesCoinM/Methods/MarketStreamMethods.php#L62) Set property
+- `getProperty(...)` [public] [WS streams] [MarketStreamMethods.php#L76](Derivatives/FuturesCoinM/Methods/MarketStreamMethods.php#L76) Get property
+
+## Troubleshooting / FAQ
+- If no streams are registered, verify event names exactly match the documented format.
+- Use lowercase symbols in event names; they are normalized internally.
+- User events require a valid signer and API key.
