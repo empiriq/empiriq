@@ -20,6 +20,13 @@ use Empiriq\Contracts\RunnableInterface;
 
 use function React\Promise\all;
 
+/**
+ * USD-M futures market facade combining REST/WS APIs and stream subscriptions.
+ *
+ * Constructed by the DI container when the market is enabled via event subscriptions.
+ *
+ * @api
+ */
 readonly class FuturesUsdMMarket implements RunnableInterface
 {
     use GeneralMethods;
