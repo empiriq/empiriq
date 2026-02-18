@@ -56,6 +56,7 @@ readonly class FuturesCoinMMarket implements RunnableInterface
         }
     }
 
+    #[\Override]
     public function run(): void
     {
         all([
@@ -81,6 +82,7 @@ readonly class FuturesCoinMMarket implements RunnableInterface
             ));
     }
 
+    #[\Override]
     public function shutdown(): void
     {
         all([

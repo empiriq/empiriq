@@ -56,6 +56,7 @@ readonly class SpotMarket implements RunnableInterface
         }
     }
 
+    #[\Override]
     public function run(): void
     {
         all([
@@ -76,6 +77,7 @@ readonly class SpotMarket implements RunnableInterface
         ->then(fn() => all(array_map(fn(SpotStreamInterface $stream) => $stream->subscribe($this), $this->streams)));
     }
 
+    #[\Override]
     public function shutdown(): void
     {
         all([

@@ -56,6 +56,7 @@ readonly class FuturesUsdMMarket implements RunnableInterface
         }
     }
 
+    #[\Override]
     public function run(): void
     {
         all([
@@ -83,6 +84,7 @@ readonly class FuturesUsdMMarket implements RunnableInterface
             );
     }
 
+    #[\Override]
     public function shutdown(): void
     {
         all([
