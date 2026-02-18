@@ -6,6 +6,9 @@ namespace Empiriq\BinanceTradeBundle\Common\Configs;
  * Configuration DTO for Web Socket API clients.
  *
  * Encapsulates all runtime configuration required to communicate with Binance Web Socket API endpoints.
+ * Constructed by the DI container from bundle configuration.
+ *
+ * @api
  */
 final readonly class WebSocketConfig
 {

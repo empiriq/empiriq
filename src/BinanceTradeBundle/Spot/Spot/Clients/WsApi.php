@@ -25,6 +25,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * {@link https://developers.binance.com/docs/binance-spot-api-docs/websocket-api/general-api-information}
  *   - Testnet:
  * {@link https://developers.binance.com/docs/binance-spot-api-docs/testnet/websocket-api/general-api-information}
+ *
+ * Constructed by the DI container.
+ *
+ * @api
  */
 final class WsApi extends ResponseResolver
 {

@@ -19,6 +19,10 @@ use React\Http\Browser;
  * The actual base URI is provided via {@see RestConfig}.
  *
  * @see https://developers.binance.com/docs/derivatives/coin-margined-futures/general-info
+ *
+ * Constructed by the DI container.
+ *
+ * @api
  */
 final class RestApi extends RestClient
 {

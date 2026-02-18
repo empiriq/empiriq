@@ -20,6 +20,13 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
+/**
+ * Serializer with bundle-specific metadata and normalizers.
+ *
+ * Constructed by the DI container.
+ *
+ * @api
+ */
 class Serializer extends SymfonySerializer implements SerializerInterface
 {
     public function __construct(

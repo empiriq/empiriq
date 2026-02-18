@@ -21,6 +21,10 @@ use React\Http\Browser;
  * Documentation:
  *  - Production: {@link https://developers.binance.com/docs/binance-spot-api-docs/rest-api/general-api-information}
  *  - Test: {@link https://developers.binance.com/docs/binance-spot-api-docs/testnet/rest-api/general-api-information}
+ *
+ * Constructed by the DI container.
+ *
+ * @api
  */
 final class RestApi extends RestClient
 {

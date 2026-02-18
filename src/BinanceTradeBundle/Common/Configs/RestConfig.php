@@ -6,6 +6,9 @@ namespace Empiriq\BinanceTradeBundle\Common\Configs;
  * Configuration DTO for Binance REST API clients.
  *
  * Encapsulates all runtime configuration required to communicate with Binance REST endpoints.
+ * Constructed by the DI container from bundle configuration.
+ *
+ * @api
  */
 final readonly class RestConfig
 {

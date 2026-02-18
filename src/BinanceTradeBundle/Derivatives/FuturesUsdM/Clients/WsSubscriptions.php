@@ -16,6 +16,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *  - Testnet: wss://fstream.binancefuture.com/ws
  *
  * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-market-streams
+ *
+ * Constructed by the DI container.
+ *
+ * @api
  */
 final class WsSubscriptions extends ResponseResolver
 {

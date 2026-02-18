@@ -7,6 +7,9 @@ use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 /**
  * Sanitizes sensitive request data before logging.
  * Supports full or partial masking of values.
+ * Constructed by the DI container.
+ *
+ * @api
  */
 readonly class Sanitizer implements SanitizerInterface
 {

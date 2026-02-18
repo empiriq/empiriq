@@ -20,6 +20,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * Documentation:
  *    - Production: {@link https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams}
  *    - Testnet: {@link https://developers.binance.com/docs/binance-spot-api-docs/testnet/web-socket-streams}
+ *
+ * Constructed by the DI container.
+ *
+ * @api
  */
 final class WsSubscriptions extends ResponseResolver
 {

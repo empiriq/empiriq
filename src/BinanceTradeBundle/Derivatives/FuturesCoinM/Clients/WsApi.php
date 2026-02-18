@@ -21,6 +21,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * The actual WebSocket URI is configurable via {@see WebSocketConfig}.
  *
  * @see https://developers.binance.com/docs/derivatives/coin-margined-futures/websocket-api-general-info
+ *
+ * Constructed by the DI container.
+ *
+ * @api
  */
 final class WsApi extends ResponseResolver
 {
