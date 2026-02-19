@@ -21,7 +21,7 @@ final class StreamBuildPass implements CompilerPassInterface
 
     /**
      * @var array<int, array{
-     *     pattern: non-empty-string,
+     *     patterns: array<int, non-empty-string>,
      *     service_id: string,
      *     class: class-string,
      *     tag: string,
@@ -31,14 +31,21 @@ final class StreamBuildPass implements CompilerPassInterface
     private const STREAM_MAPPINGS = [
         // Futures USD-M
         [
-            'pattern' => '/^binance\.futures_usd\.market\.trade\?symbol=(.+)$/i',
+            'patterns' => [
+                '/^binance\.futures_usd\.market\.trade\?symbol=(.+)$/i',
+            ],
             'service_id' => 'empiriq.binance.futures_usdm.stream.trade',
             'class' => FuturesUsdMTradeStream::class,
             'tag' => self::TAG_FUTURES_USDM,
             'requires_symbols' => true,
         ],
         [
-            'pattern' => '/^binance\.futures_usd\.user\.(account_update|order_trade_update|margin_call|trade_lite)$/i',
+            'patterns' => [
+                '/^binance\.futures_usd\.user\.account_update$/i',
+                '/^binance\.futures_usd\.user\.order_trade_update$/i',
+                '/^binance\.futures_usd\.user\.margin_call$/i',
+                '/^binance\.futures_usd\.user\.trade_lite$/i',
+            ],
             'service_id' => 'empiriq.binance.futures_usdm.stream.user_data',
             'class' => FuturesUsdMUserDataStream::class,
             'tag' => self::TAG_FUTURES_USDM,
@@ -46,14 +53,21 @@ final class StreamBuildPass implements CompilerPassInterface
         ],
         // Futures COIN-M
         [
-            'pattern' => '/^binance\.futures_coin\.market\.trade\?symbol=(.+)$/i',
+            'patterns' => [
+                '/^binance\.futures_coin\.market\.trade\?symbol=(.+)$/i',
+            ],
             'service_id' => 'empiriq.binance.futures_coinm.stream.trade',
             'class' => FuturesCoinMTradeStream::class,
             'tag' => self::TAG_FUTURES_COINM,
             'requires_symbols' => true,
         ],
         [
-            'pattern' => '/^binance\.futures_coin\.user\.(balance_update|outbound_account_position|execution_report|external_lock_update)$/i',
+            'patterns' => [
+                '/^binance\.futures_coin\.user\.balance_update$/i',
+                '/^binance\.futures_coin\.user\.outbound_account_position$/i',
+                '/^binance\.futures_coin\.user\.execution_report$/i',
+                '/^binance\.futures_coin\.user\.external_lock_update$/i',
+            ],
             'service_id' => 'empiriq.binance.futures_coinm.stream.user_data',
             'class' => FuturesCoinMUserDataStream::class,
             'tag' => self::TAG_FUTURES_COINM,
@@ -61,14 +75,21 @@ final class StreamBuildPass implements CompilerPassInterface
         ],
         // Spot
         [
-            'pattern' => '/^binance\.spot\.market\.trade\?symbol=(.+)$/i',
+            'patterns' => [
+                '/^binance\.spot\.market\.trade\?symbol=(.+)$/i',
+            ],
             'service_id' => 'empiriq.binance.spot.stream.trade',
             'class' => SpotTradeStream::class,
             'tag' => self::TAG_SPOT,
             'requires_symbols' => true,
         ],
         [
-            'pattern' => '/^binance\.spot\.user\.(balance_update|outbound_account_position|execution_report|external_lock_update)$/i',
+            'patterns' => [
+                '/^binance\.spot\.user\.balance_update$/i',
+                '/^binance\.spot\.user\.outbound_account_position$/i',
+                '/^binance\.spot\.user\.execution_report$/i',
+                '/^binance\.spot\.user\.external_lock_update$/i',
+            ],
             'service_id' => 'empiriq.binance.spot.stream.user_data',
             'class' => SpotUserDataStream::class,
             'tag' => self::TAG_SPOT,
@@ -100,7 +121,7 @@ final class StreamBuildPass implements CompilerPassInterface
             foreach (self::STREAM_MAPPINGS as $mapping) {
                 $serviceId = $mapping['service_id'];
                 if (($mapping['requires_symbols'] ?? false) === true) {
-                    $symbols = $this->extractSymbolsByPattern($eventName, $mapping['pattern']);
+                    $symbols = $this->extractSymbolsByPatterns($eventName, $mapping['patterns']);
                     if ($symbols !== []) {
                         $symbolsByService[$serviceId] = array_merge(
                             $symbolsByService[$serviceId] ?? [],
@@ -110,7 +131,7 @@ final class StreamBuildPass implements CompilerPassInterface
                     continue;
                 }
 
-                if ($this->matchesPattern($eventName, $mapping['pattern'])) {
+                if ($this->matchesAnyPattern($eventName, $mapping['patterns'])) {
                     $enabledByService[$serviceId] = true;
                 }
             }
@@ -143,28 +164,37 @@ final class StreamBuildPass implements CompilerPassInterface
     }
 
     /**
-     * @param non-empty-string $pattern
+     * @param array<int, non-empty-string> $patterns
      * @return string[]
      */
-    private function extractSymbolsByPattern(string $eventName, string $pattern): array
+    private function extractSymbolsByPatterns(string $eventName, array $patterns): array
     {
-        if (preg_match($pattern, $eventName, $matches) !== 1) {
-            return [];
+        $symbols = [];
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $eventName, $matches) !== 1) {
+                continue;
+            }
+            if (!isset($matches[1])) {
+                continue;
+            }
+            $symbols = array_merge($symbols, $this->splitList($matches[1]));
         }
 
-        if (!isset($matches[1])) {
-            return [];
-        }
-
-        return $this->splitList($matches[1]);
+        return $symbols;
     }
 
     /**
-     * @param non-empty-string $pattern
+     * @param array<int, non-empty-string> $patterns
      */
-    private function matchesPattern(string $eventName, string $pattern): bool
+    private function matchesAnyPattern(string $eventName, array $patterns): bool
     {
-        return preg_match($pattern, $eventName) === 1;
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $eventName) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
