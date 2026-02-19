@@ -9,7 +9,6 @@ final readonly class PendingRequest
     public function __construct(
         public string $id,
         public Deferred $deferred,
-        public array $request,
         public string $type,
     ) {
     }

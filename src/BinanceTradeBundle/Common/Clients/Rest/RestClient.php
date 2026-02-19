@@ -15,7 +15,7 @@ use Empiriq\Contracts\SerializerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
 use React\Http\Browser;
-use React\Http\Message\Response;
+use Psr\Http\Message\ResponseInterface;
 use React\Promise\PromiseInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerBaseException;
@@ -87,11 +87,11 @@ abstract class RestClient
 
             return $this->client
                 ->request($method, $path, $headers, $body)
-                ->then(function (Response $response) use ($id, $type): mixed {
+                ->then(function (ResponseInterface $response) use ($id, $type): mixed {
                     $data = [
                         'id' => $id,
                         'status' => 200,
-                        'result' => $this->serializer->decode($response->getBody()->getContents(), JsonEncoder::FORMAT),
+                        'result' => $this->serializer->decode((string)$response->getBody(), JsonEncoder::FORMAT),
                     ];
                     $this->logger->info(sprintf('Received response (id: %s)', $id), $data['result']);
 

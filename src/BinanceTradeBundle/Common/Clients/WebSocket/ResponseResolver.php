@@ -24,7 +24,7 @@ abstract class ResponseResolver extends RequestSender
     protected function message(array $data): void
     {
         $rawResponse = static::extractRawResponse($data);
-        if (is_null($rawResponse)) {
+        if ($rawResponse !== null) {
             if ($pending = $this->ejectPending($data['id'])) {
                 if (!isset($data['status']) || $data['status'] === 200) {
                     try {
@@ -54,9 +54,10 @@ abstract class ResponseResolver extends RequestSender
         }
     }
 
+    #[\Override]
     protected function addPending(array $request, string $type): PromiseInterface
     {
-        $pending = new PendingRequest($request['id'], new Deferred(), $request, $type);
+        $pending = new PendingRequest($request['id'], new Deferred(), $type);
         $this->pending[$pending->id] = $pending;
 
         return timeout($pending->deferred->promise(), $this->config->timeout)

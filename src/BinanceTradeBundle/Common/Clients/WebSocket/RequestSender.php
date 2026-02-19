@@ -130,4 +130,6 @@ abstract class RequestSender extends EventDispatcher
     {
         return (int)(new DateTime('now', new DateTimeZone('UTC')))->format('Uv') + $this->timeOffsetMs;
     }
+
+    abstract protected function addPending(array $request, string $type): PromiseInterface;
 }

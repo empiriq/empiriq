@@ -13,7 +13,7 @@ abstract class EventDispatcher extends Connection
     protected function message(array $data): void
     {
         $rawEvent = static::extractRawEvent($data);
-        if (is_null($rawEvent)) {
+        if ($rawEvent !== null) {
             try {
                 $event = $this->serializer->denormalize($rawEvent, static::getEventType());
                 $this->dispatcher->dispatch($event);
