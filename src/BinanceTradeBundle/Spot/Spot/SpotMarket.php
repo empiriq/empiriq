@@ -17,6 +17,7 @@ use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\MarketStreamMethods;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\TradingMethods;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Methods\UserDataStreamMethods;
 use Empiriq\Contracts\RunnableInterface;
+use React\Promise\PromiseInterface;
 
 use function React\Promise\all;
 
@@ -57,9 +58,9 @@ readonly class SpotMarket implements RunnableInterface
     }
 
     #[\Override]
-    public function run(): void
+    public function run(): PromiseInterface
     {
-        all([
+        return all([
             $this->ws->connect()->then(function () {
                 return $this->time();
             })->then(function (TimeResponse $response) {
@@ -78,9 +79,9 @@ readonly class SpotMarket implements RunnableInterface
     }
 
     #[\Override]
-    public function shutdown(): void
+    public function shutdown(): PromiseInterface
     {
-        all([
+        return all([
             $this->ws->disconnect(),
             $this->subscriptions->disconnect(),
         ]);

@@ -3,32 +3,45 @@
 namespace Empiriq\Contracts;
 
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
+use Empiriq\Contracts\Events\EmpiriqRunEvent;
+use Empiriq\Contracts\Events\EmpiriqShutdownEvent;
 use Psr\Log\LoggerInterface;
+use React\Promise\PromiseInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use function React\Async\await;
+use function React\Promise\all;
 
 readonly class Runner
 {
     /**
-     * @param iterable<RunnableInterface> $runners
+     * @var RunnableInterface[]
+     */
+    private array $runners;
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
      * @param LoggerInterface $logger
+     * @param iterable<RunnableInterface> $runners
      */
     public function __construct(
-        private iterable $runners,
+        private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
+        iterable $runners,
     ) {
-        foreach ($this->runners as $runner) {
-            if (!$runner instanceof RunnableInterface) {
-                throw new ConfigurationException('Invalid Runnable');
-            }
-        }
+        $this->runners = $this->normalizeRunners($runners);
     }
 
     public function run(): void
     {
         $this->logger->info('Runtime starting');
+        $promises = [];
         foreach ($this->runners as $runner) {
             $this->logger->info(sprintf('Running: %s', $runner::class));
-            $runner->run();
+            $promises[] = $this->handlePromise($runner->run(), $runner::class, 'run');
         }
+        await(all($promises));
+        $this->dispatcher->dispatch(new EmpiriqRunEvent(), 'empiriq.run');
         $this->logger->info('Runtime started successfully');
         if (!\extension_loaded('pcntl')) {
             $this->logger->warning('pcntl extension not available, signal handling disabled');
@@ -50,21 +63,42 @@ readonly class Runner
 
         $this->logger->info(sprintf('Received %s, initiating shutdown...', $name));
 
+        $promises = [];
         foreach ($this->runners as $service) {
-            try {
-                $service->shutdown();
-            } catch (\Throwable $e) {
-                $this->logger->error(
-                    sprintf(
-                        'Shutdown error in %s: %s',
-                        $service::class,
-                        $e->getMessage()
-                    )
-                );
-            }
+            $promises[] = $this->handlePromise($service->shutdown(), $service::class, 'shutdown');
         }
 
+        await(all($promises));
+        $this->dispatcher->dispatch(new EmpiriqShutdownEvent(), 'empiriq.shutdown');
         $this->logger->info('Shutdown completed');
         exit(0);
+    }
+
+    private function handlePromise(PromiseInterface $promise, string $service, string $operation): PromiseInterface
+    {
+        return $promise->then(
+            null,
+            function (\Throwable $e) use ($service, $operation) {
+                $this->logger->error(sprintf('%s error in %s: %s', ucfirst($operation), $service, $e->getMessage()));
+                return null;
+            }
+        );
+    }
+
+    /**
+     * @param iterable<RunnableInterface> $runners
+     * @return RunnableInterface[]
+     */
+    private function normalizeRunners(iterable $runners): array
+    {
+        $normalized = [];
+        foreach ($runners as $runner) {
+            if (!$runner instanceof RunnableInterface) {
+                throw new ConfigurationException('Invalid Runnable');
+            }
+            $normalized[] = $runner;
+        }
+
+        return $normalized;
     }
 }

@@ -6,7 +6,10 @@ use Empiriq\Contracts\RunnableInterface;
 use Empiriq\TickerBundle\TickEvent;
 use React\EventLoop\Loop;
 use React\EventLoop\TimerInterface;
+use React\Promise\PromiseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use function React\Promise\resolve;
 
 class TimeDrivenClock implements RunnableInterface
 {
@@ -25,7 +28,7 @@ class TimeDrivenClock implements RunnableInterface
     ) {
     }
 
-    public function run(): void
+    public function run(): PromiseInterface
     {
         foreach ($this->intervals as $interval) {
             $this->timers[] = Loop::addPeriodicTimer(
@@ -41,13 +44,17 @@ class TimeDrivenClock implements RunnableInterface
                 }
             );
         }
+
+        return resolve(null);
     }
 
-    public function shutdown(): void
+    public function shutdown(): PromiseInterface
     {
         foreach ($this->timers as $timer) {
             Loop::cancelTimer($timer);
         }
+
+        return resolve(null);
     }
 
     /**

@@ -17,6 +17,7 @@ use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\MarketStreamMetho
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\TradingMethods;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods\UserDataStreamMethods;
 use Empiriq\Contracts\RunnableInterface;
+use React\Promise\PromiseInterface;
 
 use function React\Promise\all;
 
@@ -57,9 +58,9 @@ readonly class FuturesUsdMMarket implements RunnableInterface
     }
 
     #[\Override]
-    public function run(): void
+    public function run(): PromiseInterface
     {
-        all([
+        return all([
             $this->ws->connect()->then(function () {
                 return $this->time();
             })->then(function (TimeResponse $response) {
@@ -85,9 +86,9 @@ readonly class FuturesUsdMMarket implements RunnableInterface
     }
 
     #[\Override]
-    public function shutdown(): void
+    public function shutdown(): PromiseInterface
     {
-        all([
+        return all([
             $this->ws->disconnect(),
             $this->subscriptions->disconnect(),
         ]);

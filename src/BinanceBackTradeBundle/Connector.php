@@ -6,8 +6,11 @@ use Empiriq\BinanceBackTradeBundle\Common\Helpers\ParallelIterator;
 use Empiriq\BinanceBackTradeBundle\Common\Interfaces\ReceiverInterface;
 use Empiriq\Contracts\ExchangeConnectorInterface;
 use Empiriq\Contracts\RunnableInterface;
+use React\Promise\PromiseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+
+use function React\Promise\resolve;
 
 class Connector implements ExchangeConnectorInterface, RunnableInterface
 {
@@ -34,9 +37,8 @@ class Connector implements ExchangeConnectorInterface, RunnableInterface
     }
 
     #[\Override]
-    public function run(): void
+    public function run(): PromiseInterface
     {
-        // todo resolve immediately
         $eventIterator = new ParallelIterator(
             array_map(fn(ReceiverInterface $market) => $market->run($this->serializer), $this->markets)
         );
@@ -50,10 +52,13 @@ class Connector implements ExchangeConnectorInterface, RunnableInterface
             $i++;
             $this->dispatcher->dispatch($event);
         }
+
+        return resolve(null);
     }
 
     #[\Override]
-    public function shutdown(): void
+    public function shutdown(): PromiseInterface
     {
+        return resolve(null);
     }
 }
