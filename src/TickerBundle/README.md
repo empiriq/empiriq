@@ -26,17 +26,12 @@ Consumers subscribe to ticks **by event name**, passing intervals as query
 parameters to keep the dot-style event prefix intact:
 
 ```
-ticker.tick?interval=1.5s
-ticker.tick?interval=1.5s,2s,500ms
+ticker.interval?seconds=1.5
 ```
 
-Supported interval formats:
+The `seconds` parameter is a numeric interval in seconds (integer or float).
 
-- `"1s"`, `"1.5s"` → seconds
-- `"250ms"` → milliseconds
-- `"100us"` → microseconds
-- `"2m"` → minutes
-- `"1h"` → hours
+If you need multiple intervals, register multiple event subscriptions.
 
 The system automatically **detects which tick intervals are subscribed to**
 and dispatches tick events only for those intervals.
@@ -95,7 +90,7 @@ The bundle is configured using a single option that selects the clock type.
 
 ```yaml
 # config/packages/ticker.yaml
-tick:
+ticker:
   clock: time   # or "event"
 ```
 
@@ -120,7 +115,6 @@ Dispatched on every tick.
 final readonly class TickEvent
 {
     public function __construct(
-        public string $period,
         public \DateTimeImmutable $time,
     ) {
     }
@@ -140,7 +134,7 @@ final class ExampleSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'ticker.tick?interval=1s' => 'onTick',
+            'ticker.interval?seconds=1' => 'onTick',
         ];
     }
 

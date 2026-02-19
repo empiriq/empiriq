@@ -3,6 +3,7 @@
 namespace Empiriq\TickerBundle\Clock;
 
 use Empiriq\Contracts\RunnableInterface;
+use Empiriq\TickerBundle\DependencyInjection\BundleBuildPass;
 use Empiriq\TickerBundle\TickEvent;
 use React\EventLoop\Loop;
 use React\EventLoop\TimerInterface;
@@ -32,14 +33,11 @@ class TimeDrivenClock implements RunnableInterface
     {
         foreach ($this->intervals as $interval) {
             $this->timers[] = Loop::addPeriodicTimer(
-                $this->intervalToSeconds($interval),
+                $interval,
                 function () use ($interval) {
                     $this->dispatcher->dispatch(
-                        new TickEvent(
-                            period: $interval,
-                            time: new \DateTimeImmutable()
-                        ),
-                        sprintf('ticker.tick?interval=%s', $interval)
+                        new TickEvent(new \DateTimeImmutable()),
+                        sprintf('%s?%s=%s', BundleBuildPass::EVENT_PATH, BundleBuildPass::QUERY_PARAM, $interval)
                     );
                 }
             );
@@ -55,37 +53,5 @@ class TimeDrivenClock implements RunnableInterface
         }
 
         return resolve(null);
-    }
-
-    /**
-     * Converts a time interval to seconds (float).
-     *
-     * Supported formats:
-     *  - "1s", "1.5s"         → seconds
-     *  - "250ms"              → milliseconds
-     *  - "100us"              → microseconds
-     *  - "2m"                 → minutes
-     *  - "1h"                 → hours
-     */
-    private function intervalToSeconds(string $interval): float
-    {
-        if (!preg_match('/^\s*(\d+(?:\.\d+)?)\s*(us|ms|s|m|h)\s*$/i', $interval, $matches)) {
-            throw new \InvalidArgumentException(
-                sprintf('Invalid interval format: "%s"', $interval)
-            );
-        }
-        $value = (float)$matches[1];
-        $unit = strtolower($matches[2]);
-        if ($value < 0) {
-            throw new \InvalidArgumentException('Interval must be non-negative');
-        }
-
-        return match ($unit) {
-            'us' => $value / 1_000_000,
-            'ms' => $value / 1_000,
-            's' => $value,
-            'm' => $value * 60,
-            'h' => $value * 3600,
-        };
     }
 }

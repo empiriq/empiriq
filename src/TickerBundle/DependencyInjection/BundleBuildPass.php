@@ -9,9 +9,13 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 
 readonly class BundleBuildPass implements CompilerPassInterface
 {
+    public const EVENT_PATH = 'ticker.interval';
+    public const QUERY_PARAM = 'seconds';
+
     /**
      * Builds the clock service based on discovered tick subscriptions.
      */
@@ -30,7 +34,10 @@ readonly class BundleBuildPass implements CompilerPassInterface
         $eventNames = $this->eventDiscovery->discover($container);
         $intervals = [];
         foreach ($eventNames as $eventName) {
-            $intervals = array_merge($intervals, $this->extractIntervals($eventName));
+            $interval = $this->extractInterval($eventName);
+            if ($interval !== null) {
+                $intervals[] = $interval;
+            }
         }
         $intervals = array_values(array_unique($intervals));
 
@@ -54,74 +61,23 @@ readonly class BundleBuildPass implements CompilerPassInterface
     }
 
     /**
-     * Extracts tick intervals from a subscription name.
-     *
-     * @return string[]
+     * Extracts the interval value from a ticker event name.
      */
-    private function extractIntervals(string $eventName): array
+    private function extractInterval(string $eventName): ?string
     {
-        if (str_starts_with($eventName, 'ticker.tick?')) {
-            return $this->extractIntervalsFromQuery($eventName);
+        if (parse_url($eventName, PHP_URL_PATH) !== self::EVENT_PATH) {
+            return null;
+        }
+        $query = parse_url($eventName, PHP_URL_QUERY);
+        if (!is_string($query) || $query === '') {
+            return null;
+        }
+        $params = HeaderUtils::parseQuery($query);
+        $interval = $params[self::QUERY_PARAM] ?? null;
+        if (!is_string($interval) || $interval === '') {
+            return null;
         }
 
-        if (preg_match('/^ticker\.tick\.(.+)$/i', $eventName, $matches)) {
-            return $this->filterValidIntervals($this->splitList($matches[1]));
-        }
-
-        return [];
-    }
-
-    /**
-     * Extracts intervals from query-style subscriptions.
-     *
-     * @return string[]
-     */
-    private function extractIntervalsFromQuery(string $eventName): array
-    {
-        $parts = explode('?', $eventName, 2);
-        if (count($parts) !== 2 || $parts[0] !== 'ticker.tick') {
-            return [];
-        }
-
-        parse_str($parts[1], $query);
-        $intervals = [];
-
-        if (isset($query['interval']) && is_string($query['interval'])) {
-            $intervals = array_merge($intervals, $this->splitList($query['interval']));
-        }
-
-        return $this->filterValidIntervals($intervals);
-    }
-
-    /**
-     * Filters and normalizes interval values.
-     *
-     * @param string[] $values
-     * @return string[]
-     */
-    private function filterValidIntervals(array $values): array
-    {
-        $valid = [];
-        foreach ($values as $value) {
-            $value = trim($value);
-            if ($value === '') {
-                continue;
-            }
-            if (preg_match('/^\d+(?:\.\d+)?(?:us|ms|s|m|h)$/i', $value) === 1) {
-                $valid[] = $value;
-            }
-        }
-
-        return $valid;
-    }
-
-    /**
-     * Splits a comma-separated interval list.
-     *
-     * @return string[]
-     */
-    private function splitList(string $value): array
-    {
-        return array_map('trim', explode(',', $value));
+        return $interval;
     }
 }

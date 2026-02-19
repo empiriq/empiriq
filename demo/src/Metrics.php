@@ -19,7 +19,7 @@ readonly class Metrics implements EventSubscriberInterface
     {
         return [
             'binance.futures_usd.market.trade?symbol=btcusdt' => 'trade',
-            'ticker.tick?interval=5s' => 'push',
+            'ticker.interval?seconds=2' => 'push',
         ];
     }
 
@@ -30,6 +30,9 @@ readonly class Metrics implements EventSubscriberInterface
 
     public function push(): void
     {
+        var_dump(777);
+        var_dump(777);
+        var_dump(777);
         $this->gateway->push($this->registry, 'trade_workers');
     }
 }
