@@ -30,7 +30,7 @@ Supported signers:
 - `hmac` — HMAC SHA256
 - `ed25519` — Ed25519 private key
 - `rsa` — RSA private key
-- `null` — unsigned (public endpoints)
+- `null` — null (public endpoints)
 
 ```yaml
 # config/packages/binance_trade.yaml

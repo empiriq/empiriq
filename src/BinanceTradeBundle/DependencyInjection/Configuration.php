@@ -14,29 +14,12 @@ final class Configuration implements ConfigurationInterface
         /** @psalm-suppress UndefinedMethod */
         $treeBuilder->getRootNode()
             ->children()
-                ->scalarNode('api_key')
-                    ->defaultNull()
+                ->scalarNode('auth')
+                    ->defaultValue('null')
                 ->end()
                 ->enumNode('environment')
                     ->values(['mainnet', 'testnet'])
                     ->defaultValue('mainnet')
-                ->end()
-                ->arrayNode('signer')
-                    ->children()
-                        ->enumNode('type')
-                            ->values(['hmac', 'ed25519', 'rsa', null])
-                            ->defaultNull()
-                        ->end()
-                        ->scalarNode('secret_key')
-                            ->defaultNull()
-                        ->end()
-                        ->scalarNode('private_key_path')
-                            ->defaultNull()
-                        ->end()
-                        ->scalarNode('passphrase')
-                            ->defaultNull()
-                        ->end()
-                    ->end()
                 ->end()
                 ->arrayNode('endpoints')
                     ->children()
@@ -69,7 +52,8 @@ final class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
-                ->end();
+                ->end()
+            ->end();
 
         return $treeBuilder;
     }

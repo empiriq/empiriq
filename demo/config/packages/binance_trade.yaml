@@ -1,7 +1,3 @@
 binance_trade:
     environment: mainnet
-    api_key: 'IQpGsLVM3gRKrdZ8DGwk4mUqaHa7McEyzpl5DQBqhnVeX9j4VZD30r7wMCnyjdHs'
-    signer:
-        type: hmac
-        secret_key: 'ngtDdiAzjragCSRjjNUi0SET2KJK6BseW7k5oxtVfyvrp9og3LxRVyNS8n39G8HO'
-
+    auth: null
