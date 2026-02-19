@@ -12,7 +12,8 @@ abstract class EventDispatcher extends Connection
     #[\Override]
     protected function message(array $data): void
     {
-        if ($rawEvent = static::extractRawEvent($data)) {
+        $rawEvent = static::extractRawEvent($data);
+        if (is_null($rawEvent)) {
             try {
                 $event = $this->serializer->denormalize($rawEvent, static::getEventType());
                 $this->dispatcher->dispatch($event);

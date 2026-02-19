@@ -34,11 +34,12 @@ final class RestApi extends RestClient
      * @param RestConfig $config REST API configuration.
      */
     public function __construct(
-        protected SignerInterface $signer,
-        protected SerializerInterface $serializer,
-        protected LoggerInterface $logger,
-        protected Browser $client,
-        protected RestConfig $config,
+        SignerInterface $signer,
+        SerializerInterface $serializer,
+        LoggerInterface $logger,
+        Browser $client,
+        RestConfig $config,
     ) {
+        parent::__construct($signer, $serializer, $logger, $client, $config);
     }
 }

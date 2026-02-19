@@ -23,7 +23,8 @@ abstract class ResponseResolver extends RequestSender
     #[\Override]
     protected function message(array $data): void
     {
-        if ($rawResponse = static::extractRawResponse($data)) {
+        $rawResponse = static::extractRawResponse($data);
+        if (is_null($rawResponse)) {
             if ($pending = $this->ejectPending($data['id'])) {
                 if (!isset($data['status']) || $data['status'] === 200) {
                     try {
@@ -35,7 +36,9 @@ abstract class ResponseResolver extends RequestSender
                             sprintf('Response denormalization failed (id: %s): %s', $pending->id, $e->getMessage()),
                             $data
                         );
-                        $pending->deferred->reject(new DeserializationException($e->getMessage(), $e->getCode(), $e));
+                        $pending->deferred->reject(
+                            new DeserializationException($e->getMessage(), (int)$e->getCode(), $e)
+                        );
                     }
                 } else {
                     $msg = $data['error']['msg'] ?? 'unknown';
@@ -44,7 +47,7 @@ abstract class ResponseResolver extends RequestSender
                     $pending->deferred->reject(new BinanceException($msg, $code, '', $data, []));
                 }
             } else {
-                $this->logger->warning(sprintf('Pending request not found for the received response'), $data);
+                $this->logger->warning('Pending request not found for the received response', $data);
             }
         } else {
             parent::message($data);

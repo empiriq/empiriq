@@ -47,7 +47,7 @@ abstract class RequestSender extends EventDispatcher
         try {
             $params = [];
             if (!is_null($payload)) {
-                $params = $this->serializer->normalize($payload);
+                $params = (array)$this->serializer->normalize($payload);
             }
             if (!is_null($recvWindow)) {
                 $params['recvWindow'] = $recvWindow;
@@ -96,7 +96,7 @@ abstract class RequestSender extends EventDispatcher
                 sprintf('Unexpected error while sending request (method: %s): %s', $method, $exception->getMessage())
             );
 
-            return reject(new RuntimeException($exception->getMessage(), $exception->getCode(), $exception));
+            return reject(new RuntimeException($exception->getMessage(), (int)$exception->getCode(), $exception));
         }
     }
 

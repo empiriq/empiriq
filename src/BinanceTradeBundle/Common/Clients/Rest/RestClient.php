@@ -25,12 +25,19 @@ use function React\Promise\reject;
 
 abstract class RestClient
 {
-    protected SignerInterface $signer;
-    protected SerializerInterface $serializer;
-    protected LoggerInterface $logger;
-    protected Browser $client;
-    protected RestConfig $config;
     private int $timeOffsetMs = 0;
+
+    public function __construct(
+        protected SignerInterface $signer,
+        protected SerializerInterface $serializer,
+        protected LoggerInterface $logger,
+        protected Browser $client,
+        protected RestConfig $config,
+    ) {
+        $this->client = $this->client->withBase($config->uri);
+        /** @psalm-suppress InvalidArgument */
+        $this->client = $this->client->withTimeout($config->timeout);
+    }
 
     /**
      * @template T of object
@@ -79,8 +86,6 @@ abstract class RestClient
             $this->logger->info(sprintf('Sending request (id: %s) %s %s %s', $id, $method, $path, $body));
 
             return $this->client
-                ->withBase($this->config->uri)
-                ->withTimeout($this->config->timeout)
                 ->request($method, $path, $headers, $body)
                 ->then(function (Response $response) use ($id, $type): mixed {
                     $data = [
