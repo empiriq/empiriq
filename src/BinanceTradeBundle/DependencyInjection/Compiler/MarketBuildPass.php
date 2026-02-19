@@ -24,6 +24,9 @@ use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\RestApi as SpotRestApi;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsApi as SpotWsApi;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsSubscriptions as SpotWsSubscriptions;
 use Empiriq\BinanceTradeBundle\Spot\Spot\SpotMarket;
+use Empiriq\SymfonyDefinitionFactory\DefinitionFactory;
+use Empiriq\SymfonyDefinitionFactory\DefinitionSpec;
+use Empiriq\SymfonyDefinitionFactory\QueryStringSpecParser;
 use Empiriq\SymfonyDependencyDiscovery\DependencyDiscovery;
 use React\Http\Browser;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -184,85 +187,36 @@ final class MarketBuildPass implements CompilerPassInterface
             throw new \RuntimeException('Invalid auth config');
         }
 
-        [$type, $params] = $this->parseAuth($auth);
-        $apiKey = $this->getStringParam($params, 'api_key') ?? '';
+        $factory = new DefinitionFactory(
+            new QueryStringSpecParser(),
+            [
+                'hmac' => new DefinitionSpec(
+                    HmacSigner::class,
+                    ['secret'],
+                    ['secret', 'api_key']
+                ),
+                'ed25519' => new DefinitionSpec(
+                    Ed25519Signer::class,
+                    ['private_key', 'passphrase'],
+                    ['private_key', 'api_key']
+                ),
+                'rsa' => new DefinitionSpec(
+                    RsaSigner::class,
+                    ['private_key', 'passphrase'],
+                    ['private_key', 'api_key']
+                ),
+                'null' => new DefinitionSpec(
+                    NullSigner::class
+                ),
+            ]
+        );
 
-        return [$apiKey, $this->buildSignerDefinition($type, $params)];
-    }
-
-    /**
-     * @param array<string, mixed> $params
-     */
-    private function buildSignerDefinition(string $type, array $params): Definition
-    {
-        return match ($type) {
-            'hmac' => new Definition(HmacSigner::class, [
-                $this->requireStringParam($params, 'secret', 'auth.secret')
-            ]),
-            'ed25519' => new Definition(Ed25519Signer::class, [
-                $this->requireStringParam($params, 'private_key', 'auth.private_key'),
-                $this->getStringParam($params, 'passphrase'),
-            ]),
-            'rsa' => new Definition(RsaSigner::class, [
-                $this->requireStringParam($params, 'private_key', 'auth.private_key'),
-                $this->getStringParam($params, 'passphrase'),
-            ]),
-            'null' => new Definition(NullSigner::class),
-            default => throw new \RuntimeException(sprintf('Unsupported auth type "%s"', $type)),
-        };
-    }
-
-    /**
-     * @return array{0: string, 1: array<string, mixed>}
-     */
-    private function parseAuth(string $auth): array
-    {
-        $parts = explode('?', $auth, 2);
-        $type = strtolower(trim($parts[0]));
-        if ($type === '') {
-            throw new \RuntimeException('Invalid auth type');
+        $parsed = $factory->parse($auth);
+        $apiKey = $parsed->params['api_key'] ?? '';
+        if (!is_string($apiKey)) {
+            throw new \RuntimeException('Auth parameter "api_key" must be a string');
         }
 
-        $params = [];
-        if (isset($parts[1]) && $parts[1] !== '') {
-            foreach (explode('&', $parts[1]) as $pair) {
-                if ($pair === '') {
-                    continue;
-                }
-                [$key, $value] = array_pad(explode('=', $pair, 2), 2, '');
-                $params[$key] = $value;
-            }
-        }
-
-        return [$type, $params];
-    }
-
-    /**
-     * @param array<string, mixed> $params
-     */
-    private function requireStringParam(array $params, string $key, string $label): string
-    {
-        $value = $this->getStringParam($params, $key);
-        if ($value === null || $value === '') {
-            throw new \RuntimeException(sprintf('Missing required %s', $label));
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param array<string, mixed> $params
-     */
-    private function getStringParam(array $params, string $key): ?string
-    {
-        if (!array_key_exists($key, $params)) {
-            return null;
-        }
-        $value = $params[$key];
-        if (is_array($value)) {
-            throw new \RuntimeException(sprintf('Auth parameter "%s" must be a string', $key));
-        }
-
-        return $value === null ? null : (string) $value;
+        return [$apiKey, $factory->createFromParsed($parsed)];
     }
 }
