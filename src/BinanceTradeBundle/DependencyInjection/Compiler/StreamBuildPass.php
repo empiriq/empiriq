@@ -1,12 +1,12 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\DependencyInjection;
+namespace Empiriq\BinanceTradeBundle\DependencyInjection\Compiler;
 
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\TradeStream as FuturesUsdMTradeStream;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Streams\TradeStream as FuturesCoinMTradeStream;
-use Empiriq\BinanceTradeBundle\Spot\Spot\Streams\TradeStream as SpotTradeStream;
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\UserDataStream as FuturesUsdMUserDataStream;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Streams\UserDataStream as FuturesCoinMUserDataStream;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\TradeStream as FuturesUsdMTradeStream;
+use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Streams\UserDataStream as FuturesUsdMUserDataStream;
+use Empiriq\BinanceTradeBundle\Spot\Spot\Streams\TradeStream as SpotTradeStream;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Streams\UserDataStream as SpotUserDataStream;
 use Empiriq\SymfonyEventDiscovery\EventDiscovery;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

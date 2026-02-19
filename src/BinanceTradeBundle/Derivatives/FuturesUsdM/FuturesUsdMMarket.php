@@ -4,6 +4,7 @@ namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM;
 
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\Authentication\AccountStatusResponse;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\TimeResponse;
+use Empiriq\BinanceContracts\FuturesUmMarketInterface;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\FuturesUsdMStreamInterface;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Clients\RestApi;
@@ -28,7 +29,7 @@ use function React\Promise\all;
  *
  * @api
  */
-readonly class FuturesUsdMMarket implements RunnableInterface
+readonly class FuturesUsdMMarket implements RunnableInterface, FuturesUmMarketInterface
 {
     use GeneralMethods;
     use MarketDataMethods;

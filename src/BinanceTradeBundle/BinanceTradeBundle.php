@@ -3,12 +3,12 @@
 namespace Empiriq\BinanceTradeBundle;
 
 use Empiriq\BinanceTradeBundle\DependencyInjection\BinanceTradeExtension;
-use Empiriq\BinanceTradeBundle\DependencyInjection\StreamBuildPass;
-use Empiriq\BinanceTradeBundle\DependencyInjection\TransportBuildPass;
+use Empiriq\BinanceTradeBundle\DependencyInjection\Compiler\MarketBuildPass;
+use Empiriq\BinanceTradeBundle\DependencyInjection\Compiler\StreamBuildPass;
+use Empiriq\SymfonyDependencyDiscovery\DependencyDiscovery;
 use Empiriq\SymfonyEventDiscovery\EventDiscovery;
 use Empiriq\SymfonyEventDiscovery\Extractor\ListenerExtractor;
 use Empiriq\SymfonyEventDiscovery\Extractor\SubscriberExtractor;
-use Empiriq\SymfonyDependencyDiscovery\DependencyDiscovery;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -37,7 +37,7 @@ final class BinanceTradeBundle extends Bundle
             )
         );
         $container->addCompilerPass(
-            new TransportBuildPass(
+            new MarketBuildPass(
                 new DependencyDiscovery()
             )
         );
