@@ -60,7 +60,7 @@ Creating Binance API Credentials:
 During container build, the bundle scans Symfony event subscribers and registers only the streams that are actually requested by your event names.
 
 Event names use a query-style format for parameters:
-- `binance.<market>.<scope>.<type>?symbol=btcusdt,ethusdt`
+- `binance.<market>.<scope>.<type>?symbol[]=btcusdt&symbol[]=ethusdt`
 - `symbol` accepts multiple comma-separated values.
 - User events do not require `symbol`.
 
@@ -74,8 +74,8 @@ Methods and events marked as **public** do not require a signer. Set `signer.typ
 
 ### Spot
 Events:
-- `binance.spot.market.trade?symbol=btcusdt` [public] [TradeEvent.php](../../src/BinanceContracts/Spot/Spot/Events/Market/TradeEvent.php) Trade updates
-- `binance.spot.market.depth?symbol=btcusdt` [public] [DepthEvent.php](../../src/BinanceContracts/Spot/Spot/Events/Market/DepthEvent.php) Order book updates
+- `binance.spot.market.trade?symbol[]=btcusdt` [public] [TradeEvent.php](../../src/BinanceContracts/Spot/Spot/Events/Market/TradeEvent.php) Trade updates
+- `binance.spot.market.depth?symbol[]=btcusdt` [public] [DepthEvent.php](../../src/BinanceContracts/Spot/Spot/Events/Market/DepthEvent.php) Order book updates
 - `binance.spot.user.balance_update` [auth] [BalanceUpdateEvent.php](../../src/BinanceContracts/Spot/Spot/Events/User/BalanceUpdateEvent.php) Balance update
 - `binance.spot.user.outbound_account_position` [auth] [OutboundAccountPositionEvent.php](../../src/BinanceContracts/Spot/Spot/Events/User/OutboundAccountPositionEvent.php) Account position update
 - `binance.spot.user.execution_report` [auth] [ExecutionReportEvent.php](../../src/BinanceContracts/Spot/Spot/Events/User/ExecutionReportEvent.php) Order execution report
@@ -108,8 +108,8 @@ Methods:
 
 ### Futures USD-M
 Events:
-- `binance.futures_usd.market.trade?symbol=btcusdt` [public] [TradeEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/Market/TradeEvent.php) Trade updates
-- `binance.futures_usd.market.depth?symbol=btcusdt` [public] [DepthEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/Market/DepthEvent.php) Order book updates
+- `binance.futures_usd.market.trade?symbol[]=btcusdt` [public] [TradeEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/Market/TradeEvent.php) Trade updates
+- `binance.futures_usd.market.depth?symbol[]=btcusdt` [public] [DepthEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/Market/DepthEvent.php) Order book updates
 - `binance.futures_usd.user.account_update` [auth] [AccountUpdateEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/User/AccountUpdateEvent.php) Account update
 - `binance.futures_usd.user.order_trade_update` [auth] [OrderTradeUpdateEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/User/OrderTradeUpdateEvent.php) Order/trade update
 - `binance.futures_usd.user.margin_call` [auth] [MarginCallEvent.php](../../src/BinanceContracts/Derivatives/FuturesUsdM/Events/User/MarginCallEvent.php) Margin call
@@ -137,8 +137,8 @@ Methods:
 
 ### Futures COIN-M
 Events:
-- `binance.futures_coin.market.trade?symbol=btcusdt` [public] [TradeEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/Market/TradeEvent.php) Trade updates
-- `binance.futures_coin.market.depth?symbol=btcusdt` [public] [DepthEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/Market/DepthEvent.php) Order book updates
+- `binance.futures_coin.market.trade?symbol[]=btcusdt` [public] [TradeEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/Market/TradeEvent.php) Trade updates
+- `binance.futures_coin.market.depth?symbol[]=btcusdt` [public] [DepthEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/Market/DepthEvent.php) Order book updates
 - `binance.futures_coin.user.balance_update` [auth] [BalanceUpdateEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/User/BalanceUpdateEvent.php) Balance update
 - `binance.futures_coin.user.outbound_account_position` [auth] [OutboundAccountPositionEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/User/OutboundAccountPositionEvent.php) Account position update
 - `binance.futures_coin.user.execution_report` [auth] [ExecutionReportEvent.php](../../src/BinanceContracts/Derivatives/FuturesCoinM/Events/User/ExecutionReportEvent.php) Order execution report

@@ -10,7 +10,7 @@ use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
 final readonly class HmacSigner implements SignerInterface
 {
     public function __construct(
-        private string $secretKey,
+        private string $secret,
     ) {
     }
 
@@ -19,6 +19,6 @@ final readonly class HmacSigner implements SignerInterface
     {
         ksort($params);
 
-        return hash_hmac('sha256', http_build_query($params), $this->secretKey);
+        return hash_hmac('sha256', http_build_query($params), $this->secret);
     }
 }

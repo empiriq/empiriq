@@ -34,10 +34,10 @@ use React\Promise\PromiseInterface;
 final readonly class TradeStream implements FuturesUsdMStreamInterface
 {
     /**
-     * @param string[] $symbols The trading pair symbol (e.g. "BTCUSDT"). Case-insensitive.
+     * @param string[] $symbol The trading pair symbol (e.g. "BTCUSDT"). Case-insensitive.
      */
     public function __construct(
-        private array $symbols
+        private array $symbol
     ) {
     }
 
@@ -45,7 +45,7 @@ final readonly class TradeStream implements FuturesUsdMStreamInterface
     public function subscribe(FuturesUsdMMarket $market): PromiseInterface
     {
         return $market->subscribe(
-            array_map(fn(string $symbol): string => strtolower($symbol) . '@trade', $this->symbols)
+            array_map(fn(string $symbol): string => strtolower($symbol) . '@trade', $this->symbol)
         );
     }
 }

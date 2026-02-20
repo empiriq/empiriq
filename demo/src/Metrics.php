@@ -18,7 +18,7 @@ readonly class Metrics implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'binance.futures_usd.market.trade?symbol=btcusdt' => 'trade',
+            'binance.futures_usd.market.trade?symbol[]=btcusdt' => 'trade',
             'ticker.interval?second=2' => 'push',
         ];
     }

@@ -24,9 +24,6 @@ use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\RestApi as SpotRestApi;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsApi as SpotWsApi;
 use Empiriq\BinanceTradeBundle\Spot\Spot\Clients\WsSubscriptions as SpotWsSubscriptions;
 use Empiriq\BinanceTradeBundle\Spot\Spot\SpotMarket;
-use Empiriq\SymfonyDefinitionFactory\DefinitionFactory;
-use Empiriq\SymfonyDefinitionFactory\DefinitionSpec;
-use Empiriq\SymfonyDefinitionFactory\QueryStringSpecParser;
 use Empiriq\SymfonyDependencyDiscovery\DependencyDiscovery;
 use React\Http\Browser;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -34,6 +31,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 
 final class MarketBuildPass implements CompilerPassInterface
 {
@@ -182,41 +180,42 @@ final class MarketBuildPass implements CompilerPassInterface
      */
     private function resolveAuth(array $config): array
     {
-        $auth = $config['auth'] ?? 'null';
-        if (!is_string($auth) || trim($auth) === '') {
+        $mapping = [
+            'hmac' => HmacSigner::class,
+            'ed25519' => Ed25519Signer::class,
+            'rsa' => RsaSigner::class,
+            'null' => NullSigner::class,
+        ];
+        $def = $this->parse($mapping, $config['auth']);
+        if (!$def) {
             throw new \RuntimeException('Invalid auth config');
         }
+        parse_str(parse_url($config['auth'], PHP_URL_QUERY), $auth);
 
-        $factory = new DefinitionFactory(
-            new QueryStringSpecParser(),
-            [
-                'hmac' => new DefinitionSpec(
-                    HmacSigner::class,
-                    ['secret'],
-                    ['secret', 'api_key']
-                ),
-                'ed25519' => new DefinitionSpec(
-                    Ed25519Signer::class,
-                    ['private_key', 'passphrase'],
-                    ['private_key', 'api_key']
-                ),
-                'rsa' => new DefinitionSpec(
-                    RsaSigner::class,
-                    ['private_key', 'passphrase'],
-                    ['private_key', 'api_key']
-                ),
-                'null' => new DefinitionSpec(
-                    NullSigner::class
-                ),
-            ]
-        );
+        return [$auth['api_key'], $def];
+    }
 
-        $parsed = $factory->parse($auth);
-        $apiKey = $parsed->params['api_key'] ?? '';
-        if (!is_string($apiKey)) {
-            throw new \RuntimeException('Auth parameter "api_key" must be a string');
+    private function parse(array $mapping, string $eventName): ?Definition
+    {
+        foreach ($mapping as $key => $class) {
+            if (parse_url($eventName, PHP_URL_PATH) === $key) {
+                $def = new Definition($class);
+                $rc = new \ReflectionClass($class);
+                $ctor = $rc->getConstructor();
+                $params = $ctor?->getParameters() ?? [];
+                $query = parse_url($eventName, PHP_URL_QUERY);
+                if (is_string($query) && $query !== '') {
+                    $params2 = HeaderUtils::parseQuery($query);
+                    /* @var \ReflectionParameter $argument */
+                    foreach ($params as $i => $argument) {
+                        $def->setArgument($i, $params2[$argument->name] ?? null);
+                    }
+                }
+
+                return $def;
+            }
         }
 
-        return [$apiKey, $factory->createFromParsed($parsed)];
+        return null;
     }
 }
