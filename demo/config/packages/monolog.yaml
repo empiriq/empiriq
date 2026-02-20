@@ -3,5 +3,5 @@ monolog:
         stdout:
             type: stream
             path: php://stdout
-            level: debug
+            level: '%env(default:monolog.default_level:MONOLOG_LEVEL)%'
             formatter: monolog.formatter.json

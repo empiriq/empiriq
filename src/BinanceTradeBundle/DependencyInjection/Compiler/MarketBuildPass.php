@@ -184,7 +184,7 @@ final class MarketBuildPass implements CompilerPassInterface
             'hmac' => HmacSigner::class,
             'ed25519' => Ed25519Signer::class,
             'rsa' => RsaSigner::class,
-            'null' => NullSigner::class,
+            'unsigned' => NullSigner::class,
         ];
         $def = $this->parse($mapping, $config['auth']);
         if (!$def) {
@@ -192,7 +192,7 @@ final class MarketBuildPass implements CompilerPassInterface
         }
         parse_str(parse_url($config['auth'], PHP_URL_QUERY), $auth);
 
-        return [$auth['api_key'], $def];
+        return [$auth['api_key'] ?? '', $def];
     }
 
     private function parse(array $mapping, string $eventName): ?Definition

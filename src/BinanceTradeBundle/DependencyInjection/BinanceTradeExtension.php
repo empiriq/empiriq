@@ -13,13 +13,8 @@ final class BinanceTradeExtension extends Extension
     #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $container->setParameter(
-            self::PARAMETER_NAME,
-            $container->resolveEnvPlaceholders(
-                $container->getParameterBag()->resolveValue($this->processConfiguration(new Configuration(), $configs)),
-                true
-            )
-        );
+        $config = $this->processConfiguration(new Configuration(), $configs);
+        $container->setParameter(self::PARAMETER_NAME, $config);
         $container->setParameter(self::DEFAULTS, [
             'mainnet' => [
                 'spot' => [

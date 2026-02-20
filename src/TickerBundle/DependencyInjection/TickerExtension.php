@@ -13,10 +13,7 @@ final class TickerExtension extends Extension
     {
         $container->setParameter(
             self::PARAMETER_NAME,
-            $container->resolveEnvPlaceholders(
-                $container->getParameterBag()->resolveValue($this->processConfiguration(new Configuration(), $configs)),
-                true
-            )
+            $this->processConfiguration(new Configuration(), $configs)
         );
     }
 }
