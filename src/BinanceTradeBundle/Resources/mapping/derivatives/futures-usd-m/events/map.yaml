@@ -1,10 +1,10 @@
-Empiriq\BinanceContracts\Markets\FuturesUsdM\Common\EventInterface:
+Empiriq\BinanceContracts\Markets\FuturesUm\Common\EventInterface:
     discriminator_map:
         type_property: 'e'
         mapping:
-            "depthUpdate": Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\Market\DepthEvent
-            "trade": Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\Market\TradeEvent
-            "ORDER_TRADE_UPDATE": Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\OrderTradeUpdateEvent
-            "ACCOUNT_UPDATE": Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\AccountUpdateEvent
-            "TRADE_LITE": Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\TradeLiteEvent
-            "MARGIN_CALL": Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\MarginCallEvent
+            "depthUpdate": Empiriq\BinanceContracts\Markets\FuturesUm\Events\Market\DepthEvent
+            "trade": Empiriq\BinanceContracts\Markets\FuturesUm\Events\Market\TradeEvent
+            "ORDER_TRADE_UPDATE": Empiriq\BinanceContracts\Markets\FuturesUm\Events\User\OrderTradeUpdateEvent
+            "ACCOUNT_UPDATE": Empiriq\BinanceContracts\Markets\FuturesUm\Events\User\AccountUpdateEvent
+            "TRADE_LITE": Empiriq\BinanceContracts\Markets\FuturesUm\Events\User\TradeLiteEvent
+            "MARGIN_CALL": Empiriq\BinanceContracts\Markets\FuturesUm\Events\User\MarginCallEvent

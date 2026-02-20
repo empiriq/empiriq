@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\User\AccountUpdateEvent:
+Empiriq\BinanceContracts\Markets\FuturesCm\Events\User\AccountUpdateEvent:
     attributes:
         time:
             serialized_name: 'E'
@@ -7,7 +7,7 @@ Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\User\AccountUpdateEvent:
         balances:
             serialized_name: 'B'
 
-Empiriq\BinanceContracts\Markets\FuturesCoinM\Common\Balance:
+Empiriq\BinanceContracts\Markets\FuturesCm\Common\Balance:
     attributes:
         asset:
             serialized_name: 'a'

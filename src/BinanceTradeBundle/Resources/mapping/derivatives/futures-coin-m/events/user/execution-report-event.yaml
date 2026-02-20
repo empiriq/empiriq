@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\User\ExecutionReportEvent:
+Empiriq\BinanceContracts\Markets\FuturesCm\Events\User\ExecutionReportEvent:
     attributes:
         time:
             serialized_name: 'E'

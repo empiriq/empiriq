@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\MarginCallEvent:
+Empiriq\BinanceContracts\Markets\FuturesUm\Events\User\MarginCallEvent:
     attributes:
         time:
             serialized_name: 'E'

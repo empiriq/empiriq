@@ -2,8 +2,8 @@
 
 namespace Empiriq\BinanceTradeBundle\DependencyInjection\Compiler;
 
-use Empiriq\BinanceTradeBundle\Markets\FuturesUsdM\Streams\TradeStream as FuturesUsdMTradeStream;
-use Empiriq\BinanceTradeBundle\Markets\FuturesUsdM\Streams\UserDataStream as FuturesUsdMUserDataStream;
+use Empiriq\BinanceTradeBundle\Markets\FuturesUm\Streams\TradeStream as FuturesUsdMTradeStream;
+use Empiriq\BinanceTradeBundle\Markets\FuturesUm\Streams\UserDataStream as FuturesUsdMUserDataStream;
 use Empiriq\SymfonyEventDiscovery\EventDiscovery;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

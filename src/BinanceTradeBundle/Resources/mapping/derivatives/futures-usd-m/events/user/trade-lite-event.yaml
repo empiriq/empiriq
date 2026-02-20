@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\TradeLiteEvent:
+Empiriq\BinanceContracts\Markets\FuturesUm\Events\User\TradeLiteEvent:
     attributes:
         time:
             serialized_name: 'E'

@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\Market\DepthEvent:
+Empiriq\BinanceContracts\Markets\FuturesCm\Events\Market\DepthEvent:
     attributes:
         time:
             serialized_name: 'E'
@@ -13,14 +13,14 @@ Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\Market\DepthEvent:
         asks:
             serialized_name: 'a'
 
-Empiriq\BinanceContracts\Markets\FuturesCoinM\Common\Ask:
+Empiriq\BinanceContracts\Markets\FuturesCm\Common\Ask:
     attributes:
         price:
             serialized_name: '0'
         quantity:
             serialized_name: '1'
 
-Empiriq\BinanceContracts\Markets\FuturesCoinM\Common\Bid:
+Empiriq\BinanceContracts\Markets\FuturesCm\Common\Bid:
     attributes:
         price:
             serialized_name: '0'

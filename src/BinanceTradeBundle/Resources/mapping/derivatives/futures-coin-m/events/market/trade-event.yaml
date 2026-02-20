@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\Market\TradeEvent:
+Empiriq\BinanceContracts\Markets\FuturesCm\Events\Market\TradeEvent:
     attributes:
         time:
             serialized_name: 'T'

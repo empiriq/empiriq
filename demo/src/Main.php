@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Empiriq\BinanceContracts\Markets\FuturesUmInterface;
+use Empiriq\BinanceContracts\Markets\FuturesUm\FuturesUmInterface;
 use Empiriq\Contracts\Runner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

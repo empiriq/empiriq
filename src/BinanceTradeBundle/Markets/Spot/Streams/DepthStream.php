@@ -3,7 +3,7 @@
 namespace Empiriq\BinanceTradeBundle\Markets\Spot\Streams;
 
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
-use Empiriq\BinanceTradeBundle\Markets\Spot\SpotMarket;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Spot;
 use React\Promise\PromiseInterface;
 
 /**
@@ -25,7 +25,7 @@ final readonly class DepthStream implements SpotStreamInterface
     }
 
     #[\Override]
-    public function subscribe(SpotMarket $market): PromiseInterface
+    public function subscribe(Spot $market): PromiseInterface
     {
         return $market->subscribe(
             array_map(fn(string $symbol): string => strtolower($symbol) . '@depth', $this->symbols)

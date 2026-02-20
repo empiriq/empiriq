@@ -1,0 +1,95 @@
+<?php
+
+namespace Empiriq\BinanceTradeBundle\Markets\Spot;
+
+use Empiriq\BinanceContracts\Markets\Spot\Responses\Account\AccountStatusResponse;
+use Empiriq\BinanceContracts\Markets\Spot\Responses\General\TimeResponse;
+use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Clients\RestApi;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Clients\WsApi;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Clients\WsSubscriptions;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Methods\AccountMethods;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Methods\AuthenticationMethods;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Methods\GeneralMethods;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Methods\MarketDataMethods;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Methods\MarketStreamMethods;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Methods\TradingMethods;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Methods\UserDataStreamMethods;
+use Empiriq\Contracts\RunnableInterface;
+use React\Promise\PromiseInterface;
+
+use function React\Promise\all;
+
+/**
+ * Spot market facade combining REST/WS APIs and stream subscriptions.
+ *
+ * Constructed by the DI container when the market is enabled via event subscriptions.
+ *
+ * @api
+ */
+readonly class Spot implements RunnableInterface
+{
+    use GeneralMethods;
+    use MarketDataMethods;
+    use AuthenticationMethods;
+    use TradingMethods;
+    use AccountMethods;
+    use UserDataStreamMethods;
+    use MarketStreamMethods;
+
+    /**
+     * @param RestApi $rest
+     * @param WsApi $ws
+     * @param WsSubscriptions $subscriptions
+     * @param iterable<SpotStreamInterface> $streams
+     */
+    public function __construct(
+        public RestApi $rest,
+        public WsApi $ws,
+        public WsSubscriptions $subscriptions,
+        private iterable $streams,
+    ) {
+        foreach ($this->streams as $stream) {
+            if (!$stream instanceof SpotStreamInterface) {
+                throw new ConfigurationException('Invalid stream');
+            }
+        }
+    }
+
+    #[\Override]
+    public function run(): PromiseInterface
+    {
+        return all([
+            $this->ws->connect()->then(function () {
+                return $this->time();
+            })->then(function (TimeResponse $response) {
+                $this->rest->calculateTimeOffset($response->result->serverTime);
+                $this->ws->calculateTimeOffset($response->result->serverTime);
+                return $this;
+            })->then(function () {
+                return $this->ws->canLogIn() ? $this->sessionLogon() : null;
+            })->then(function (?AccountStatusResponse $response) {
+                $this->ws->setLoggedIn((bool)$response);
+                return $this;
+            }),
+            $this->subscriptions->connect(),
+        ])
+        ->then(fn() => all(array_map(fn(SpotStreamInterface $stream) => $stream->subscribe($this), $this->streams)))
+        ->then(static fn() => null);
+    }
+
+    #[\Override]
+    public function shutdown(): PromiseInterface
+    {
+        return all([
+            $this->ws->disconnect(),
+            $this->subscriptions->disconnect(),
+        ])->then(static fn() => null);
+    }
+
+    public function isLoggedIn(): bool
+    {
+        return $this->ws->isLoggedIn();
+    }
+}

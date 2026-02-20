@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\OrderTradeUpdateEvent:
+Empiriq\BinanceContracts\Markets\FuturesUm\Events\User\OrderTradeUpdateEvent:
     attributes:
         time:
             serialized_name: 'E'
@@ -7,7 +7,7 @@ Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\OrderTradeUpdateEvent:
         order:
             serialized_name: 'o'
 
-Empiriq\BinanceContracts\Markets\FuturesUsdM\Common\Order:
+Empiriq\BinanceContracts\Markets\FuturesUm\Common\Order:
     attributes:
         symbol:
             serialized_name: 's'

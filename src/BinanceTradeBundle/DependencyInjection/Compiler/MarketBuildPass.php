@@ -2,24 +2,24 @@
 
 namespace Empiriq\BinanceTradeBundle\DependencyInjection\Compiler;
 
-use Empiriq\BinanceContracts\Markets\FuturesUmInterface;
+use Empiriq\BinanceContracts\Markets\FuturesUm\FuturesUmInterface;
 use Empiriq\BinanceTradeBundle\Common\Configs\RestConfig;
 use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceTradeBundle\DependencyInjection\BinanceTradeExtension;
-use Empiriq\BinanceTradeBundle\Markets\FuturesCoinM\Clients\RestApi as FuturesCoinMRestApi;
-use Empiriq\BinanceTradeBundle\Markets\FuturesCoinM\Clients\WsApi as FuturesCoinMWsApi;
-use Empiriq\BinanceTradeBundle\Markets\FuturesCoinM\Clients\WsSubscriptions as FuturesCoinMWsSubscriptions;
-use Empiriq\BinanceTradeBundle\Markets\FuturesCoinM\FuturesCoinMMarket;
-use Empiriq\BinanceTradeBundle\Markets\FuturesUsdM\Clients\RestApi as FuturesUsdMRestApi;
-use Empiriq\BinanceTradeBundle\Markets\FuturesUsdM\Clients\WsApi as FuturesUsdMWsApi;
-use Empiriq\BinanceTradeBundle\Markets\FuturesUsdM\Clients\WsSubscriptions as FuturesUsdMWsSubscriptions;
-use Empiriq\BinanceTradeBundle\Markets\FuturesUsdM\FuturesUsdM;
+use Empiriq\BinanceTradeBundle\Markets\FuturesCm\Clients\RestApi as FuturesCoinMRestApi;
+use Empiriq\BinanceTradeBundle\Markets\FuturesCm\Clients\WsApi as FuturesCoinMWsApi;
+use Empiriq\BinanceTradeBundle\Markets\FuturesCm\Clients\WsSubscriptions as FuturesCoinMWsSubscriptions;
+use Empiriq\BinanceTradeBundle\Markets\FuturesCm\FuturesCm;
+use Empiriq\BinanceTradeBundle\Markets\FuturesUm\Clients\RestApi as FuturesUsdMRestApi;
+use Empiriq\BinanceTradeBundle\Markets\FuturesUm\Clients\WsApi as FuturesUsdMWsApi;
+use Empiriq\BinanceTradeBundle\Markets\FuturesUm\Clients\WsSubscriptions as FuturesUsdMWsSubscriptions;
+use Empiriq\BinanceTradeBundle\Markets\FuturesUm\FuturesUm;
 use Empiriq\BinanceTradeBundle\Markets\Spot\Clients\RestApi as SpotRestApi;
 use Empiriq\BinanceTradeBundle\Markets\Spot\Clients\WsApi as SpotWsApi;
 use Empiriq\BinanceTradeBundle\Markets\Spot\Clients\WsSubscriptions as SpotWsSubscriptions;
-use Empiriq\BinanceTradeBundle\Markets\Spot\SpotMarket;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Spot;
 use Empiriq\SymfonyDependencyDiscovery\DependencyDiscovery;
 use React\Http\Browser;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -35,7 +35,7 @@ final class MarketBuildPass implements CompilerPassInterface
         [
             'tag' => StreamBuildPass::TAG_FUTURES_USDM,
             'service_id' => FuturesUmInterface::class,
-            'class' => FuturesUsdM::class,
+            'class' => FuturesUm::class,
             'endpoint_key' => 'futures_usdm',
             'clients' => [
                 'rest' => FuturesUsdMRestApi::class,
@@ -46,7 +46,7 @@ final class MarketBuildPass implements CompilerPassInterface
         [
             'tag' => StreamBuildPass::TAG_FUTURES_COINM,
             'service_id' => 'FuturesCoinMTransport',
-            'class' => FuturesCoinMMarket::class,
+            'class' => FuturesCm::class,
             'endpoint_key' => 'futures_coinm',
             'clients' => [
                 'rest' => FuturesCoinMRestApi::class,
@@ -57,7 +57,7 @@ final class MarketBuildPass implements CompilerPassInterface
         [
             'tag' => StreamBuildPass::TAG_SPOT,
             'service_id' => 'SpotTransport',
-            'class' => SpotMarket::class,
+            'class' => Spot::class,
             'endpoint_key' => 'spot',
             'clients' => [
                 'rest' => SpotRestApi::class,

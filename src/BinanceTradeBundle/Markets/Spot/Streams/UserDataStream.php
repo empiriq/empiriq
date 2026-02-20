@@ -4,7 +4,7 @@ namespace Empiriq\BinanceTradeBundle\Markets\Spot\Streams;
 
 use Empiriq\BinanceContracts\Markets\Spot\Responses\UserData\SubscribeResponse;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
-use Empiriq\BinanceTradeBundle\Markets\Spot\SpotMarket;
+use Empiriq\BinanceTradeBundle\Markets\Spot\Spot;
 use React\EventLoop\Loop;
 use React\Promise\PromiseInterface;
 
@@ -18,7 +18,7 @@ use React\Promise\PromiseInterface;
 final readonly class UserDataStream implements SpotStreamInterface
 {
     #[\Override]
-    public function subscribe(SpotMarket $market): PromiseInterface
+    public function subscribe(Spot $market): PromiseInterface
     {
         if ($market->isLoggedIn()) {
             return $market->userDataStreamSubscribe();
