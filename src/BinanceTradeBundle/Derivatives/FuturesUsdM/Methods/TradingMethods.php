@@ -24,13 +24,14 @@ trait TradingMethods
      * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/websocket-api
      * @return PromiseInterface<null>
      */
-    public function orderPlace(OrderPlace $payload): PromiseInterface
+    public function orderPlace(OrderPlace $payload, int $recvWindow = 5000): PromiseInterface
     {
         return $this->ws->send(
             method: 'order.place',
             permission: Permission::TRADE,
             type: OrderPlaceResponse::class,
             payload: $payload,
+            recvWindow: $recvWindow,
         );
     }
 
@@ -50,13 +51,14 @@ trait TradingMethods
      * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/websocket-api/Cancel-Order
      * @return PromiseInterface<OrderCancelResponse>
      */
-    public function orderCancel(OrderCancel $payload): PromiseInterface
+    public function orderCancel(OrderCancel $payload, int $recvWindow = 5000): PromiseInterface
     {
         return $this->ws->send(
             method: 'order.cancel',
             permission: Permission::TRADE,
             type: OrderCancelResponse::class,
             payload: $payload,
+            recvWindow: $recvWindow,
         );
     }
 

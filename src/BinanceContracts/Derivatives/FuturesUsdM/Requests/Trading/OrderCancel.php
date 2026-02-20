@@ -6,10 +6,8 @@ use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\OrderCancelRestricti
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\OrderIdentifierType;
 
 /**
- * Cancel order (TRADE)
- *
  * Cancel an active order.
- * @link https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-api.md#cancel-order-trade
+ * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/websocket-api/Cancel-Order
  */
 readonly class OrderCancel
 {
