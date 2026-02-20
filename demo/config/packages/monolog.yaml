@@ -1,7 +1,18 @@
 monolog:
+    channels: ['binance_api']
     handlers:
         stdout:
             type: stream
             path: php://stdout
             level: '%env(default:monolog.default_level:MONOLOG_LEVEL)%'
             formatter: monolog.formatter.json
+        binance_api_file:
+            type: stream
+            path: '%kernel.logs_dir%/binance_api.json'
+            level: debug
+            formatter: monolog.formatter.json
+            channels: ['binance_api']
+        record_router:
+            type: service
+            id: Empiriq\Logging\RecordRoutingHandler
+            level: debug

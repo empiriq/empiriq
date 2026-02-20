@@ -35,5 +35,14 @@ services:
         public: true
         arguments:
             $runners: !tagged_iterator empiriq.runnable
+    Empiriq\Logging\RecordMessagePrefixPredicate:
+        arguments:
+            $prefix: 'Received response (id:'
+    Empiriq\Logging\RecordRoutingHandler:
+        arguments:
+            $routes:
+                - when: '@Empiriq\Logging\RecordMessagePrefixPredicate'
+                  handler: '@monolog.handler.binance_api_file'
+            $fallback: ~
     App\:
         resource: '../src/'
