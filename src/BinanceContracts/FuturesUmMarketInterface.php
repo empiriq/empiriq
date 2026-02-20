@@ -3,6 +3,7 @@
 namespace Empiriq\BinanceContracts;
 
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Requests\MarketData\Depth;
+use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\ExchangeInfoResponse;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\PingResponse;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\TimeResponse;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\MarketData\DepthResponse;
@@ -20,50 +21,42 @@ interface FuturesUmMarketInterface
 {
     /**
      * Account balance info
-     *
-     * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/account/websocket-api
      */
     public function accountBalanceV2(): PromiseInterface;
 
     /**
      * Log in with API key
-     *
-     * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-api-general-info#log-in-with-api-key-signed
      * @return PromiseInterface
      */
     public function sessionLogon(): PromiseInterface;
 
     /**
      * Log out of the session
-     *
-     * @link  https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-api-general-info#log-out-of-the-session
      * @return PromiseInterface
      */
     public function sessionLogout(): PromiseInterface;
 
     /**
      * Query session status
-     *
-     * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-api-general-info#query-session-status
      * @return PromiseInterface
      */
     public function sessionStatus(): PromiseInterface;
 
     /**
-     * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api
+     * Ping the REST API to test connectivity.
      * @return PromiseInterface<PingResponse>
      */
     public function ping(): PromiseInterface;
 
     /**
-     * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Check-Server-Time
+     * Get Binance server time.
      * @return PromiseInterface<TimeResponse>
      */
     public function time(): PromiseInterface;
 
     /**
-     * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Exchange-Information
-     * @return PromiseInterface<TimeResponse>
+     * Fetch exchange information.
+     * @return PromiseInterface<ExchangeInfoResponse>
      */
     public function exchangeInfo(): PromiseInterface;
 
@@ -73,19 +66,6 @@ interface FuturesUmMarketInterface
      * @link
      */
     public function depth(Depth $payload): PromiseInterface;
-
-    /**
-     * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-market-streams/Live-Subscribing-Unsubscribing-to-streams#subscribe-to-a-stream
-     * @param array $streams like ["btcusdt@aggTrade", "btcusdt@depth"]
-     * @return PromiseInterface
-     */
-    public function subscribe(array $streams): PromiseInterface;
-
-    /**
-     * @param array $streams
-     * @return PromiseInterface
-     */
-    public function unsubscribe(array $streams): PromiseInterface;
 
     /**
      * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/websocket-market-streams/Live-Subscribing-Unsubscribing-to-streams#listing-subscriptions

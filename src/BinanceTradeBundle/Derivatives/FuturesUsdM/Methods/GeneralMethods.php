@@ -3,15 +3,16 @@
 namespace Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\Methods;
 
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\Permission;
+use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\ExchangeInfoResponse;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\PingResponse;
 use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Responses\General\TimeResponse;
 use React\Promise\PromiseInterface;
 
 /**
- * General sender methods
- *
+ * General REST endpoints for USD‑M Futures.
+ * These methods are exposed via {@see \Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMMarket}
  * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api
- * @internal
+ * @api
  */
 trait GeneralMethods
 {
@@ -45,7 +46,7 @@ trait GeneralMethods
 
     /**
      * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Exchange-Information
-     * @return PromiseInterface<TimeResponse>
+     * @return PromiseInterface<ExchangeInfoResponse>
      */
     public function exchangeInfo(): PromiseInterface
     {
@@ -53,7 +54,7 @@ trait GeneralMethods
             method: 'GET',
             path: '/fapi/v1/exchangeInfo',
             permission: Permission::NONE,
-            type: TimeResponse::class,
+            type: ExchangeInfoResponse::class,
         );
     }
 }
