@@ -7,13 +7,19 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 
 final class BinanceTradeExtension extends Extension
 {
-    public const  CONFIG = 'binance_trade.config';
-    public const  DEFAULTS = 'binance_trade.defaults';
+    public const PARAMETER_NAME = 'binance_trade.config';
+    public const DEFAULTS = 'binance_trade.defaults';
 
     #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $container->setParameter(self::CONFIG, $this->processConfiguration(new Configuration(), $configs));
+        $container->setParameter(
+            self::PARAMETER_NAME,
+            $container->resolveEnvPlaceholders(
+                $container->getParameterBag()->resolveValue($this->processConfiguration(new Configuration(), $configs)),
+                true
+            )
+        );
         $container->setParameter(self::DEFAULTS, [
             'mainnet' => [
                 'spot' => [

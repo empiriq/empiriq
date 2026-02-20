@@ -81,11 +81,11 @@ final class MarketBuildPass implements CompilerPassInterface
     #[\Override]
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasParameter(BinanceTradeExtension::CONFIG)) {
+        if (!$container->hasParameter(BinanceTradeExtension::PARAMETER_NAME)) {
             throw new \Exception('CONFIG not found');
         }
         /** @var array<string, mixed> $config */
-        $config = $container->getParameter(BinanceTradeExtension::CONFIG);
+        $config = $container->getParameter(BinanceTradeExtension::PARAMETER_NAME);
         $defaults = $container->getParameter(BinanceTradeExtension::DEFAULTS);
         if (!is_array($defaults)) {
             throw new \RuntimeException('Invalid default endpoints config');
