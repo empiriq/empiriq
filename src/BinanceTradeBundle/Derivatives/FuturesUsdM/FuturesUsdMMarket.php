@@ -83,7 +83,8 @@ readonly class FuturesUsdMMarket implements RunnableInterface, FuturesUmMarketIn
                         is_array($this->streams) ? $this->streams : iterator_to_array($this->streams)
                     )
                 )
-            );
+            )
+            ->then(static fn() => null);
     }
 
     #[\Override]
@@ -92,7 +93,7 @@ readonly class FuturesUsdMMarket implements RunnableInterface, FuturesUmMarketIn
         return all([
             $this->ws->disconnect(),
             $this->subscriptions->disconnect(),
-        ]);
+        ])->then(static fn() => null);
     }
 
     public function isLoggedIn(): bool

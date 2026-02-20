@@ -80,7 +80,8 @@ readonly class FuturesCoinMMarket implements RunnableInterface
                     fn(FuturesCoinMStreamInterface $stream) => $stream->subscribe($this),
                     $this->streams
                 )
-            ));
+            ))
+            ->then(static fn() => null);
     }
 
     #[\Override]
@@ -89,7 +90,7 @@ readonly class FuturesCoinMMarket implements RunnableInterface
         return all([
             $this->ws->disconnect(),
             $this->subscriptions->disconnect(),
-        ]);
+        ])->then(static fn() => null);
     }
 
     public function isLoggedIn(): bool
