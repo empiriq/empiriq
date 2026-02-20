@@ -12,7 +12,7 @@ use React\Promise\PromiseInterface;
  * General REST endpoints for USD‑M Futures.
  * These methods are exposed via {@see \Empiriq\BinanceTradeBundle\Derivatives\FuturesUsdM\FuturesUsdMMarket}
  * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api
- * @api
+ * @internal
  */
 trait GeneralMethods
 {
