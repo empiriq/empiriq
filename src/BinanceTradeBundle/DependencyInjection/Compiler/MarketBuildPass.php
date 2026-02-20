@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 
 final class MarketBuildPass implements CompilerPassInterface
 {
@@ -125,7 +126,12 @@ final class MarketBuildPass implements CompilerPassInterface
 
     private function getTransport(array $config, array $mapping): Definition
     {
-        parse_str(parse_url($config['auth'], PHP_URL_QUERY), $auth);
+        $authSpec = $config['auth'] ?? '';
+        if (!is_string($authSpec)) {
+            throw new \RuntimeException('Auth config must be a string.');
+        }
+        $authSpec = ltrim($authSpec, '?');
+        $auth = $authSpec === '' ? [] : HeaderUtils::parseQuery($authSpec);
         $apiKey = $auth['api_key'] ?? '';
         $endpointKey = $mapping['endpoint_key'];
         $clients = $mapping['clients'];

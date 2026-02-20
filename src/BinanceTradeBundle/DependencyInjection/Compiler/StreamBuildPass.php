@@ -24,6 +24,7 @@ final class StreamBuildPass implements CompilerPassInterface
     #[\Override]
     public function process(ContainerBuilder $container): void
     {
+        /** @var array<string, class-string> $mapping */
         $mapping = [
             'binance.futures_usd.market.trade' => FuturesUsdMTradeStream::class,
             'binance.futures_usd.user.account_update' => FuturesUsdMUserDataStream::class,
@@ -33,35 +34,42 @@ final class StreamBuildPass implements CompilerPassInterface
         ];
         $events = $this->event->discover($container);
         foreach ($events as $eventName) {
-            $def = $this->parse($mapping, $eventName);
-            if ($def) {
+            $result = $this->parse($mapping, $eventName);
+            if ($result) {
+                [$serviceId, $def] = $result;
                 $container->setDefinition(
-                    $def->getClass(),
+                    $serviceId,
                     $def
                 )->addTag(self::TAG_FUTURES_USDM);
             }
         }
     }
 
-    private function parse(array $mapping, string $eventName): ?Definition
+    /**
+     * @param array<string, class-string> $mapping
+     * @return array{string, Definition}|null
+     */
+    private function parse(array $mapping, string $eventName): ?array
     {
         foreach ($mapping as $key => $class) {
-            if (parse_url($eventName, PHP_URL_PATH) === $key) {
-                $def = new Definition($class);
-                $rc = new \ReflectionClass($class);
-                $ctor = $rc->getConstructor();
-                $params = $ctor?->getParameters() ?? [];
-                $query = parse_url($eventName, PHP_URL_QUERY);
-                if (is_string($query) && $query !== '') {
-                    $params2 = HeaderUtils::parseQuery($query);
-                    /* @var \ReflectionParameter $argument */
-                    foreach ($params as $i => $argument) {
-                        $def->setArgument($i, $params2[$argument->name] ?? null);
-                    }
-                }
-
-                return $def;
+            $path = parse_url($eventName, PHP_URL_PATH);
+            if (!is_string($path) || $path !== $key) {
+                continue;
             }
+            $def = new Definition($class);
+            $rc = new \ReflectionClass($class);
+            $ctor = $rc->getConstructor();
+            $params = $ctor?->getParameters() ?? [];
+            $query = parse_url($eventName, PHP_URL_QUERY);
+            if (is_string($query) && $query !== '') {
+                $params2 = HeaderUtils::parseQuery($query);
+                /* @var \ReflectionParameter $argument */
+                foreach ($params as $i => $argument) {
+                    $def->setArgument($i, $params2[$argument->name] ?? null);
+                }
+            }
+
+            return [$class, $def];
         }
 
         return null;
