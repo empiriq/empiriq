@@ -1,10 +1,10 @@
-Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Common\EventInterface:
+Empiriq\BinanceContracts\Markets\FuturesCoinM\Common\EventInterface:
     discriminator_map:
         type_property: 'e'
         mapping:
-            "depthUpdate": Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Events\Market\DepthEvent
-            "trade": Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Events\Market\TradeEvent
-            "balanceUpdate": Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Events\User\BalanceUpdateEvent
-            "executionReport": Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Events\User\ExecutionReportEvent
-            "externalLockUpdate": Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Events\User\ExternalLockUpdateEvent
-            "outboundAccountPosition": Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Events\User\OutboundAccountPositionEvent
+            "depthUpdate": Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\Market\DepthEvent
+            "trade": Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\Market\TradeEvent
+            "balanceUpdate": Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\User\BalanceUpdateEvent
+            "executionReport": Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\User\ExecutionReportEvent
+            "externalLockUpdate": Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\User\ExternalLockUpdateEvent
+            "outboundAccountPosition": Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\User\OutboundAccountPositionEvent

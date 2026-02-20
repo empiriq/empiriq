@@ -2,9 +2,9 @@
 
 namespace Empiriq\BinanceBackTradeBundle\Tests\Helpers;
 
-use Empiriq\BinanceContracts\Spot\Spot\Events\Market\TradeEvent;
 use Empiriq\BinanceBackTradeBundle\Common\Helpers\CsvIterator;
 use Empiriq\BinanceBackTradeBundle\Common\Helpers\Serializer;
+use Empiriq\BinanceContracts\Markets\Spot\Events\Market\TradeEvent;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 

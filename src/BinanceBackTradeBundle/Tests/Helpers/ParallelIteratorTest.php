@@ -2,8 +2,6 @@
 
 namespace Empiriq\BinanceBackTradeBundle\Tests\Helpers;
 
-use ArrayIterator;
-use Empiriq\BinanceContracts\Spot\Spot\Events\Market\TradeEvent;
 use Empiriq\BinanceBackTradeBundle\Common\Helpers\ParallelIterator;
 use PHPUnit\Framework\TestCase;
 

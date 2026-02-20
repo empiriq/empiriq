@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\Market\TradeEvent;
+use Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\Market\TradeEvent;
 use Prometheus\CollectorRegistry;
 use PrometheusPushGateway\PushGateway;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

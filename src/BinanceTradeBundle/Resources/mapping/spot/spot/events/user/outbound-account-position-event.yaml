@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Spot\Spot\Events\User\AccountUpdateEvent:
+Empiriq\BinanceContracts\Markets\Spot\Events\User\AccountUpdateEvent:
     attributes:
         time:
             serialized_name: 'E'
@@ -7,7 +7,7 @@ Empiriq\BinanceContracts\Spot\Spot\Events\User\AccountUpdateEvent:
         balances:
             serialized_name: 'B'
 
-Empiriq\BinanceContracts\Spot\Spot\Common\Balance:
+Empiriq\BinanceContracts\Markets\Spot\Common\Balance:
     attributes:
         asset:
             serialized_name: 'a'

@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Spot\Spot\Events\Market\TradeEvent:
+Empiriq\BinanceContracts\Markets\Spot\Events\Market\TradeEvent:
     attributes:
         time:
             serialized_name: 'T'

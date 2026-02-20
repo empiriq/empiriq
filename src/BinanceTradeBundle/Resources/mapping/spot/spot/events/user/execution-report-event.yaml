@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Spot\Spot\Events\User\ExecutionReportEvent:
+Empiriq\BinanceContracts\Markets\Spot\Events\User\ExecutionReportEvent:
     attributes:
         time:
             serialized_name: 'E'

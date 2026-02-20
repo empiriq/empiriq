@@ -4,10 +4,10 @@ namespace Empiriq\BinanceBackTradeBundle\Tests\Helpers;
 
 use DateTime;
 use DateTimeZone;
-use Empiriq\BinanceContracts\Spot\Spot\Events\Market\TradeEvent;
 use Empiriq\BinanceBackTradeBundle\Common\Helpers\CsvIterator;
 use Empiriq\BinanceBackTradeBundle\Common\Helpers\Serializer;
 use Empiriq\BinanceBackTradeBundle\Common\Helpers\TimeRangeIterator;
+use Empiriq\BinanceContracts\Markets\Spot\Events\Market\TradeEvent;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 

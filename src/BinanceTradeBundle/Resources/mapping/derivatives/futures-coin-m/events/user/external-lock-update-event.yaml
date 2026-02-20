@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Events\User\ExternalLockUpdateEvent:
+Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\User\ExternalLockUpdateEvent:
     attributes:
         time:
             serialized_name: 'E'

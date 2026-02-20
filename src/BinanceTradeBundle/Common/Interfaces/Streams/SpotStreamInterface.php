@@ -2,7 +2,7 @@
 
 namespace Empiriq\BinanceTradeBundle\Common\Interfaces\Streams;
 
-use Empiriq\BinanceTradeBundle\Spot\Spot\SpotMarket;
+use Empiriq\BinanceTradeBundle\Markets\Spot\SpotMarket;
 use React\Promise\PromiseInterface;
 
 interface SpotStreamInterface

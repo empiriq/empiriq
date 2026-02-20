@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\AccountUpdateEvent:
+Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\AccountUpdateEvent:
     attributes:
         time:
             serialized_name: 'E'
@@ -7,7 +7,7 @@ Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\AccountUpdateEvent:
         updateData:
             serialized_name: 'a'
 
-Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\Payload\AccountUpdateData:
+Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\Payload\AccountUpdateData:
     attributes:
         reason:
             serialized_name: 'm'
@@ -16,7 +16,7 @@ Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\Payload\AccountUpda
         positions:
             serialized_name: 'P'
 
-Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\Payload\BalanceUpdate:
+Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\Payload\BalanceUpdate:
     attributes:
         asset:
             serialized_name: 'a'
@@ -27,7 +27,7 @@ Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\Payload\BalanceUpda
         balanceChange:
             serialized_name: 'bc'
 
-Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\User\Payload\PositionUpdate:
+Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\User\Payload\PositionUpdate:
     attributes:
         symbol:
             serialized_name: 's'

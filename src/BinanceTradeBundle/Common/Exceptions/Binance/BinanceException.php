@@ -2,8 +2,8 @@
 
 namespace Empiriq\BinanceTradeBundle\Common\Exceptions\Binance;
 
+use Empiriq\BinanceContracts\Markets\Spot\Common\RateLimit;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\RuntimeException;
-use Empiriq\BinanceContracts\Spot\Spot\Common\RateLimit;
 
 //todo use ErrorCode
 class BinanceException extends RuntimeException

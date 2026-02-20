@@ -8,11 +8,11 @@ use DatePeriod;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use Empiriq\BinanceContracts\Spot\Spot\Events\Market\TradeEvent;
 use Empiriq\BinanceBackTradeBundle\Common\AbstractStream;
 use Empiriq\BinanceBackTradeBundle\Common\Helpers\CsvLoader;
 use Empiriq\BinanceBackTradeBundle\Common\Interfaces\CsvLoaderInterface;
 use Empiriq\BinanceBackTradeBundle\Common\Interfaces\Streams\SpotStreamInterface;
+use Empiriq\BinanceContracts\Markets\Spot\Events\Market\TradeEvent;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 

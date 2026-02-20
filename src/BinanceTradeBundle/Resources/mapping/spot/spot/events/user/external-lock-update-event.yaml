@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Spot\Spot\Events\User\ExternalLockUpdateEvent:
+Empiriq\BinanceContracts\Markets\Spot\Events\User\ExternalLockUpdateEvent:
     attributes:
         time:
             serialized_name: 'E'

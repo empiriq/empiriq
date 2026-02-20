@@ -2,7 +2,7 @@
 
 namespace Empiriq\BinanceTradeBundle\Common\Interfaces\Streams;
 
-use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\FuturesCoinMMarket;
+use Empiriq\BinanceTradeBundle\Markets\FuturesCoinM\FuturesCoinMMarket;
 use React\Promise\PromiseInterface;
 
 interface FuturesCoinMStreamInterface

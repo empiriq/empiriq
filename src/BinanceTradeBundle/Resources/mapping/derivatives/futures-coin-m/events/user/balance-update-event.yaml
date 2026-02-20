@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Derivatives\FuturesCoinM\Events\User\BalanceUpdateEvent:
+Empiriq\BinanceContracts\Markets\FuturesCoinM\Events\User\BalanceUpdateEvent:
     attributes:
         time:
             serialized_name: 'E'

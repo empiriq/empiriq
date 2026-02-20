@@ -1,4 +1,4 @@
-Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\Market\DepthEvent:
+Empiriq\BinanceContracts\Markets\FuturesUsdM\Events\Market\DepthEvent:
     attributes:
         time:
             serialized_name: 'E'
@@ -13,14 +13,14 @@ Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Events\Market\DepthEvent:
         asks:
             serialized_name: 'a'
 
-Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\Ask:
+Empiriq\BinanceContracts\Markets\FuturesUsdM\Common\Ask:
     attributes:
         price:
             serialized_name: '0'
         quantity:
             serialized_name: '1'
 
-Empiriq\BinanceContracts\Derivatives\FuturesUsdM\Common\Bid:
+Empiriq\BinanceContracts\Markets\FuturesUsdM\Common\Bid:
     attributes:
         price:
             serialized_name: '0'

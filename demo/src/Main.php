@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Empiriq\BinanceContracts\FuturesUmMarketInterface;
+use Empiriq\BinanceContracts\Markets\FuturesUmInterface;
 use Empiriq\Contracts\Runner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -11,7 +11,7 @@ use function React\Async\await;
 readonly class Main implements EventSubscriberInterface
 {
     public function __construct(
-        private FuturesUmMarketInterface $market,
+        private FuturesUmInterface $market,
         private Runner $runner,
     ) {
     }
