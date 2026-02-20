@@ -5,7 +5,7 @@ namespace Empiriq\TickerBundle;
 use Empiriq\SymfonyEventDiscovery\EventDiscovery;
 use Empiriq\SymfonyEventDiscovery\Extractor\ListenerExtractor;
 use Empiriq\SymfonyEventDiscovery\Extractor\SubscriberExtractor;
-use Empiriq\TickerBundle\DependencyInjection\BundleBuildPass;
+use Empiriq\TickerBundle\DependencyInjection\Compiler\ClockBuildPass;
 use Empiriq\TickerBundle\DependencyInjection\TickerExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -25,7 +25,7 @@ final class TickerBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(
-            new BundleBuildPass(
+            new ClockBuildPass(
                 new EventDiscovery([
                     new SubscriberExtractor(),
                     new ListenerExtractor(),

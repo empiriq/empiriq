@@ -7,9 +7,16 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 
 final class TickerExtension extends Extension
 {
+    public const PARAMETER_NAME = 'ticker.config';
+
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
-        $container->setParameter('ticker.clock_type', $config['clock']);
+        $container->setParameter(
+            self::PARAMETER_NAME,
+            $container->resolveEnvPlaceholders(
+                $container->getParameterBag()->resolveValue($this->processConfiguration(new Configuration(), $configs)),
+                true
+            )
+        );
     }
 }

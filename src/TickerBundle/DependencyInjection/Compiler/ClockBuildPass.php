@@ -1,20 +1,21 @@
 <?php
 
-namespace Empiriq\TickerBundle\DependencyInjection;
+namespace Empiriq\TickerBundle\DependencyInjection\Compiler;
 
 use Empiriq\SymfonyEventDiscovery\EventDiscovery;
 use Empiriq\TickerBundle\Clock\EventDrivenClock;
 use Empiriq\TickerBundle\Clock\TimeDrivenClock;
+use Empiriq\TickerBundle\DependencyInjection\TickerExtension;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 
-readonly class BundleBuildPass implements CompilerPassInterface
+readonly class ClockBuildPass implements CompilerPassInterface
 {
     public const EVENT_PATH = 'ticker.interval';
-    public const QUERY_PARAM = 'seconds';
+    public const QUERY_PARAM = 'second';
 
     /**
      * Builds the clock service based on discovered tick subscriptions.
@@ -30,7 +31,7 @@ readonly class BundleBuildPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        $clockType = $container->getParameter('ticker.clock_type');
+        $configs = $container->getParameter(TickerExtension::PARAMETER_NAME);
         $eventNames = $this->eventDiscovery->discover($container);
         $intervals = [];
         foreach ($eventNames as $eventName) {
@@ -44,11 +45,11 @@ readonly class BundleBuildPass implements CompilerPassInterface
         $container->setDefinition(
             'ticker.clock',
             new Definition(
-                match ($clockType) {
+                match ($configs['clock']) {
                     'time' => TimeDrivenClock::class,
                     'event' => EventDrivenClock::class,
                     default => throw new \InvalidArgumentException(
-                        sprintf('Invalid tick clock type "%s". Allowed values: time, event.', $clockType)
+                        sprintf('Invalid tick clock type "%s". Allowed values: time, event.', $configs['clock'])
                     ),
                 },
                 [

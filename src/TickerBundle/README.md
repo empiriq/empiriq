@@ -26,10 +26,10 @@ Consumers subscribe to ticks **by event name**, passing intervals as query
 parameters to keep the dot-style event prefix intact:
 
 ```
-ticker.interval?seconds=1.5
+ticker.interval?second=1.5
 ```
 
-The `seconds` parameter is a numeric interval in seconds (integer or float).
+The `second` parameter is a numeric interval in seconds (integer or float).
 
 If you need multiple intervals, register multiple event subscriptions.
 
@@ -134,7 +134,7 @@ final class ExampleSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'ticker.interval?seconds=1' => 'onTick',
+            'ticker.interval?second=1' => 'onTick',
         ];
     }
 

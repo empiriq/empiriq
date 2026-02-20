@@ -3,7 +3,7 @@
 namespace Empiriq\TickerBundle\Clock;
 
 use Empiriq\Contracts\RunnableInterface;
-use Empiriq\TickerBundle\DependencyInjection\BundleBuildPass;
+use Empiriq\TickerBundle\DependencyInjection\Compiler\ClockBuildPass;
 use Empiriq\TickerBundle\TickEvent;
 use React\EventLoop\Loop;
 use React\EventLoop\TimerInterface;
@@ -37,7 +37,7 @@ class TimeDrivenClock implements RunnableInterface
                 function () use ($interval) {
                     $this->dispatcher->dispatch(
                         new TickEvent(new \DateTimeImmutable()),
-                        sprintf('%s?%s=%s', BundleBuildPass::EVENT_PATH, BundleBuildPass::QUERY_PARAM, $interval)
+                        sprintf('%s?%s=%s', ClockBuildPass::EVENT_PATH, ClockBuildPass::QUERY_PARAM, $interval)
                     );
                 }
             );
