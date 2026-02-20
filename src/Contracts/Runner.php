@@ -53,7 +53,7 @@ readonly class Runner
         $this->logger->info('Signal handlers registered');
     }
 
-    private function shutdown(int $signal): void
+    public function shutdown(int $signal = SIGTERM): void
     {
         $name = match ($signal) {
             SIGINT => 'SIGINT',
