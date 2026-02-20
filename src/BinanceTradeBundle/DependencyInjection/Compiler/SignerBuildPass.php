@@ -1,0 +1,61 @@
+<?php
+
+namespace Empiriq\BinanceTradeBundle\DependencyInjection\Compiler;
+
+use Empiriq\BinanceTradeBundle\Common\Signers\Ed25519Signer;
+use Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner;
+use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
+use Empiriq\BinanceTradeBundle\Common\Signers\RsaSigner;
+use Empiriq\BinanceTradeBundle\DependencyInjection\BinanceTradeExtension;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\HttpFoundation\HeaderUtils;
+
+final class SignerBuildPass implements CompilerPassInterface
+{
+    #[\Override]
+    public function process(ContainerBuilder $container): void
+    {
+        if (!$container->hasParameter(BinanceTradeExtension::PARAMETER_NAME)) {
+            throw new \Exception('CONFIG not found');
+        }
+        /** @var array<string, mixed> $config */
+        $config = $container->getParameter(BinanceTradeExtension::PARAMETER_NAME);
+        $mapping = [
+            'hmac' => HmacSigner::class,
+            'ed25519' => Ed25519Signer::class,
+            'rsa' => RsaSigner::class,
+            'unsigned' => NullSigner::class,
+        ];
+        $signerDefinition = $this->parse($mapping, $config['auth']);
+        if (!$signerDefinition) {
+            throw new \RuntimeException('Invalid auth config');
+        }
+        $container->setDefinition('empiriq.binance.signer', $signerDefinition);
+    }
+
+    private function parse(array $mapping, string $eventName): ?Definition
+    {
+        foreach ($mapping as $key => $class) {
+            if (parse_url($eventName, PHP_URL_PATH) === $key) {
+                $def = new Definition($class);
+                $rc = new \ReflectionClass($class);
+                $ctor = $rc->getConstructor();
+                $params = $ctor?->getParameters() ?? [];
+                $query = parse_url($eventName, PHP_URL_QUERY);
+                if (is_string($query) && $query !== '') {
+                    $params2 = HeaderUtils::parseQuery($query);
+                    /* @var \ReflectionParameter $argument */
+                    foreach ($params as $i => $argument) {
+                        $def->setArgument($i, $params2[$argument->name] ?? null);
+                    }
+                }
+
+                return $def;
+            }
+        }
+
+        return null;
+    }
+}

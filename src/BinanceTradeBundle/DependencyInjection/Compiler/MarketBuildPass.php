@@ -7,10 +7,6 @@ use Empiriq\BinanceTradeBundle\Common\Configs\RestConfig;
 use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceTradeBundle\Common\Helpers\Serializer;
-use Empiriq\BinanceTradeBundle\Common\Signers\Ed25519Signer;
-use Empiriq\BinanceTradeBundle\Common\Signers\HmacSigner;
-use Empiriq\BinanceTradeBundle\Common\Signers\NullSigner;
-use Empiriq\BinanceTradeBundle\Common\Signers\RsaSigner;
 use Empiriq\BinanceTradeBundle\DependencyInjection\BinanceTradeExtension;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\RestApi as FuturesCoinMRestApi;
 use Empiriq\BinanceTradeBundle\Derivatives\FuturesCoinM\Clients\WsApi as FuturesCoinMWsApi;
@@ -31,7 +27,6 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\HttpFoundation\HeaderUtils;
 
 final class MarketBuildPass implements CompilerPassInterface
 {
@@ -102,16 +97,14 @@ final class MarketBuildPass implements CompilerPassInterface
             $config['endpoints'] = [];
         }
         $config['endpoints'] = array_replace_recursive($defaults[$environment], $config['endpoints']);
-        [$apiKey, $signerDefinition] = $this->resolveAuth($config);
-        $this->load($config, $apiKey, $signerDefinition, $container);
+        $this->load($config, $container);
     }
 
-    private function load(array $config, string $apiKey, Definition $signer, ContainerBuilder $container): void
+    private function load(array $config, ContainerBuilder $container): void
     {
         $container->setDefinition('empiriq.binance.serializer', new Definition(Serializer::class));
         $container->setDefinition('empiriq.binance.sanitizer', new Definition(Sanitizer::class));
         $container->setDefinition('empiriq.binance.browser', new Definition(Browser::class));
-        $container->setDefinition('empiriq.binance.signer', $signer);
 
         $dependencies = $this->dependency->discover($container);
 
@@ -125,13 +118,15 @@ final class MarketBuildPass implements CompilerPassInterface
 
             $container->setDefinition(
                 $mapping['service_id'],
-                $this->getTransport($config, $mapping, $apiKey)
+                $this->getTransport($config, $mapping)
             )->addTag('empiriq.runnable');
         }
     }
 
-    private function getTransport(array $config, array $mapping, string $apiKey): Definition
+    private function getTransport(array $config, array $mapping): Definition
     {
+        parse_str(parse_url($config['auth'], PHP_URL_QUERY), $auth);
+        $apiKey = $auth['api_key'] ?? '';
         $endpointKey = $mapping['endpoint_key'];
         $clients = $mapping['clients'];
 
@@ -172,50 +167,5 @@ final class MarketBuildPass implements CompilerPassInterface
             ]),
             new TaggedIteratorArgument($mapping['tag']),
         ]);
-    }
-
-    /**
-     * @param array<string, mixed> $config
-     * @return array{string, Definition}
-     */
-    private function resolveAuth(array $config): array
-    {
-        $mapping = [
-            'hmac' => HmacSigner::class,
-            'ed25519' => Ed25519Signer::class,
-            'rsa' => RsaSigner::class,
-            'unsigned' => NullSigner::class,
-        ];
-        $def = $this->parse($mapping, $config['auth']);
-        if (!$def) {
-            throw new \RuntimeException('Invalid auth config');
-        }
-        parse_str(parse_url($config['auth'], PHP_URL_QUERY), $auth);
-
-        return [$auth['api_key'] ?? '', $def];
-    }
-
-    private function parse(array $mapping, string $eventName): ?Definition
-    {
-        foreach ($mapping as $key => $class) {
-            if (parse_url($eventName, PHP_URL_PATH) === $key) {
-                $def = new Definition($class);
-                $rc = new \ReflectionClass($class);
-                $ctor = $rc->getConstructor();
-                $params = $ctor?->getParameters() ?? [];
-                $query = parse_url($eventName, PHP_URL_QUERY);
-                if (is_string($query) && $query !== '') {
-                    $params2 = HeaderUtils::parseQuery($query);
-                    /* @var \ReflectionParameter $argument */
-                    foreach ($params as $i => $argument) {
-                        $def->setArgument($i, $params2[$argument->name] ?? null);
-                    }
-                }
-
-                return $def;
-            }
-        }
-
-        return null;
     }
 }
