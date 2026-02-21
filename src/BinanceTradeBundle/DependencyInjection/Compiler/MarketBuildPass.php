@@ -163,6 +163,7 @@ final class MarketBuildPass implements CompilerPassInterface
             ]),
             new Definition($clients['subscriptions'], [
                 new Reference(EventPublisherInterface::class),
+                new Reference('empiriq.binance.signer'),
                 new Reference('empiriq.binance.serializer'),
                 new Reference('logger'),
                 new Reference('empiriq.binance.sanitizer'),

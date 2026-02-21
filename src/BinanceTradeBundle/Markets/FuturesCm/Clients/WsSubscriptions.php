@@ -6,6 +6,7 @@ use Empiriq\BinanceContracts\Markets\FuturesCm\Common\EventInterface;
 use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
 use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
+use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
 use Empiriq\Contracts\Messaging\EventPublisherInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\Log\LoggerInterface;
@@ -25,6 +26,7 @@ final class WsSubscriptions extends ResponseResolver
 {
     /**
      * @param EventPublisherInterface $publisher Event publisher.
+     * @param SignerInterface $signer Request signer.
      * @param SerializerInterface $serializer Payload serializer.
      * @param LoggerInterface $logger PSR-3 logger instance.
      * @param SanitizerInterface $sanitizer Sanitizer for sensitive data before logging.
@@ -32,6 +34,7 @@ final class WsSubscriptions extends ResponseResolver
      */
     public function __construct(
         protected EventPublisherInterface $publisher,
+        protected SignerInterface $signer,
         protected SerializerInterface $serializer,
         protected LoggerInterface $logger,
         protected SanitizerInterface $sanitizer,
