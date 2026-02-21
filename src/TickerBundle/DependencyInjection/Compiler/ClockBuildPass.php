@@ -14,8 +14,8 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
 
 readonly class ClockBuildPass implements CompilerPassInterface
 {
-    public const EVENT_PATH = 'ticker.interval';
-    public const QUERY_PARAM = 'second';
+    public const EVENT_PATH = 'tick';
+    public const QUERY_PARAM = 'interval';
 
     /**
      * Builds the clock service based on discovered tick subscriptions.
@@ -76,6 +76,9 @@ readonly class ClockBuildPass implements CompilerPassInterface
         $params = HeaderUtils::parseQuery($query);
         $interval = $params[self::QUERY_PARAM] ?? null;
         if (!is_string($interval) || $interval === '') {
+            return null;
+        }
+        if (!is_numeric($interval) || (float)$interval <= 0.0) {
             return null;
         }
 

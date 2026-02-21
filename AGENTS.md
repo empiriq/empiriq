@@ -19,7 +19,7 @@ Local instructions for automated code changes in this repository.
 
 ## Event Subscription Contract
 - Binance event format: `binance.<market>.<scope>.<type>?symbol[]=btcusdt&symbol[]=ethusdt`.
-- Ticker event format: `ticker.interval?second=1.5`.
+- Ticker event format: `tick?interval=1.5`.
 - `path` defines event kind; `query` defines generation/filter parameters.
 - The same string is used in two roles:
 - as Symfony subscription key (`getSubscribedEvents()` / listener event name)

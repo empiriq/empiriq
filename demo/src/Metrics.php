@@ -19,19 +19,17 @@ readonly class Metrics implements EventSubscriberInterface
     {
         return [
             'binance.futures_usd.market.trade?symbol[]=btcusdt' => 'trade',
-            'ticker.interval?second=2' => 'push',
+            'tick?interval=2' => 'push',
         ];
     }
 
     public function trade(TradeEvent $event): void
     {
-        var_dump(666);
         $this->registry->getOrRegisterCounter('market_events', 'trade_count', 'Trade count')->inc();
     }
 
     public function push(): void
     {
-        var_dump(777);
         $this->gateway->push($this->registry, 'trade_workers');
     }
 }

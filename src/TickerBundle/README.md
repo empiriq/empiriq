@@ -26,10 +26,11 @@ Consumers subscribe to ticks **by event name**, passing intervals as query
 parameters to keep the dot-style event prefix intact:
 
 ```
-ticker.interval?second=1.5
+tick?interval=1.5
 ```
 
-The `second` parameter is a numeric interval in seconds (integer or float).
+The `interval` parameter is a numeric interval in seconds (integer or float).
+The same interval is available at runtime in `TickEvent::$interval`.
 
 If you need multiple intervals, register multiple event subscriptions.
 
@@ -116,6 +117,7 @@ final readonly class TickEvent
 {
     public function __construct(
         public \DateTimeImmutable $time,
+        public float $interval,
     ) {
     }
 }
@@ -134,13 +136,13 @@ final class ExampleSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'ticker.interval?second=1' => 'onTick',
+            'tick?interval=1' => 'onTick',
         ];
     }
 
     public function onTick(TickEvent $event): void
     {
-        var_dump('tick');
+        var_dump($event->interval);
     }
 }
 ```

@@ -32,11 +32,12 @@ class TimeDrivenClock implements RunnableInterface
     public function run(): PromiseInterface
     {
         foreach ($this->intervals as $interval) {
+            $seconds = (float)$interval;
             $this->timers[] = Loop::addPeriodicTimer(
-                $interval,
-                function () use ($interval) {
+                $seconds,
+                function () use ($interval, $seconds) {
                     $this->dispatcher->dispatch(
-                        new TickEvent(new \DateTimeImmutable()),
+                        new TickEvent(new \DateTimeImmutable(), $seconds),
                         sprintf('%s?%s=%s', ClockBuildPass::EVENT_PATH, ClockBuildPass::QUERY_PARAM, $interval)
                     );
                 }
