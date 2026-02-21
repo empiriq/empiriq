@@ -22,6 +22,12 @@ use Empiriq\BinanceContracts\Markets\Spot\Events\User\ExternalLockUpdateEvent as
 use Empiriq\BinanceContracts\Markets\Spot\Events\User\OutboundAccountPositionEvent as SpotOutboundAccountPositionEvent;
 use Empiriq\Contracts\Messaging\EventSelectorResolverInterface;
 
+/**
+ * Resolves Binance domain events to selector-aware event names.
+ * Public API for bundle integrations.
+ *
+ * @api
+ */
 final class BinanceEventSelectorResolver implements EventSelectorResolverInterface
 {
     private const PATHS = [
@@ -52,7 +58,7 @@ final class BinanceEventSelectorResolver implements EventSelectorResolverInterfa
     {
         $class = $event::class;
         $path = self::PATHS[$class] ?? null;
-        if (!is_string($path) || $path === '') {
+        if ($path === null) {
             return null;
         }
 

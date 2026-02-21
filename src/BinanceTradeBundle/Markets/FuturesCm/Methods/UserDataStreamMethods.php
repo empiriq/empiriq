@@ -18,7 +18,7 @@ trait UserDataStreamMethods
 {
     /**
      * Subscribe to User Data Stream
-     * @return PromiseInterface<SubscribeResponse>
+     * @return PromiseInterface<null>
      */
     public function userDataStreamSubscribe(): PromiseInterface
     {
@@ -27,7 +27,7 @@ trait UserDataStreamMethods
 
     /**
      * Unsubscribe from User Data Stream
-     * @return PromiseInterface<SubscribeResponse>
+     * @return PromiseInterface<null>
      */
     public function userDataStreamUnsubscribe(): PromiseInterface
     {

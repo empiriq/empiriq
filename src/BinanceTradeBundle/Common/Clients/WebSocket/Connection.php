@@ -43,7 +43,9 @@ abstract class Connection
                 )
             );
 
-            return reject(new ConnectionFailedException($exception->getMessage(), $exception->getCode(), $exception));
+            return reject(
+                new ConnectionFailedException($exception->getMessage(), (int)$exception->getCode(), $exception)
+            );
         });
     }
 
@@ -112,7 +114,7 @@ abstract class Connection
         $this->logger->error(
             sprintf('WebSocket error (uri: %s, exception: %s)', $this->config->uri, $exception->getMessage())
         );
-        $this->error(new DisconnectedException($exception->getMessage(), $exception->getCode(), $exception));
+        $this->error(new DisconnectedException($exception->getMessage(), (int)$exception->getCode(), $exception));
     }
 
     abstract protected function message(array $data): void;
