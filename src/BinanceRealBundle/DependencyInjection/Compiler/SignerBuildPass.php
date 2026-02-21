@@ -6,7 +6,7 @@ use Empiriq\BinanceRealBundle\Common\Signers\Ed25519Signer;
 use Empiriq\BinanceRealBundle\Common\Signers\HmacSigner;
 use Empiriq\BinanceRealBundle\Common\Signers\NullSigner;
 use Empiriq\BinanceRealBundle\Common\Signers\RsaSigner;
-use Empiriq\BinanceRealBundle\DependencyInjection\BinanceTradeExtension;
+use Empiriq\BinanceRealBundle\DependencyInjection\BinanceRealExtension;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -17,11 +17,11 @@ final class SignerBuildPass implements CompilerPassInterface
     #[\Override]
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasParameter(BinanceTradeExtension::PARAMETER_NAME)) {
+        if (!$container->hasParameter(BinanceRealExtension::PARAMETER_NAME)) {
             throw new \Exception('CONFIG not found');
         }
         /** @var array<string, mixed> $config */
-        $config = $container->getParameter(BinanceTradeExtension::PARAMETER_NAME);
+        $config = $container->getParameter(BinanceRealExtension::PARAMETER_NAME);
         if (!is_string($config['auth'] ?? null)) {
             throw new \RuntimeException('Auth config must be a string');
         }

@@ -13,7 +13,7 @@ use Empiriq\BinanceRealBundle\Common\Messaging\FuturesUmRestApiCommandMessageHan
 use Empiriq\BinanceRealBundle\Common\Messaging\FuturesUmWsApiCommandMessageHandler;
 use Empiriq\BinanceRealBundle\Common\Messaging\SpotRestApiCommandMessageHandler;
 use Empiriq\BinanceRealBundle\Common\Messaging\SpotWsApiCommandMessageHandler;
-use Empiriq\BinanceRealBundle\DependencyInjection\BinanceTradeExtension;
+use Empiriq\BinanceRealBundle\DependencyInjection\BinanceRealExtension;
 use Empiriq\BinanceRealBundle\Markets\FuturesCm\Clients\RestApi as FuturesCoinMRestApi;
 use Empiriq\BinanceRealBundle\Markets\FuturesCm\Clients\WsApi as FuturesCoinMWsApi;
 use Empiriq\BinanceRealBundle\Markets\FuturesCm\Clients\WsSubscriptions as FuturesCoinMWsSubscriptions;
@@ -94,12 +94,12 @@ final class MarketBuildPass implements CompilerPassInterface
     #[\Override]
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasParameter(BinanceTradeExtension::PARAMETER_NAME)) {
+        if (!$container->hasParameter(BinanceRealExtension::PARAMETER_NAME)) {
             throw new \Exception('CONFIG not found');
         }
         /** @var array<string, mixed> $config */
-        $config = $container->getParameter(BinanceTradeExtension::PARAMETER_NAME);
-        $defaults = $container->getParameter(BinanceTradeExtension::DEFAULTS);
+        $config = $container->getParameter(BinanceRealExtension::PARAMETER_NAME);
+        $defaults = $container->getParameter(BinanceRealExtension::DEFAULTS);
         if (!is_array($defaults)) {
             throw new \RuntimeException('Invalid default endpoints config');
         }

@@ -2,7 +2,7 @@
 
 namespace Empiriq\BinanceRealBundle;
 
-use Empiriq\BinanceRealBundle\DependencyInjection\BinanceTradeExtension;
+use Empiriq\BinanceRealBundle\DependencyInjection\BinanceRealExtension;
 use Empiriq\BinanceRealBundle\DependencyInjection\Compiler\MarketBuildPass;
 use Empiriq\BinanceRealBundle\DependencyInjection\Compiler\ResolveConfigPass;
 use Empiriq\BinanceRealBundle\DependencyInjection\Compiler\SignerBuildPass;
@@ -24,7 +24,7 @@ final class BinanceRealBundle extends Bundle
     #[\Override]
     public function getContainerExtension(): ?ExtensionInterface
     {
-        return new BinanceTradeExtension();
+        return new BinanceRealExtension();
     }
 
     #[\Override]

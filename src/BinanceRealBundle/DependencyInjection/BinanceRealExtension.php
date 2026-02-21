@@ -5,16 +5,10 @@ namespace Empiriq\BinanceRealBundle\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
-final class BinanceTradeExtension extends Extension
+final class BinanceRealExtension extends Extension
 {
     public const PARAMETER_NAME = 'binance_trade.config';
     public const DEFAULTS = 'binance_trade.defaults';
-
-    #[\Override]
-    public function getAlias(): string
-    {
-        return 'binance_real';
-    }
 
     #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
