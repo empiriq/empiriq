@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * The resulting catalog represents events that the codebase declares
  * it can listen to, not events that are guaranteed to have runtime listeners.
  */
-readonly class EventDiscovery
+final readonly class EventDiscovery
 {
     /**
      * @param iterable<ExtractorInterface> $extractors

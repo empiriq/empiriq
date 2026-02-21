@@ -6,7 +6,6 @@ use Monolog\Handler\AbstractHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Level;
 use Monolog\LogRecord;
-use Psr\Log\LogLevel;
 
 /**
  * Routes log records to different handlers based on custom predicates.
@@ -26,7 +25,7 @@ final class RecordRoutingHandler extends AbstractHandler
         int|string|Level $level = Level::Debug,
         bool $bubble = true,
     ) {
-        parent::__construct($level, $bubble);
+        parent::__construct($this->normalizeLevel($level), $bubble);
         foreach ($routes as $route) {
             if (!isset($route['when'], $route['handler'])) {
                 throw new \InvalidArgumentException('Each route must define "when" and "handler".');
@@ -41,6 +40,34 @@ final class RecordRoutingHandler extends AbstractHandler
         $this->routes = $routes;
     }
 
+    private function normalizeLevel(int|string|Level $level): Level
+    {
+        if ($level instanceof Level) {
+            return $level;
+        }
+
+        if (is_int($level)) {
+            if (!in_array($level, Level::VALUES, true)) {
+                throw new \InvalidArgumentException(sprintf('Invalid log level value: %d', $level));
+            }
+
+            return Level::from($level);
+        }
+
+        return match (strtolower($level)) {
+            'debug' => Level::Debug,
+            'info' => Level::Info,
+            'notice' => Level::Notice,
+            'warning' => Level::Warning,
+            'error' => Level::Error,
+            'critical' => Level::Critical,
+            'alert' => Level::Alert,
+            'emergency' => Level::Emergency,
+            default => throw new \InvalidArgumentException(sprintf('Invalid log level name: %s', $level)),
+        };
+    }
+
+    #[\Override]
     public function handle(LogRecord $record): bool
     {
         if (!$this->isHandling($record)) {
@@ -62,6 +89,7 @@ final class RecordRoutingHandler extends AbstractHandler
         return false;
     }
 
+    #[\Override]
     public function handleBatch(array $records): void
     {
         foreach ($records as $record) {

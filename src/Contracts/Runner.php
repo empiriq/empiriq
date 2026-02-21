@@ -12,7 +12,12 @@ use React\Promise\PromiseInterface;
 use function React\Async\await;
 use function React\Promise\all;
 
-readonly class Runner
+/**
+ * Starts and stops all runtime services.
+ *
+ * @api
+ */
+final readonly class Runner
 {
     /**
      * @var RunnableInterface[]

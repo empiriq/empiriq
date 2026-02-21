@@ -14,12 +14,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 final class SubscriberExtractor implements ExtractorInterface
 {
+    #[\Override]
     public function collect(ContainerBuilder $container): array
     {
         $events = [];
         foreach ($container->getDefinitions() as $definition) {
             $class = $definition->getClass();
-            if (!$class || !class_exists($class)) {
+            if (!is_string($class) || $class === '' || !class_exists($class)) {
                 continue;
             }
             if (!is_subclass_of($class, EventSubscriberInterface::class)) {

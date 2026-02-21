@@ -62,7 +62,7 @@ final readonly class SymfonyMessengerEventPublisher implements EventPublisherInt
     {
         $matches = [];
         foreach ($subscriptions as $subscription) {
-            if (!is_string($subscription) || $subscription === '') {
+            if ($subscription === '') {
                 continue;
             }
             $subscriptionPath = parse_url($subscription, PHP_URL_PATH);

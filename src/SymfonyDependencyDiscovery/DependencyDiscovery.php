@@ -6,6 +6,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Discovers constructor and definition-argument dependencies from Symfony DI.
+ *
+ * @api
+ */
 final class DependencyDiscovery
 {
     /**
@@ -100,7 +105,7 @@ final class DependencyDiscovery
         if ($type instanceof \ReflectionUnionType) {
             $names = [];
             foreach ($type->getTypes() as $innerType) {
-                $names = array_merge($names, $this->normalizeNamedType($innerType, $context));
+                $names = array_merge($names, $this->extractTypeNames($innerType, $context));
             }
 
             return $names;
@@ -109,7 +114,7 @@ final class DependencyDiscovery
         if ($type instanceof \ReflectionIntersectionType) {
             $names = [];
             foreach ($type->getTypes() as $innerType) {
-                $names = array_merge($names, $this->normalizeNamedType($innerType, $context));
+                $names = array_merge($names, $this->extractTypeNames($innerType, $context));
             }
 
             return $names;
@@ -129,11 +134,14 @@ final class DependencyDiscovery
             return [];
         }
 
-        $name = $type->getName();
-        if ($name === 'self') {
+        $name = (string) $type;
+        $nameLower = strtolower($name);
+
+        if ($nameLower === 'self') {
             return [$context->getName()];
         }
-        if ($name === 'parent') {
+
+        if ($nameLower === 'parent') {
             $parent = $context->getParentClass();
             return $parent ? [$parent->getName()] : [];
         }

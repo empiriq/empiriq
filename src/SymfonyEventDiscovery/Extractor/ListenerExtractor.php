@@ -14,6 +14,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
  */
 final class ListenerExtractor implements ExtractorInterface
 {
+    #[\Override]
     public function collect(ContainerBuilder $container): array
     {
         $events = [];
@@ -21,7 +22,7 @@ final class ListenerExtractor implements ExtractorInterface
         foreach ($container->getDefinitions() as $definition) {
             $class = $definition->getClass();
 
-            if (!$class || !class_exists($class)) {
+            if (!is_string($class) || $class === '' || !class_exists($class)) {
                 continue;
             }
 

@@ -6,6 +6,8 @@ use Monolog\LogRecord;
 
 /**
  * Matches log records by message prefix.
+ *
+ * @api
  */
 final class RecordMessagePrefixPredicate
 {

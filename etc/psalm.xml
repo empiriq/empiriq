@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 <psalm errorLevel="7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://getpsalm.org/schema/config" xsi:schemaLocation="https://getpsalm.org/schema/config ../vendor/vimeo/psalm/config.xsd">
     <projectFiles>
-        <directory name="../src/TickerBundle"/>
+        <directory name="../src"/>
         <ignoreFiles>
             <directory name="../vendor"/>
+            <directory name="../src/BinanceBackTradeBundle"/>
+            <directory name="../src/BinanceContracts"/>
             <directory name="../src/BinanceTradeBundle/Common/Exceptions"/>
         </ignoreFiles>
     </projectFiles>
