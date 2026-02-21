@@ -63,6 +63,7 @@ Event names use a query-style format for parameters:
 - `binance.<market>.<scope>.<type>?symbol[]=btcusdt&symbol[]=ethusdt`
 - `symbol` accepts multiple comma-separated values.
 - User events do not require `symbol`.
+- Selector matching is supported at runtime: one incoming event is routed to all matching subscriptions by path + query selectors.
 
 To enable streams, register an EventSubscriber and return the event names in `getSubscribedEvents()`.
 

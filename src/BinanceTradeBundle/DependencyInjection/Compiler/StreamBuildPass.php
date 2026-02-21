@@ -15,6 +15,7 @@ final class StreamBuildPass implements CompilerPassInterface
     public const TAG_FUTURES_USDM = 'empiriq.binance.futures_usdm.stream';
     public const TAG_FUTURES_COINM = 'empiriq.binance.futures_coinm.stream';
     public const TAG_SPOT = 'empiriq.binance.spot.stream';
+    public const SUBSCRIPTIONS_PARAMETER = 'empiriq.event.subscriptions';
 
     public function __construct(
         private readonly EventDiscovery $event
@@ -33,6 +34,7 @@ final class StreamBuildPass implements CompilerPassInterface
             'binance.futures_usd.user.trade_lite' => FuturesUsdMUserDataStream::class,
         ];
         $events = $this->event->discover($container);
+        $container->setParameter(self::SUBSCRIPTIONS_PARAMETER, $events);
         foreach ($events as $eventName) {
             $result = $this->parse($mapping, $eventName);
             if ($result) {

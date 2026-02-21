@@ -25,6 +25,7 @@ readonly class Metrics implements EventSubscriberInterface
 
     public function trade(TradeEvent $event): void
     {
+        var_dump(666);
         $this->registry->getOrRegisterCounter('market_events', 'trade_count', 'Trade count')->inc();
     }
 

@@ -24,6 +24,7 @@ Local instructions for automated code changes in this repository.
 - The same string is used in two roles:
 - as Symfony subscription key (`getSubscribedEvents()` / listener event name)
 - as container-build instruction for stream/clock registration
+- Selector routing matches by event `path` and query values (array and comma-separated values are supported).
 
 ## Event Delivery Pipeline
 - Producers (WS clients, `Runner`) publish through `Empiriq\Contracts\Messaging\EventPublisherInterface`.

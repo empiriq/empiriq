@@ -26,6 +26,6 @@ readonly class Main implements EventSubscriberInterface
     public function run(): void
     {
         var_dump(await($this->market->ping()));
-        $this->runner->shutdown();
+//        $this->runner->shutdown();
     }
 }

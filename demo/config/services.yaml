@@ -23,10 +23,13 @@ services:
     Empiriq\Contracts\Messaging\SymfonyMessengerEventPublisher:
         arguments:
             $bus: '@event.bus'
+            $selectorResolver: '@Empiriq\BinanceTradeBundle\Messaging\BinanceEventSelectorResolver'
+            $selectorSubscriptions: '%empiriq.event.subscriptions%'
     Empiriq\Contracts\Messaging\EventPublisherInterface: '@Empiriq\Contracts\Messaging\SymfonyMessengerEventPublisher'
     Empiriq\Contracts\Messaging\DomainEventMessageHandler:
         tags:
             - { name: messenger.message_handler, bus: event.bus }
+    Empiriq\BinanceTradeBundle\Messaging\BinanceEventSelectorResolver: ~
     Psr\Container\ContainerInterface: '@service_container'
     Psr\Log\LoggerInterface: '@logger'
     # makes classes in src/ available to be used as services
