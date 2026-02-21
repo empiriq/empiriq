@@ -5,8 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     monolog.default_level: debug
-    binance_trade.default_environment: mainnet
-    binance_trade.default_auth: unsigned
+    binance_real.default_environment: mainnet
+    binance_real.default_auth: unsigned
 
 services:
     # default configuration for services in *this* file
@@ -20,6 +20,7 @@ services:
         class: Symfony\Component\EventDispatcher\EventDispatcher
         public: true
     Symfony\Component\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
+    Symfony\Component\Messenger\MessageBusInterface: '@event.bus'
     Empiriq\Contracts\Messaging\SymfonyMessengerEventPublisher:
         arguments:
             $bus: '@event.bus'

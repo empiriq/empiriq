@@ -7,6 +7,12 @@ use Empiriq\BinanceRealBundle\Common\Configs\RestConfig;
 use Empiriq\BinanceRealBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceRealBundle\Common\Helpers\Sanitizer;
 use Empiriq\BinanceRealBundle\Common\Helpers\Serializer;
+use Empiriq\BinanceRealBundle\Common\Messaging\FuturesCmRestApiCommandMessageHandler;
+use Empiriq\BinanceRealBundle\Common\Messaging\FuturesCmWsApiCommandMessageHandler;
+use Empiriq\BinanceRealBundle\Common\Messaging\FuturesUmRestApiCommandMessageHandler;
+use Empiriq\BinanceRealBundle\Common\Messaging\FuturesUmWsApiCommandMessageHandler;
+use Empiriq\BinanceRealBundle\Common\Messaging\SpotRestApiCommandMessageHandler;
+use Empiriq\BinanceRealBundle\Common\Messaging\SpotWsApiCommandMessageHandler;
 use Empiriq\BinanceRealBundle\DependencyInjection\BinanceTradeExtension;
 use Empiriq\BinanceRealBundle\Markets\FuturesCm\Clients\RestApi as FuturesCoinMRestApi;
 use Empiriq\BinanceRealBundle\Markets\FuturesCm\Clients\WsApi as FuturesCoinMWsApi;
@@ -43,6 +49,10 @@ final class MarketBuildPass implements CompilerPassInterface
                 'ws' => FuturesUsdMWsApi::class,
                 'subscriptions' => FuturesUsdMWsSubscriptions::class,
             ],
+            'handlers' => [
+                'ws' => FuturesUmWsApiCommandMessageHandler::class,
+                'rest' => FuturesUmRestApiCommandMessageHandler::class,
+            ],
         ],
         [
             'tag' => StreamBuildPass::TAG_FUTURES_COINM,
@@ -54,6 +64,10 @@ final class MarketBuildPass implements CompilerPassInterface
                 'ws' => FuturesCoinMWsApi::class,
                 'subscriptions' => FuturesCoinMWsSubscriptions::class,
             ],
+            'handlers' => [
+                'ws' => FuturesCmWsApiCommandMessageHandler::class,
+                'rest' => FuturesCmRestApiCommandMessageHandler::class,
+            ],
         ],
         [
             'tag' => StreamBuildPass::TAG_SPOT,
@@ -64,6 +78,10 @@ final class MarketBuildPass implements CompilerPassInterface
                 'rest' => SpotRestApi::class,
                 'ws' => SpotWsApi::class,
                 'subscriptions' => SpotWsSubscriptions::class,
+            ],
+            'handlers' => [
+                'ws' => SpotWsApiCommandMessageHandler::class,
+                'rest' => SpotRestApiCommandMessageHandler::class,
             ],
         ],
     ];
@@ -114,14 +132,16 @@ final class MarketBuildPass implements CompilerPassInterface
             $hasTaggedStreams = $container->findTaggedServiceIds($mapping['tag']) !== [];
             $isRequested = in_array($mapping['class'], $dependencies, true);
 
-            if (!$hasTaggedStreams && !$isRequested) {
-                continue;
-            }
-
-            $container->setDefinition(
+            $transportDefinition = $container->setDefinition(
                 $mapping['service_id'],
                 $this->getTransport($config, $mapping)
-            )->addTag('empiriq.runnable');
+            );
+
+            if ($hasTaggedStreams || $isRequested) {
+                $transportDefinition->addTag('empiriq.runnable');
+            }
+
+            $this->registerCommandHandlers($container, $mapping);
         }
     }
 
@@ -175,5 +195,33 @@ final class MarketBuildPass implements CompilerPassInterface
             ]),
             new TaggedIteratorArgument($mapping['tag']),
         ]);
+    }
+
+    private function registerCommandHandlers(ContainerBuilder $container, array $mapping): void
+    {
+        $handlers = $mapping['handlers'] ?? null;
+        if (!is_array($handlers)) {
+            return;
+        }
+
+        $market = new Reference($mapping['service_id']);
+
+        if (is_string($handlers['ws'] ?? null)) {
+            $container
+                ->setDefinition(
+                    sprintf('empiriq.binance.command_handler.%s.ws', $mapping['endpoint_key']),
+                    new Definition($handlers['ws'], [$market])
+                )
+                ->addTag('messenger.message_handler', ['bus' => 'event.bus']);
+        }
+
+        if (is_string($handlers['rest'] ?? null)) {
+            $container
+                ->setDefinition(
+                    sprintf('empiriq.binance.command_handler.%s.rest', $mapping['endpoint_key']),
+                    new Definition($handlers['rest'], [$market])
+                )
+                ->addTag('messenger.message_handler', ['bus' => 'event.bus']);
+        }
     }
 }

@@ -4,6 +4,9 @@ namespace Empiriq\BinanceContracts\Markets\FuturesUm\Requests\Trading;
 
 use Empiriq\BinanceContracts\Markets\FuturesUm\Common\OrderCancelRestriction;
 use Empiriq\BinanceContracts\Markets\FuturesUm\Common\OrderIdentifierType;
+use Empiriq\BinanceContracts\Markets\FuturesUm\Requests\FuturesUmWsRequestInterface;
+use Empiriq\BinanceContracts\Markets\FuturesUm\Common\Permission;
+use Empiriq\BinanceContracts\Markets\FuturesUm\Responses\Trading\OrderCancelResponse;
 
 /**
  * Order Amend Keep Priority (TRADE)
@@ -15,7 +18,7 @@ use Empiriq\BinanceContracts\Markets\FuturesUm\Common\OrderIdentifierType;
  * @link https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-api.md#order-amend-keep-priority-trade
  * @link https://github.com/binance/binance-spot-api-docs/blob/master/faqs/order_amend_keep_priority.md
  */
-readonly class OrderAmendKeepPriority
+readonly class OrderAmendKeepPriority implements FuturesUmWsRequestInterface
 {
     public ?int $orderId;
 
@@ -31,5 +34,20 @@ readonly class OrderAmendKeepPriority
     ) {
         $this->orderId = $identifierType === OrderIdentifierType::EXCHANGE ? $identifier : null;
         $this->origClientOrderId = $identifierType === OrderIdentifierType::CLIENT ? $identifier : null;
+    }
+
+    public function wsMethod(): string
+    {
+        return 'order.amend.keepPriority';
+    }
+
+    public function permission(): Permission
+    {
+        return Permission::TRADE;
+    }
+
+    public function responseType(): string
+    {
+        return OrderCancelResponse::class;
     }
 }

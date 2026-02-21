@@ -2,20 +2,25 @@
 
 namespace App;
 
-use Empiriq\BinanceContracts\Markets\FuturesUm\FuturesUmInterface;
+use Empiriq\BinanceContracts\Markets\FuturesUm\Requests\MarketData\Depth;
+use Empiriq\BinanceRealBundle\Common\Messaging\FuturesUmWsApiCommandMessage;
 use Empiriq\Contracts\Runner;
+use React\Promise\PromiseInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 use function React\Async\await;
 
 readonly class Main implements EventSubscriberInterface
 {
     public function __construct(
-        private FuturesUmInterface $market,
+        private MessageBusInterface $bus,
         private Runner $runner,
     ) {
     }
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [
@@ -25,7 +30,13 @@ readonly class Main implements EventSubscriberInterface
 
     public function run(): void
     {
-        var_dump(await($this->market->ping()));
-//        $this->runner->shutdown();
+        $message = new FuturesUmWsApiCommandMessage(
+            new Depth(symbol: 'BTCUSDT', limit: 5)
+        );
+        $result = $this->bus->dispatch($message)->last(HandledStamp::class)?->getResult();
+        if ($result instanceof PromiseInterface) {
+            var_dump(await($result));
+        }
+        $this->runner->shutdown();
     }
 }

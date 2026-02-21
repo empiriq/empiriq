@@ -4,8 +4,11 @@ namespace Empiriq\BinanceContracts\Markets\Spot\Requests\Trading;
 
 use Empiriq\BinanceContracts\Markets\Spot\Common\OrderCancelRestriction;
 use Empiriq\BinanceContracts\Markets\Spot\Common\OrderIdentifierType;
+use Empiriq\BinanceContracts\Markets\Spot\Requests\SpotWsRequestInterface;
+use Empiriq\BinanceContracts\Markets\Spot\Common\Permission;
+use Empiriq\BinanceContracts\Markets\Spot\Responses\Trading\OrderPlaceResponse;
 
-readonly class OrderListPlaceOco
+readonly class OrderListPlaceOco implements SpotWsRequestInterface
 {
     public ?int $orderId;
 
@@ -21,5 +24,20 @@ readonly class OrderListPlaceOco
     ) {
         $this->orderId = $identifierType === OrderIdentifierType::EXCHANGE ? $identifier : null;
         $this->origClientOrderId = $identifierType === OrderIdentifierType::CLIENT ? $identifier : null;
+    }
+
+    public function wsMethod(): string
+    {
+        return 'orderList.place.oco';
+    }
+
+    public function permission(): Permission
+    {
+        return Permission::TRADE;
+    }
+
+    public function responseType(): string
+    {
+        return OrderPlaceResponse::class;
     }
 }

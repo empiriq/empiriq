@@ -4,7 +4,7 @@
 Local instructions for automated code changes in this repository.
 
 ## Project Map
-- Runtime entrypoint: `demo/bin/trade` (boots `App\Kernel`, resolves `Empiriq\Contracts\Runner`).
+- Runtime entrypoints: `demo/bin/real`, `demo/bin/paper`, `demo/bin/back` (boot `App\Kernel`, resolve `Empiriq\Contracts\Runner`).
 - Core runtime contracts: `src/Contracts`.
 - Market integration and DI compiler passes: `src/BinanceRealBundle`.
 - Event and dependency discovery utilities: `src/SymfonyEventDiscovery`, `src/SymfonyDependencyDiscovery`.
@@ -31,6 +31,47 @@ Local instructions for automated code changes in this repository.
 - Publisher wraps payload into `Empiriq\Contracts\Messaging\DomainEventMessage`.
 - Messenger bus handles the message (demo default transport: `sync://`).
 - `DomainEventMessageHandler` forwards into Symfony `EventDispatcherInterface`.
+
+## Market API Command Architecture
+- Application code should call market APIs through Messenger command messages, not via direct calls to `Spot`, `FuturesUm`, `FuturesCm` methods.
+- Command envelopes live in `src/BinanceRealBundle/Common/Messaging`:
+- `SpotWsApiCommandMessage`, `SpotRestApiCommandMessage`
+- `FuturesUmWsApiCommandMessage`, `FuturesUmRestApiCommandMessage`
+- `FuturesCmWsApiCommandMessage`, `FuturesCmRestApiCommandMessage`
+- Command messages intentionally have no generic `context` field.
+- Command handlers are registered in `MarketBuildPass` only for markets that are actually built/enabled.
+
+## Request DTO Contracts For Commands
+- Request DTOs in `src/BinanceContracts/Markets/*/Requests` are command payloads.
+- WS requests must implement market-specific WS marker interfaces:
+- `SpotWsRequestInterface`
+- `FuturesUmWsRequestInterface`
+- `FuturesCmWsRequestInterface`
+- These interfaces extend `WsRequestMetaInterface` and each DTO must provide:
+- `wsMethod(): string`
+- `permission(): PermissionInterface`
+- `responseType(): class-string`
+- REST marker interfaces exist and must be used for new REST command DTOs:
+- `SpotRestRequestInterface`
+- `FuturesUmRestRequestInterface`
+- `FuturesCmRestRequestInterface`
+- They extend `RestRequestMetaInterface` and require:
+- `httpMethod(): string`
+- `path(): string`
+- `permission(): PermissionInterface`
+- `responseType(): class-string`
+
+## Command Calling Pattern
+- Inject `Symfony\Component\Messenger\MessageBusInterface` and dispatch typed command messages.
+- In `sync` mode, read `HandledStamp` result and `await()` returned `PromiseInterface` when needed.
+- Keep market facades (`Spot`, `FuturesUm`, `FuturesCm`) for runtime lifecycle and stream orchestration (`run/shutdown`), not as primary app API surface.
+
+## Adding New API Method (Command-First)
+- Add/update request DTO in `BinanceContracts/Markets/<Market>/Requests/...`.
+- Implement the correct market/API marker interface and metadata methods.
+- Ensure `permission()` and `responseType()` match official Binance docs.
+- For polymorphic responses, pin a single deterministic shape in DTO metadata (or explicit match logic in DTO).
+- Reuse existing message+handler pair for that market/API; no new handler needed unless introducing a new market/API channel.
 
 ## API Method Playbook
 - Use official Binance endpoint docs as the single source of truth for request/response shape.
