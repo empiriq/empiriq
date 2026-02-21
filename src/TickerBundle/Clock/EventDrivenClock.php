@@ -2,6 +2,9 @@
 
 namespace Empiriq\TickerBundle\Clock;
 
-class EventDrivenClock
+/**
+ * Event-driven ticker clock.
+ */
+final class EventDrivenClock
 {
 }

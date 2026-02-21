@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 
-readonly class ClockBuildPass implements CompilerPassInterface
+final readonly class ClockBuildPass implements CompilerPassInterface
 {
     public const EVENT_PATH = 'tick';
     public const QUERY_PARAM = 'interval';
@@ -29,9 +29,17 @@ readonly class ClockBuildPass implements CompilerPassInterface
     /**
      * Configures the active clock and its tick intervals.
      */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $configs = $container->getParameter(TickerExtension::PARAMETER_NAME);
+        if (!is_array($configs)) {
+            throw new \RuntimeException('Invalid ticker config parameter type.');
+        }
+        $clock = $configs['clock'] ?? null;
+        if (!is_string($clock) || $clock === '') {
+            throw new \RuntimeException('Ticker clock config must be a non-empty string.');
+        }
         $eventNames = $this->eventDiscovery->discover($container);
         $intervals = [];
         foreach ($eventNames as $eventName) {
@@ -45,11 +53,11 @@ readonly class ClockBuildPass implements CompilerPassInterface
         $container->setDefinition(
             'ticker.clock',
             new Definition(
-                match ($configs['clock']) {
+                match ($clock) {
                     'time' => TimeDrivenClock::class,
                     'event' => EventDrivenClock::class,
                     default => throw new \InvalidArgumentException(
-                        sprintf('Invalid tick clock type "%s". Allowed values: time, event.', $configs['clock'])
+                        sprintf('Invalid tick clock type "%s". Allowed values: time, event.', $clock)
                     ),
                 },
                 [

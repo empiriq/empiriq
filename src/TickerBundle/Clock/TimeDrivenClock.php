@@ -12,7 +12,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use function React\Promise\resolve;
 
-class TimeDrivenClock implements RunnableInterface
+/**
+ * Time-driven ticker clock constructed by the DI container.
+ *
+ * @api
+ */
+final class TimeDrivenClock implements RunnableInterface
 {
     /**
      * @var TimerInterface[]
@@ -29,6 +34,7 @@ class TimeDrivenClock implements RunnableInterface
     ) {
     }
 
+    #[\Override]
     public function run(): PromiseInterface
     {
         foreach ($this->intervals as $interval) {
@@ -47,6 +53,7 @@ class TimeDrivenClock implements RunnableInterface
         return resolve(null);
     }
 
+    #[\Override]
     public function shutdown(): PromiseInterface
     {
         foreach ($this->timers as $timer) {

@@ -2,6 +2,7 @@
 
 namespace Empiriq\TickerBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -11,15 +12,15 @@ final class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('ticker');
-        /** @psalm-suppress UndefinedMethod */
         $root = $treeBuilder->getRootNode();
-        $root
-            ->children()
-                ->scalarNode('clock')
-                    ->isRequired()
-                    ->info('Tick clock type: time (TimeDrivenClock) or event (EventDrivenClock)')
-                ->end()
-            ->end();
+        if (!$root instanceof ArrayNodeDefinition) {
+            throw new \RuntimeException('Ticker root configuration node must be an array node.');
+        }
+        $children = $root->children();
+        $clockNode = $children->scalarNode('clock');
+        $clockNode
+            ->isRequired()
+            ->info('Tick clock type: time (TimeDrivenClock) or event (EventDrivenClock)');
 
         return $treeBuilder;
     }
