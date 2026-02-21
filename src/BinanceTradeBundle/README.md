@@ -1,7 +1,7 @@
 # Binance Trade Bundle
 
 ## Overview
-Binance Trade Bundle is a modular, event-driven library for real-time Binance trading with asynchronous communication and typed objects. It is non-blocking (React promises), publishes events through Symfony EventDispatcher, uses typed contracts, and prefers WebSocket streams when available.
+Binance Trade Bundle is a modular, event-driven library for real-time Binance trading with asynchronous communication and typed objects. It is non-blocking (React promises), publishes events through Symfony Messenger (sync transport by default) and then forwards them to Symfony EventDispatcher, uses typed contracts, and prefers WebSocket streams when available.
 
 ## Installation
 ### Requirements
@@ -57,7 +57,7 @@ Creating Binance API Credentials:
 - [For Testnet](https://www.binance.com/en/support/faq/detail/ab78f9a1b8824cf0a106b4229c76496d)
 
 ## General Usage Principles
-During container build, the bundle scans Symfony event subscribers and registers only the streams that are actually requested by your event names.
+During container build, the bundle scans Symfony event subscribers and registers only the streams that are actually requested by your event names. The same subscription names are used as instructions for stream generation.
 
 Event names use a query-style format for parameters:
 - `binance.<market>.<scope>.<type>?symbol[]=btcusdt&symbol[]=ethusdt`
@@ -65,6 +65,13 @@ Event names use a query-style format for parameters:
 - User events do not require `symbol`.
 
 To enable streams, register an EventSubscriber and return the event names in `getSubscribedEvents()`.
+
+Event delivery pipeline:
+- WebSocket payload -> typed event object
+- typed event -> `DomainEventMessage` on Messenger bus
+- Messenger handler -> Symfony EventDispatcher (`dispatch($event, $eventName)`)
+
+Default transport in demo setup is synchronous (`sync://`), so subscribers are called in-process.
 
 All market classes expose async methods that return React promises. Inject the market class you need and call its methods directly.
 

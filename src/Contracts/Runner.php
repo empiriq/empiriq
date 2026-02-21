@@ -5,9 +5,9 @@ namespace Empiriq\Contracts;
 use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
 use Empiriq\Contracts\Events\EmpiriqRunEvent;
 use Empiriq\Contracts\Events\EmpiriqShutdownEvent;
+use Empiriq\Contracts\Messaging\EventPublisherInterface;
 use Psr\Log\LoggerInterface;
 use React\Promise\PromiseInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use function React\Async\await;
 use function React\Promise\all;
@@ -20,12 +20,12 @@ readonly class Runner
     private array $runners;
 
     /**
-     * @param EventDispatcherInterface $dispatcher
+     * @param EventPublisherInterface $publisher
      * @param LoggerInterface $logger
      * @param iterable<RunnableInterface> $runners
      */
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private EventPublisherInterface $publisher,
         private LoggerInterface $logger,
         iterable $runners,
     ) {
@@ -41,7 +41,7 @@ readonly class Runner
             $promises[] = $this->handlePromise($runner->run(), $runner::class, 'run');
         }
         await(all($promises));
-        $this->dispatcher->dispatch(new EmpiriqRunEvent(), 'empiriq.run');
+        $this->publisher->publish(new EmpiriqRunEvent(), 'empiriq.run');
         $this->logger->info('Runtime started successfully');
         if (!\extension_loaded('pcntl')) {
             $this->logger->warning('pcntl extension not available, signal handling disabled');
@@ -69,7 +69,7 @@ readonly class Runner
         }
 
         await(all($promises));
-        $this->dispatcher->dispatch(new EmpiriqShutdownEvent(), 'empiriq.shutdown');
+        $this->publisher->publish(new EmpiriqShutdownEvent(), 'empiriq.shutdown');
         $this->logger->info('Shutdown completed');
         exit(0);
     }

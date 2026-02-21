@@ -10,7 +10,8 @@ same strategies live, with no code changes.
 - **Non-blocking:** Asynchronous, promise-based requests powered
   by [react/promise](https://github.com/reactphp/promise).
 - **Event-driven:** Exchange events are published directly into
-  the [symfony/event-dispatcher](https://symfony.com/doc/current/components/event_dispatcher.html).
+  [symfony/messenger](https://symfony.com/doc/current/components/messenger.html) (sync transport by default)
+  and then forwarded to [symfony/event-dispatcher](https://symfony.com/doc/current/components/event_dispatcher.html).
 - **Typed:** Strongly-typed request, response, and event objects
   via [empiriq/binance-contracts](src/BinanceContracts).
 - **Fast:** Uses WebSocket endpoints when available to ensure speed, and falls back to REST when not.

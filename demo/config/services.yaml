@@ -20,6 +20,13 @@ services:
         class: Symfony\Component\EventDispatcher\EventDispatcher
         public: true
     Symfony\Component\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
+    Empiriq\Contracts\Messaging\SymfonyMessengerEventPublisher:
+        arguments:
+            $bus: '@event.bus'
+    Empiriq\Contracts\Messaging\EventPublisherInterface: '@Empiriq\Contracts\Messaging\SymfonyMessengerEventPublisher'
+    Empiriq\Contracts\Messaging\DomainEventMessageHandler:
+        tags:
+            - { name: messenger.message_handler, bus: event.bus }
     Psr\Container\ContainerInterface: '@service_container'
     Psr\Log\LoggerInterface: '@logger'
     # makes classes in src/ available to be used as services

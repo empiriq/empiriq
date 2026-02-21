@@ -20,6 +20,7 @@ use Empiriq\BinanceTradeBundle\Markets\Spot\Clients\RestApi as SpotRestApi;
 use Empiriq\BinanceTradeBundle\Markets\Spot\Clients\WsApi as SpotWsApi;
 use Empiriq\BinanceTradeBundle\Markets\Spot\Clients\WsSubscriptions as SpotWsSubscriptions;
 use Empiriq\BinanceTradeBundle\Markets\Spot\Spot;
+use Empiriq\Contracts\Messaging\EventPublisherInterface;
 use Empiriq\SymfonyDependencyDiscovery\DependencyDiscovery;
 use React\Http\Browser;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -149,7 +150,7 @@ final class MarketBuildPass implements CompilerPassInterface
                 ]),
             ]),
             new Definition($clients['ws'], [
-                new Reference('event_dispatcher'),
+                new Reference(EventPublisherInterface::class),
                 new Reference('empiriq.binance.signer'),
                 new Reference('empiriq.binance.serializer'),
                 new Reference('logger'),
@@ -161,7 +162,7 @@ final class MarketBuildPass implements CompilerPassInterface
                 ]),
             ]),
             new Definition($clients['subscriptions'], [
-                new Reference('event_dispatcher'),
+                new Reference(EventPublisherInterface::class),
                 new Reference('empiriq.binance.serializer'),
                 new Reference('logger'),
                 new Reference('empiriq.binance.sanitizer'),

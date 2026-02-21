@@ -7,9 +7,9 @@ use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
 use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SignerInterface;
+use Empiriq\Contracts\Messaging\EventPublisherInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * WebSocket API client for USD-M Futures.
@@ -29,7 +29,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class WsApi extends ResponseResolver
 {
     /**
-     * @param EventDispatcherInterface $dispatcher Event dispatcher.
+     * @param EventPublisherInterface $publisher Event publisher.
      * @param SignerInterface $signer Request signer.
      * @param SerializerInterface $serializer Payload serializer.
      * @param LoggerInterface $logger PSR-3 logger instance.
@@ -37,7 +37,7 @@ final class WsApi extends ResponseResolver
      * @param WebSocketConfig $config WebSocket API configuration.
      */
     public function __construct(
-        protected EventDispatcherInterface $dispatcher,
+        protected EventPublisherInterface $publisher,
         protected SignerInterface $signer,
         protected SerializerInterface $serializer,
         protected LoggerInterface $logger,

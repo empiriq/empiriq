@@ -6,9 +6,9 @@ use Empiriq\BinanceContracts\Markets\FuturesUm\Common\EventInterface;
 use Empiriq\BinanceTradeBundle\Common\Clients\WebSocket\ResponseResolver;
 use Empiriq\BinanceTradeBundle\Common\Configs\WebSocketConfig;
 use Empiriq\BinanceTradeBundle\Common\Interfaces\SanitizerInterface;
+use Empiriq\Contracts\Messaging\EventPublisherInterface;
 use Empiriq\Contracts\SerializerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * API endpoints:
@@ -24,14 +24,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class WsSubscriptions extends ResponseResolver
 {
     /**
-     * @param EventDispatcherInterface $dispatcher Event dispatcher.
+     * @param EventPublisherInterface $publisher Event publisher.
      * @param SerializerInterface $serializer Payload serializer.
      * @param LoggerInterface $logger PSR-3 logger instance.
      * @param SanitizerInterface $sanitizer Sanitizer for sensitive data before logging.
      * @param WebSocketConfig $config WebSocket configuration.
      */
     public function __construct(
-        protected EventDispatcherInterface $dispatcher,
+        protected EventPublisherInterface $publisher,
         protected SerializerInterface $serializer,
         protected LoggerInterface $logger,
         protected SanitizerInterface $sanitizer,

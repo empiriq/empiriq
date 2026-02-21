@@ -1,0 +1,8 @@
+framework:
+    messenger:
+        transports:
+            sync: 'sync://'
+        buses:
+            event.bus: ~
+        routing:
+            'Empiriq\Contracts\Messaging\DomainEventMessage': sync

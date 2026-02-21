@@ -2,12 +2,12 @@
 
 namespace Empiriq\BinanceTradeBundle\Common\Clients\WebSocket;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Empiriq\Contracts\Messaging\EventPublisherInterface;
 use Throwable;
 
 abstract class EventDispatcher extends Connection
 {
-    protected EventDispatcherInterface $dispatcher;
+    protected EventPublisherInterface $publisher;
 
     #[\Override]
     protected function message(array $data): void
@@ -16,7 +16,7 @@ abstract class EventDispatcher extends Connection
         if ($rawEvent !== null) {
             try {
                 $event = $this->serializer->denormalize($rawEvent, static::getEventType());
-                $this->dispatcher->dispatch($event);
+                $this->publisher->publish($event);
             } catch (Throwable $exception) {
                 $this->logger->warning(sprintf('Event denormalization failed: %s', $exception->getMessage()), $data);
             }
