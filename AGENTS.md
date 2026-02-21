@@ -32,6 +32,24 @@ Local instructions for automated code changes in this repository.
 - Messenger bus handles the message (demo default transport: `sync://`).
 - `DomainEventMessageHandler` forwards into Symfony `EventDispatcherInterface`.
 
+## API Method Playbook
+- Use official Binance endpoint docs as the single source of truth for request/response shape.
+- For each method, verify: WS/REST method name, permission level, required params, conditional params, and defaults.
+- Keep enum values protocol-exact (string values must match Binance docs).
+- For `order.place`-like methods, prefer one pinned full typed response DTO strategy.
+- If endpoint supports multiple response shapes, pin request mode to the richest stable shape in request DTO defaults.
+- Keep `PromiseInterface<T>` phpdoc aligned with real method return type.
+- For Binance decimal fields in response DTOs, prefer `string` types unless endpoint guarantees numeric JSON.
+- Preserve BC where practical: add enum values instead of replacing; keep legacy aliases with explicit comments.
+- Avoid spot/futures DTO cross-pollination: validate each market type independently.
+- Validate DTO constructors for nullability to avoid runtime `TypeError` on optional fields.
+
+## API Change Checklist
+- Update contracts DTOs (`Requests`, `Responses`, `Common enums`) first, then bundle methods.
+- Re-check serializer normalization of request DTOs for expected outgoing payload keys.
+- Re-check deserialization types against example payloads from docs.
+- Update bundle README API reference when method semantics or params change.
+
 ## Quality Gates
 - Style: `vendor/bin/phpcs --standard=PSR12 src`
 - Static analysis: `vendor/bin/psalm --config=etc/psalm.xml --show-info=true --no-progress`

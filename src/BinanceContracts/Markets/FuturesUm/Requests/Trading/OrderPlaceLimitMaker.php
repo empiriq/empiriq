@@ -2,13 +2,14 @@
 
 namespace Empiriq\BinanceContracts\Markets\FuturesUm\Requests\Trading;
 
-use Empiriq\BinanceContracts\Markets\FuturesUm\Common\OrderNewResponseType;
 use Empiriq\BinanceContracts\Markets\FuturesUm\Common\OrderPreventionMode;
 use Empiriq\BinanceContracts\Markets\FuturesUm\Common\OrderSide;
 use Empiriq\BinanceContracts\Markets\FuturesUm\Common\OrderType;
 
 /**
- * Buy or sell "quantity" at the specified "price" or better.
+ * LIMIT_MAKER payload.
+ *
+ * Kept for compatibility with existing contracts.
  */
 readonly class OrderPlaceLimitMaker extends OrderPlace
 {
@@ -22,7 +23,6 @@ readonly class OrderPlaceLimitMaker extends OrderPlace
         ?int $strategyType,
         public ?float $icebergQty = null,
         ?OrderPreventionMode $selfTradePreventionMode = null,
-        ?OrderNewResponseType $newOrderRespType = OrderNewResponseType::ACK,
     ) {
         parent::__construct(
             symbol: $symbol,
@@ -32,7 +32,6 @@ readonly class OrderPlaceLimitMaker extends OrderPlace
             strategyId: $strategyId,
             strategyType: $strategyType,
             selfTradePreventionMode: $selfTradePreventionMode,
-            newOrderRespType: $newOrderRespType,
         );
     }
 }

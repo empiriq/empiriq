@@ -8,10 +8,12 @@ use Empiriq\BinanceContracts\Markets\FuturesUm\Common\OrderSide;
 use Empiriq\BinanceContracts\Markets\FuturesUm\Common\OrderType;
 
 /**
- * Place new order (TRADE)
+ * Base DTO for USD-M Futures `order.place` request payloads.
  *
- * This adds 1 order to the EXCHANGE_MAX_ORDERS filter and the MAX_NUM_ORDERS filter.
- * @link https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-api.md#place-new-order-trade
+ * We pin `newOrderRespType` to RESULT by default to always decode the full
+ * typed order response payload.
+ *
+ * @see https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/websocket-api/New-Order
  */
 readonly abstract class OrderPlace
 {
@@ -23,7 +25,7 @@ readonly abstract class OrderPlace
         public ?int $strategyId,
         public ?int $strategyType,
         public ?OrderPreventionMode $selfTradePreventionMode,
-        public ?OrderNewResponseType $newOrderRespType,
+        public OrderNewResponseType $newOrderRespType = OrderNewResponseType::RESULT,
     ) {
     }
 }

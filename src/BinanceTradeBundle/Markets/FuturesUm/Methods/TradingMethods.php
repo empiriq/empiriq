@@ -21,8 +21,12 @@ trait TradingMethods
 {
     /**
      * Send in a new order.
+     *
+     * Uses RESULT response mode from request DTO defaults and returns
+     * a fully typed {@see OrderPlaceResponse}.
+     *
      * @link https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/websocket-api
-     * @return PromiseInterface<null>
+     * @return PromiseInterface<OrderPlaceResponse>
      */
     public function orderPlace(OrderPlace $payload, int $recvWindow = 5000): PromiseInterface
     {
