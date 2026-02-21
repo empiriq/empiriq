@@ -2,7 +2,7 @@
 
 namespace Empiriq\Contracts;
 
-use Empiriq\BinanceTradeBundle\Common\Exceptions\Configuration\ConfigurationException;
+use Empiriq\BinanceRealBundle\Common\Exceptions\Configuration\ConfigurationException;
 use Empiriq\Contracts\Events\EmpiriqRunEvent;
 use Empiriq\Contracts\Events\EmpiriqShutdownEvent;
 use Empiriq\Contracts\Messaging\EventPublisherInterface;

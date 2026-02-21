@@ -6,7 +6,7 @@ Local instructions for automated code changes in this repository.
 ## Project Map
 - Runtime entrypoint: `demo/bin/trade` (boots `App\Kernel`, resolves `Empiriq\Contracts\Runner`).
 - Core runtime contracts: `src/Contracts`.
-- Market integration and DI compiler passes: `src/BinanceTradeBundle`.
+- Market integration and DI compiler passes: `src/BinanceRealBundle`.
 - Event and dependency discovery utilities: `src/SymfonyEventDiscovery`, `src/SymfonyDependencyDiscovery`.
 - Tick generation bundle: `src/TickerBundle`.
 - Demo app wiring and env defaults: `demo/config`.
@@ -59,7 +59,7 @@ Local instructions for automated code changes in this repository.
 ## Change Checklist
 - If event flow changes, update:
 - `README.md`
-- `src/BinanceTradeBundle/README.md`
+- `src/BinanceRealBundle/README.md`
 - relevant files in `demo/config/packages/`
 - If event naming grammar changes, update parser points in compiler passes and docs in the same commit.
 - If messenger transport mode changes (`sync`/`async`), update docs and operational notes (worker requirements, failure transport).

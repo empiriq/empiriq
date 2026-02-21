@@ -4,9 +4,9 @@
         <directory name="../src"/>
         <ignoreFiles>
             <directory name="../vendor"/>
-            <directory name="../src/BinanceBackTradeBundle"/>
+            <directory name="../src/BinanceBackBundle"/>
             <directory name="../src/BinanceContracts"/>
-            <directory name="../src/BinanceTradeBundle/Common/Exceptions"/>
+            <directory name="../src/BinanceRealBundle/Common/Exceptions"/>
         </ignoreFiles>
     </projectFiles>
 </psalm>
