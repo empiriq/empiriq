@@ -8,7 +8,7 @@ Local instructions for automated code changes in this repository.
 - Core runtime contracts: `src/Contracts`.
 - Market integration and DI compiler passes: `src/BinanceRealBundle`.
 - Event and dependency discovery utilities: `src/SymfonyEventDiscovery`, `src/SymfonyDependencyDiscovery`.
-- Tick generation bundle: `src/TickerBundle`.
+- Tick generation bundle: `src/TickBundle`.
 - Demo app wiring and env defaults: `demo/config`.
 
 ## Core Engineering Rules

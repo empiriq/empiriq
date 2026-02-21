@@ -1,8 +1,8 @@
 <?php
 
-namespace Empiriq\TickerBundle\DependencyInjection\Compiler;
+namespace Empiriq\TickBundle\DependencyInjection\Compiler;
 
-use Empiriq\TickerBundle\DependencyInjection\TickerExtension;
+use Empiriq\TickBundle\DependencyInjection\TickExtension;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -11,13 +11,13 @@ final class ResolveConfigPass implements CompilerPassInterface
     #[\Override]
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasParameter(TickerExtension::PARAMETER_NAME)) {
+        if (!$container->hasParameter(TickExtension::PARAMETER_NAME)) {
             throw new \Exception('CONFIG not found');
         }
         /** @var array<string, mixed> $config */
-        $config = $container->getParameter(TickerExtension::PARAMETER_NAME);
+        $config = $container->getParameter(TickExtension::PARAMETER_NAME);
         $config = $container->getParameterBag()->resolveValue($config);
         $config = $container->resolveEnvPlaceholders($config, true);
-        $container->setParameter(TickerExtension::PARAMETER_NAME, $config);
+        $container->setParameter(TickExtension::PARAMETER_NAME, $config);
     }
 }

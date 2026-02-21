@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\TickerBundle\DependencyInjection;
+namespace Empiriq\TickBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -11,7 +11,7 @@ final class Configuration implements ConfigurationInterface
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('ticker');
+        $treeBuilder = new TreeBuilder('tick');
         $root = $treeBuilder->getRootNode();
         if (!$root instanceof ArrayNodeDefinition) {
             throw new \RuntimeException('Ticker root configuration node must be an array node.');

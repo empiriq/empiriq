@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\TickerBundle;
+namespace Empiriq\TickBundle;
 
 /**
  * Periodic tick event payload.

@@ -1,13 +1,13 @@
 <?php
 
-namespace Empiriq\TickerBundle;
+namespace Empiriq\TickBundle;
 
 use Empiriq\SymfonyEventDiscovery\EventDiscovery;
 use Empiriq\SymfonyEventDiscovery\Extractor\ListenerExtractor;
 use Empiriq\SymfonyEventDiscovery\Extractor\SubscriberExtractor;
-use Empiriq\TickerBundle\DependencyInjection\Compiler\ClockBuildPass;
-use Empiriq\TickerBundle\DependencyInjection\Compiler\ResolveConfigPass;
-use Empiriq\TickerBundle\DependencyInjection\TickerExtension;
+use Empiriq\TickBundle\DependencyInjection\Compiler\ClockBuildPass;
+use Empiriq\TickBundle\DependencyInjection\Compiler\ResolveConfigPass;
+use Empiriq\TickBundle\DependencyInjection\TickExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -17,12 +17,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  *
  * @api
  */
-final class TickerBundle extends Bundle
+final class TickBundle extends Bundle
 {
     #[\Override]
     public function getContainerExtension(): ?ExtensionInterface
     {
-        return new TickerExtension();
+        return new TickExtension();
     }
 
     #[\Override]

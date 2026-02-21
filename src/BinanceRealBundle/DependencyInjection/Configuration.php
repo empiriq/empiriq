@@ -10,7 +10,7 @@ final class Configuration implements ConfigurationInterface
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('binance_trade');
+        $treeBuilder = new TreeBuilder('binance_real');
         /** @psalm-suppress UndefinedMethod */
         $treeBuilder->getRootNode()
             ->children()

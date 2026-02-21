@@ -1,7 +1,7 @@
 Ticker Bundle
 ===
 
-TickerBundle provides a unified **tick generation mechanism** for Symfony applications. It emits `TickEvent`s into the Symfony EventDispatcher using one of two interchangeable clock strategies:
+TickBundle provides a unified **tick generation mechanism** for Symfony applications. It emits `TickEvent`s into the Symfony EventDispatcher using one of two interchangeable clock strategies:
 
 * **Time-driven** — ticks are produced at a fixed time interval (real-time)
 * **Event-driven** — ticks are produced in response to incoming events (backtest)
@@ -129,7 +129,7 @@ final readonly class TickEvent
 
 ```php
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use TickerBundle\TickEvent;
+use TickBundle\TickEvent;
 
 final class ExampleSubscriber implements EventSubscriberInterface
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Empiriq\TickerBundle\DependencyInjection;
+namespace Empiriq\TickBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
-final class TickerExtension extends Extension
+final class TickExtension extends Extension
 {
     public const PARAMETER_NAME = 'ticker.config';
 

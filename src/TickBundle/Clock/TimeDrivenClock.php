@@ -1,10 +1,10 @@
 <?php
 
-namespace Empiriq\TickerBundle\Clock;
+namespace Empiriq\TickBundle\Clock;
 
 use Empiriq\Contracts\RunnableInterface;
-use Empiriq\TickerBundle\DependencyInjection\Compiler\ClockBuildPass;
-use Empiriq\TickerBundle\TickEvent;
+use Empiriq\TickBundle\DependencyInjection\Compiler\ClockBuildPass;
+use Empiriq\TickBundle\TickEvent;
 use React\EventLoop\Loop;
 use React\EventLoop\TimerInterface;
 use React\Promise\PromiseInterface;

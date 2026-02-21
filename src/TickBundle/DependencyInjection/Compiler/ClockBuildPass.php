@@ -1,11 +1,11 @@
 <?php
 
-namespace Empiriq\TickerBundle\DependencyInjection\Compiler;
+namespace Empiriq\TickBundle\DependencyInjection\Compiler;
 
 use Empiriq\SymfonyEventDiscovery\EventDiscovery;
-use Empiriq\TickerBundle\Clock\EventDrivenClock;
-use Empiriq\TickerBundle\Clock\TimeDrivenClock;
-use Empiriq\TickerBundle\DependencyInjection\TickerExtension;
+use Empiriq\TickBundle\Clock\EventDrivenClock;
+use Empiriq\TickBundle\Clock\TimeDrivenClock;
+use Empiriq\TickBundle\DependencyInjection\TickExtension;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -32,7 +32,7 @@ final readonly class ClockBuildPass implements CompilerPassInterface
     #[\Override]
     public function process(ContainerBuilder $container): void
     {
-        $configs = $container->getParameter(TickerExtension::PARAMETER_NAME);
+        $configs = $container->getParameter(TickExtension::PARAMETER_NAME);
         if (!is_array($configs)) {
             throw new \RuntimeException('Invalid ticker config parameter type.');
         }

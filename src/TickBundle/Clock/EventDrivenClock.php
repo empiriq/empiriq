@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\TickerBundle\Clock;
+namespace Empiriq\TickBundle\Clock;
 
 /**
  * Event-driven ticker clock.
