@@ -11,6 +11,12 @@ final class BinanceTradeExtension extends Extension
     public const DEFAULTS = 'binance_trade.defaults';
 
     #[\Override]
+    public function getAlias(): string
+    {
+        return 'binance_real';
+    }
+
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration(new Configuration(), $configs);

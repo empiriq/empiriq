@@ -7,7 +7,7 @@ use Empiriq\Contracts\Runner;
 require dirname(__DIR__, 2) . '/vendor/autoload.php';
 
 
-$kernel = new Kernel('trade', true);
+$kernel = new Kernel('real', true);
 $kernel->boot();
 
 /** @var Runner $entrypoint */

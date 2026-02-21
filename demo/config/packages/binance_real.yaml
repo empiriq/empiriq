@@ -1,3 +1,3 @@
 binance_real:
-    environment: '%env(default:binance_trade.default_environment:BINANCE_TRADE_ENVIRONMENT)%'
-    auth: '%env(default:binance_trade.default_auth:BINANCE_TRADE_AUTH1)%'
+    environment: '%env(default:binance_real.default_environment:BINANCE_TRADE_ENVIRONMENT)%'
+    auth: '%env(default:binance_real.default_auth:BINANCE_TRADE_AUTH1)%'
