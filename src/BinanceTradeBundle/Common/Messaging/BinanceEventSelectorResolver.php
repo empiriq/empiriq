@@ -1,6 +1,6 @@
 <?php
 
-namespace Empiriq\BinanceTradeBundle\Messaging;
+namespace Empiriq\BinanceTradeBundle\Common\Messaging;
 
 use Empiriq\BinanceContracts\Markets\FuturesCm\Events\Market\DepthEvent as FuturesCmDepthEvent;
 use Empiriq\BinanceContracts\Markets\FuturesCm\Events\Market\TradeEvent as FuturesCmTradeEvent;
