@@ -111,6 +111,20 @@ runs: ## Show the last 20 backfill runs.
 backfillers: ## Show registered backfillers: capabilities, heartbeat and results of 24 hours.
 	@echo "select id, name, capabilities, alive, heartbeat_age, running, done_24h, failed_24h, rows_24h from api.backfiller order by id;" | $(PSQL)
 
+##@ Live
+
+.PHONY: feeders
+feeders: ## Show registered feeders: capabilities, heartbeat and streams.
+	@echo "select id, name, capabilities, alive, heartbeat_age, streams from api.feeder order by id;" | $(PSQL)
+
+.PHONY: live
+live: ## Show live requests: status, feeders and lag.
+	@echo "select id, venue_id, symbol, stream, desired_status, feeders, complete_until, lag, covered_since from api.live_request order by id;" | $(PSQL)
+
+.PHONY: live-request
+live-request: ## Request live data of SYMBOL on VENUE, for example make live-request VENUE=binance-spot SYMBOL=BTCUSDT.
+	@echo "select api.add_live_request(api.instrument_id('$(VENUE)', '$(SYMBOL)'), '$(STREAM)');" | $(PSQL)
+
 ##@ History
 
 .PHONY: instrument

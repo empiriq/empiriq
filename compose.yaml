@@ -3,7 +3,7 @@
 #   make help    list all targets
 #
 # The services are built from the repositories next to this one
-# (../empiriq, ../binance-backfiller, ../console). Override the paths in .env.
+# (../empiriq, ../binance-backfiller, ../binance-feeder, ../console). Override the paths in .env.
 #
 # The project name "empiriq" keeps the names of the network
 # (empiriq_default) and of the database volume (empiriq_pgdata).
@@ -48,6 +48,8 @@ services:
       CONSOLE_DB_PASSWORD: ${CONSOLE_DB_PASSWORD:-console}
       BACKFILLER_DB_USER: ${BACKFILLER_DB_USER:-empiriq_backfiller}
       BACKFILLER_DB_PASSWORD: ${BACKFILLER_DB_PASSWORD:-backfiller}
+      FEEDER_DB_USER: ${FEEDER_DB_USER:-empiriq_binance_feeder}
+      FEEDER_DB_PASSWORD: ${FEEDER_DB_PASSWORD:-feeder}
     volumes:
       - ./sql:/sql:ro
     entrypoint:
@@ -57,6 +59,7 @@ services:
         psql -X -q -v ON_ERROR_STOP=1
         -v console_user="$$CONSOLE_DB_USER" -v console_password="$$CONSOLE_DB_PASSWORD"
         -v backfiller_user="$$BACKFILLER_DB_USER" -v backfiller_password="$$BACKFILLER_DB_PASSWORD"
+        -v feeder_user="$$FEEDER_DB_USER" -v feeder_password="$$FEEDER_DB_PASSWORD"
         -f /sql/logins.sql
     restart: "no"
 
@@ -70,6 +73,17 @@ services:
       BACKFILLER_NAME: binance-backfiller
       BACKFILLER_VENUES: binance-spot=spot,binance-futures-um=futures/um
       BACKFILLER_WORKERS: "2"
+    restart: unless-stopped
+
+  binance-feeder:
+    build: ${BINANCE_FEEDER_DIR:-../binance-feeder}
+    depends_on:
+      logins:
+        condition: service_completed_successfully
+    environment:
+      FEEDER_DATABASE_URL: postgres://${FEEDER_DB_USER:-empiriq_binance_feeder}:${FEEDER_DB_PASSWORD:-feeder}@empiriq:5432/${EMPIRIQ_DB_NAME:-empiriq}
+      FEEDER_NAME: binance-feeder
+      FEEDER_VENUES: binance-spot=wss://stream.binance.com:9443/ws,binance-futures-um=wss://fstream.binance.com/ws
     restart: unless-stopped
 
   console:
