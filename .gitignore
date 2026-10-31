@@ -1,0 +1,23 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# JetBrains
+.idea
+
+# Other editors
+.vscode/
+*.swp
+*~
+
+# Local environment and overrides
+.env
+.env.*
+!.env.example
+compose.override.yaml
+
+# Logs and scratch files
+*.log
+tmp/
+
+todo.txt
