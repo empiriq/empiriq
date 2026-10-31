@@ -23,8 +23,6 @@ DELAY  ?= 0
 KIND  ?= perpetual
 BASE  ?= BTC
 QUOTE ?= USDT
-TICK  ?= 0.1
-LOT   ?= 0.001
 
 # make logs S=console, make restart S=binance-backfiller
 S ?=
@@ -128,8 +126,8 @@ live-request: ## Request live data of SYMBOL on VENUE, for example make live-req
 ##@ History
 
 .PHONY: instrument
-instrument: ## Register an instrument (VENUE, SYMBOL, KIND, BASE, QUOTE, TICK, LOT).
-	@echo "select api.register_instrument('$(VENUE)', '$(SYMBOL)', '$(KIND)', '$(BASE)', '$(QUOTE)', $(TICK), $(LOT));" | $(PSQL)
+instrument: ## Register an instrument (VENUE, SYMBOL, KIND, BASE, QUOTE).
+	@echo "select api.register_instrument('$(VENUE)', '$(SYMBOL)', '$(KIND)', '$(BASE)', '$(QUOTE)');" | $(PSQL)
 
 .PHONY: request
 request: ## Request history (VENUE, SYMBOL, STREAM, FROM, TO, DELAY), for example FROM=2026-06-01 TO=2026-06-02.
