@@ -83,7 +83,7 @@ services:
     environment:
       FEEDER_DATABASE_URL: postgres://${FEEDER_DB_USER:-empiriq_binance_feeder}:${FEEDER_DB_PASSWORD:-feeder}@empiriq:5432/${EMPIRIQ_DB_NAME:-empiriq}
       FEEDER_NAME: binance-feeder
-      FEEDER_VENUES: binance-spot=wss://stream.binance.com:9443/ws,binance-futures-um=wss://fstream.binance.com/ws
+      FEEDER_VENUES: binance-spot=spot,binance-futures-um=futures/um
     restart: unless-stopped
 
   console:
