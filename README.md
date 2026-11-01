@@ -21,7 +21,7 @@ nothing about this repository or about compose.
 ```sh
 make build    # build the images of all repositories
 make up       # start the database and all services
-make open     # the console: http://localhost:3000, admin / admin
+make open     # the console: http://localhost:3000, no login
 make help     # all targets
 ```
 
@@ -129,7 +129,8 @@ Copy `.env.example` to `.env` and change what you need. All values in
 - **Database:** `EMPIRIQ_PG_PORT`, `POSTGRES_DB`, and the owner login
   `POSTGRES_USER` / `POSTGRES_PASSWORD`, used by all services.
 - **Console:** `CONSOLE_PORT`, `CONSOLE_ADMIN_USER`, `CONSOLE_ADMIN_PASSWORD`.
-  The admin password is used only when Grafana starts the first time.
+  The admin password is used only when Grafana starts the first time. The
+  console has no login for operators, so it listens on `127.0.0.1` only.
 
 Change the passwords before you run the stack on a server.
 
