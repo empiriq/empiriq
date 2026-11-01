@@ -115,6 +115,8 @@ services:
   # notice: they write to the default json-file log driver as before.
   loki:
     image: grafana/loki:3.6.0
+    # The new volume belongs to root, and the image runs as user 10001.
+    user: "0"
     command: ["-config.file=/etc/loki/config.yaml", "-config.expand-env=true"]
     environment:
       LOKI_RETENTION: ${LOKI_RETENTION:-168h}
