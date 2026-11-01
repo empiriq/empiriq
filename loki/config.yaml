@@ -1,5 +1,5 @@
 # Loki for the logs of the stack: one process, data on the volume "loki".
-# Started with -config.expand-env=true: ${...} comes from the environment.
+# Started with -config.expand-env=true: variables come from the environment.
 auth_enabled: false
 
 server:
