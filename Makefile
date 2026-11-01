@@ -14,7 +14,8 @@ PSQL         = $(COMPOSE) exec -T empiriq sh -c 'psql -U "$$POSTGRES_USER" -d "$
 # History requests: make request SYMBOL=BTCUSDT FROM=2026-06-01 TO=2026-06-02
 VENUE  ?= binance-futures-um
 SYMBOL ?= BTCUSDT
-STREAM ?= trade
+# Streams of a request, comma separated: STREAMS=trade,depth
+STREAMS ?= trade
 FROM   ?=
 TO     ?=
 DELAY  ?= 0
@@ -120,8 +121,8 @@ live: ## Show live requests: status, feeders and lag.
 	@echo "select id, venue_id, symbol, stream, desired_status, feeders, complete_until, lag, covered_since from api.live_request order by id;" | $(PSQL)
 
 .PHONY: live-request
-live-request: ## Request live data of SYMBOL on VENUE, for example make live-request VENUE=binance-spot SYMBOL=BTCUSDT.
-	@echo "select api.add_live_request(api.instrument_id('$(VENUE)', '$(SYMBOL)'), '$(STREAM)');" | $(PSQL)
+live-request: ## Request live data of SYMBOL on VENUE (STREAMS), for example make live-request VENUE=binance-spot SYMBOL=BTCUSDT STREAMS=trade,depth.
+	@echo "select api.add_live_request(api.instrument_id('$(VENUE)', '$(SYMBOL)'), '{$(STREAMS)}');" | $(PSQL)
 
 ##@ History
 
@@ -130,9 +131,9 @@ instrument: ## Register an instrument (VENUE, SYMBOL, KIND, BASE, QUOTE).
 	@echo "select api.register_instrument('$(VENUE)', '$(SYMBOL)', '$(KIND)', '$(BASE)', '$(QUOTE)');" | $(PSQL)
 
 .PHONY: request
-request: ## Request history (VENUE, SYMBOL, STREAM, FROM, TO, DELAY), for example FROM=2026-06-01 TO=2026-06-02.
+request: ## Request history (VENUE, SYMBOL, STREAMS, FROM, TO, DELAY), for example FROM=2026-06-01 TO=2026-06-02.
 	@test -n "$(FROM)" -a -n "$(TO)" || { echo "set FROM and TO, for example FROM=2026-06-01 TO=2026-06-02"; exit 1; }
-	@echo "select api.add_history_request(api.instrument_id('$(VENUE)', '$(SYMBOL)'), '$(STREAM)', '$(FROM)', '$(TO)', interval '$(DELAY)');" | $(PSQL)
+	@echo "select api.add_history_request(api.instrument_id('$(VENUE)', '$(SYMBOL)'), '{$(STREAMS)}', '$(FROM)', '$(TO)', interval '$(DELAY)');" | $(PSQL)
 
 .PHONY: check
 check: ## Check loaded trades of SYMBOL in [FROM, TO): count, id range, gaps, aggressor, delay.
