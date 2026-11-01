@@ -1,45 +1,79 @@
 # stack
 
-The empiriq stack: the database and all services, started together with
-Docker Compose. Use it on your computer for development, and as the start
-for a server.
+The empiriq stack builds the images of all repositories and runs them
+together: `docker buildx bake` builds, Docker Compose runs. Use it on your
+computer for development, or to try empiriq without cloning every repository.
 
 | Service              | Repository             | What it does |
 |----------------------|------------------------|--------------|
-| `empiriq`            | `../empiriq`           | PostgreSQL 18 with the empiriq migrations, on localhost:1792 |
+| `empiriq`            | `../empiriq`           | PostgreSQL 18 with the empiriq migrations in the image, on localhost:1792 |
 | `binance-backfiller` | `../binance-backfiller`| Loads history from the Binance archive |
 | `binance-feeder`     | `../binance-feeder`    | Writes live trades of the live requests from the Binance WebSocket streams |
 | `console`            | `../console`           | Grafana with the console, on localhost:3000 |
 | `loki`               | this repository        | Stores the logs of all containers (`loki/config.yaml`) |
 | `alloy`              | this repository        | Reads the output of all containers and sends it to Loki (`alloy/config.alloy`) |
 
-The services are built from the repositories next to this one:
-
-```
-empiriq/
-  empiriq/              database: migrations, api, docs
-  binance-backfiller/
-  binance-feeder/
-  console/
-  stack/                this repository
-```
+Each service repository has one `Dockerfile` and builds one image. It knows
+nothing about this repository or about compose.
 
 ## Run
 
 ```sh
-make up       # build and start everything
+make build    # build the images of all repositories
+make up       # start the database and all services
 make open     # the console: http://localhost:3000, admin / admin
 make help     # all targets
 ```
 
 `make up` starts the database first. When it is healthy, the services start.
+It uses only built images: if one is missing, it says so.
 
 - `make logs S=console` follows the logs of one service.
-- `make restart S=binance-backfiller` rebuilds and restarts one service, for
-  example after a change of its code.
+- `make build S=binance-feeder && make restart S=binance-feeder` builds one
+  image again and restarts its service, for example after a change of its
+  code.
 - `make reset` deletes all data: the database and the settings and users of
-  Grafana. Then it starts everything again. The migrations run on the new
-  database.
+  Grafana. Then it starts everything again. The migrations of the image run on
+  the new database.
+
+## Images
+
+`docker-bake.hcl` describes the images. `make build` runs `docker buildx
+bake` with the variables of `versions.env` and `.env`.
+
+| Image | Repository | Target |
+|-------|------------|--------|
+| `empiriq/empiriq:<version>` | empiriq | the stage `empiriq` of its Dockerfile |
+| `empiriq/binance-backfiller:<version>` | binance-backfiller | the Dockerfile |
+| `empiriq/binance-feeder:<version>` | binance-feeder | the Dockerfile |
+| `empiriq/console:<version>` | console | the Dockerfile |
+
+**Sources.** `SOURCE` decides where bake takes the code:
+
+- `local` (default): the repositories next to this one, as they are on disk,
+  with the version `dev`:
+  ```
+  empiriq/
+    empiriq/
+    binance-backfiller/
+    binance-feeder/
+    console/
+    stack/                this repository
+  ```
+- `git`: GitHub, at the tags of `versions.env`. No clones are needed:
+  ```sh
+  make build SOURCE=git GITHUB_ORG=<org>
+  ```
+
+**Versions.** `versions.env` has one version for each image. A set of tags
+that work together is a release of the stack. Each image reports its version
+in its labels (`org.opencontainers.image.version`, `revision`), and the Go
+services also in their registration.
+
+**Registry.** There is none yet. The images are local, and compose never
+pulls them (`PULL_POLICY=never`). With a registry, set `REGISTRY` (for
+example `ghcr.io/<org>/`) and `PULL_POLICY=missing`. GitHub Actions can use the
+same `docker-bake.hcl` and only add the push.
 
 ## Database login
 
@@ -88,7 +122,10 @@ filters for the service, the level and a text search.
 Copy `.env.example` to `.env` and change what you need. All values in
 `.env.example` are the defaults.
 
-- **Paths:** `EMPIRIQ_DIR`, `BINANCE_BACKFILLER_DIR`, `BINANCE_FEEDER_DIR`, `CONSOLE_DIR`.
+- **Images:** `SOURCE`, `GITHUB_ORG`, `REGISTRY`, `PULL_POLICY`. The versions
+  are in `versions.env`.
+- **Paths for `SOURCE=local`:** `EMPIRIQ_DIR`, `BINANCE_BACKFILLER_DIR`,
+  `BINANCE_FEEDER_DIR`, `CONSOLE_DIR`.
 - **Database:** `EMPIRIQ_PG_PORT`, `POSTGRES_DB`, and the owner login
   `POSTGRES_USER` / `POSTGRES_PASSWORD`, used by all services.
 - **Console:** `CONSOLE_PORT`, `CONSOLE_ADMIN_USER`, `CONSOLE_ADMIN_PASSWORD`.
@@ -114,22 +151,28 @@ These targets run psql in the database container as the owner.
 
 ## Development
 
-- **Console.** The stack mounts `dashboards/` and `grafana/provisioning/` of
-  the console repository. Grafana reads changed dashboards within 10 seconds.
-  No rebuild is needed.
-- **Database.** A change of the migrations needs `make reset`. The migrations
-  run only on an empty database.
+The stack mounts nothing of the service repositories. Every change goes
+through an image:
+
+- **Code of a service:** `make build S=<service> && make restart S=<service>`.
+- **Dashboards of the console:** the same with `S=console`. It takes seconds:
+  the image only copies the files.
+- **Migrations:** `make build S=empiriq && make reset`. The migrations run only
+  on an empty database.
 - **A new service.** Add it to `compose.yaml`. A new feeder or backfiller
   uses the owner login with `options=-c%20role%3Dempiriq_feeder`.
 
-Tests of the services do not use the stack. `make smoke` in empiriq and
-`make test-integration` in binance-backfiller start their own database in
+Tests of the services do not use the stack. `make smoke` in empiriq builds
+and runs its own test image. `make test-integration` in binance-backfiller and
+binance-feeder starts the image `empiriq/empiriq:dev` with the data in
 memory.
 
 ## Layout
 
 ```
-compose.yaml        the database and the services
+docker-bake.hcl     how the images are built: sources, versions, tags
+versions.env        the version of each image
+compose.yaml        the database and the services, from the images
 loki/config.yaml    Loki: storage and retention of logs
 alloy/config.alloy  Alloy: which logs go to Loki, and their labels
 .env.example        settings and their defaults

@@ -1,10 +1,43 @@
-# empiriq stack: the database and all services
+# empiriq stack: builds the images of all repositories and runs them together
+#   make build   build the images (docker buildx bake, docker-bake.hcl)
+#   make up      start the database and all services
 #   make help    list all targets
 #
-# The services are built from the repositories next to this one. Settings
-# come from .env (see .env.example).
+# Versions come from versions.env, settings from .env (see .env.example).
 
+include versions.env
 -include .env
+
+# Where bake takes the sources: local (the repositories next to this one) or
+# git (GitHub, at the tags of versions.env).
+SOURCE     ?= local
+GITHUB_ORG ?=
+# Prefix of the image names, for example ghcr.io/<org>/. Empty: local images.
+REGISTRY   ?=
+EMPIRIQ_DIR            ?= ../empiriq
+BINANCE_BACKFILLER_DIR ?= ../binance-backfiller
+BINANCE_FEEDER_DIR     ?= ../binance-feeder
+CONSOLE_DIR            ?= ../console
+
+# Git revisions for the image labels, from the repositories next to this one.
+rev = $(shell git -C $(1) rev-parse --short HEAD 2>/dev/null)
+ifeq ($(SOURCE),local)
+EMPIRIQ_REVISION            ?= $(call rev,$(EMPIRIQ_DIR))
+BINANCE_BACKFILLER_REVISION ?= $(call rev,$(BINANCE_BACKFILLER_DIR))
+BINANCE_FEEDER_REVISION     ?= $(call rev,$(BINANCE_FEEDER_DIR))
+CONSOLE_REVISION            ?= $(call rev,$(CONSOLE_DIR))
+endif
+
+# docker buildx bake and docker compose read these from the environment.
+export SOURCE GITHUB_ORG REGISTRY PULL_POLICY \
+       EMPIRIQ_VERSION BINANCE_BACKFILLER_VERSION BINANCE_FEEDER_VERSION CONSOLE_VERSION \
+       EMPIRIQ_DIR BINANCE_BACKFILLER_DIR BINANCE_FEEDER_DIR CONSOLE_DIR \
+       EMPIRIQ_REVISION BINANCE_BACKFILLER_REVISION BINANCE_FEEDER_REVISION CONSOLE_REVISION
+
+IMAGES = $(REGISTRY)empiriq/empiriq:$(EMPIRIQ_VERSION) \
+         $(REGISTRY)empiriq/binance-backfiller:$(BINANCE_BACKFILLER_VERSION) \
+         $(REGISTRY)empiriq/binance-feeder:$(BINANCE_FEEDER_VERSION) \
+         $(REGISTRY)empiriq/console:$(CONSOLE_VERSION)
 
 CONSOLE_PORT ?= 3000
 URL          = http://localhost:$(CONSOLE_PORT)
@@ -24,7 +57,7 @@ KIND  ?= perpetual
 BASE  ?= BTC
 QUOTE ?= USDT
 
-# make logs S=console, make restart S=binance-backfiller
+# make logs S=console, make restart S=binance-backfiller, make build S=console
 S ?=
 
 ##@ General
@@ -33,20 +66,43 @@ S ?=
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
+##@ Images
+
+.PHONY: build
+build: ## Build all images, or one with S=<image>. SOURCE=git GITHUB_ORG=<org> builds from GitHub.
+ifeq ($(SOURCE),git)
+	@test -n "$(GITHUB_ORG)" || { echo "SOURCE=git needs GITHUB_ORG"; exit 1; }
+	@for v in $(EMPIRIQ_VERSION) $(BINANCE_BACKFILLER_VERSION) $(BINANCE_FEEDER_VERSION) $(CONSOLE_VERSION); do \
+	  test "$$v" != dev || { echo "SOURCE=git needs git tags in versions.env, not dev"; exit 1; }; \
+	done
+endif
+	docker buildx bake --load $(S)
+
+.PHONY: images
+images: ## Show the built images of empiriq.
+	@docker image ls --filter 'reference=$(REGISTRY)empiriq/*'
+
 ##@ Stack
 
 .PHONY: up
-up: ## Build and start the database and all services.
-	$(COMPOSE) up -d --build
+up: check-images ## Start the database and all services from the built images.
+	$(COMPOSE) up -d
 	@echo "console: $(URL)"
+
+.PHONY: check-images
+check-images:
+	@# Without a registry (PULL_POLICY never), every image must be built.
+	@if [ "$(or $(PULL_POLICY),never)" = never ]; then for i in $(IMAGES); do \
+	  docker image inspect $$i >/dev/null 2>&1 || { echo "no image $$i: run make build"; exit 1; }; \
+	done; fi
 
 .PHONY: down
 down: ## Stop all services (data stays).
 	$(COMPOSE) down
 
 .PHONY: restart
-restart: ## Rebuild and restart all services, or one with S=<service>.
-	$(COMPOSE) up -d --build --force-recreate $(S)
+restart: check-images ## Restart all services, or one with S=<service>, with the current images.
+	$(COMPOSE) up -d --force-recreate $(S)
 
 .PHONY: reset
 reset: ## Start from a clean slate: delete the database and Grafana data, create the database again from the migrations.
@@ -66,8 +122,8 @@ open: ## Open the console in the browser.
 	@open $(URL) 2>/dev/null || xdg-open $(URL) 2>/dev/null || echo $(URL)
 
 .PHONY: lint
-lint: ## Check compose.yaml.
-	@$(COMPOSE) config -q && echo ok
+lint: ## Check compose.yaml and docker-bake.hcl.
+	@$(COMPOSE) config -q && docker buildx bake --print >/dev/null && echo ok
 
 ##@ Database
 

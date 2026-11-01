@@ -1,9 +1,12 @@
 # Instructions for Claude
 
-This repository starts the empiriq database and all services together. It
-has no code of its own. The services live in their own repositories next to
-this one.
+This repository builds the images of all repositories (`docker-bake.hcl`)
+and starts them together (`compose.yaml`). It has no code of its own. The
+services live in their own repositories next to this one.
 
+- Each service repository has one Dockerfile and knows nothing about this
+  repository. Compose uses only images: no `build:` and no mounts of
+  service repositories.
 - Use the terms of `../empiriq/docs/reference/glossary.md`.
 - Follow the writing style of `../empiriq/CLAUDE.md` for docs and comments.
 - Configuration of a service that is the same everywhere belongs into the
@@ -21,5 +24,5 @@ message in [Conventional Commits](https://www.conventionalcommits.org/) format,
 in a separate code block.
 
 - Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `build`, `ci`.
-- Scopes for this repo: `compose`, `make`, `docs`.
+- Scopes for this repo: `compose`, `bake`, `make`, `docs`.
 - Subject in English, imperative mood, no trailing period, max 72 characters.
