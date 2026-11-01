@@ -11,6 +11,8 @@ for a server.
 | `binance-backfiller` | `../binance-backfiller`| Loads history from the Binance archive |
 | `binance-feeder`     | `../binance-feeder`    | Writes live trades of the live requests from the Binance WebSocket streams |
 | `console`            | `../console`           | Grafana with the console, on localhost:3000 |
+| `loki`               | this repository        | Stores the logs of all containers (`loki/config.yaml`) |
+| `alloy`              | this repository        | Reads the output of all containers and sends it to Loki (`alloy/config.alloy`) |
 
 The services are built from the repositories next to this one:
 
@@ -57,6 +59,19 @@ of empiriq, so it can do only what that role allows
 `sql/logins.sql` creates the logins and sets their passwords. It runs on
 every `make up`, so the logins come back after `make reset`. The logins live
 in the database: there is no other step after a reset.
+
+## Logs
+
+Alloy reads the output of every container of the project through the Docker
+socket and sends it to Loki. The console shows it on the page **Logs**:
+filters for the service, the level and a text search.
+
+- **Labels:** `service` (the compose service), `container` and `level`.
+  Alloy takes the level from JSON (`"level":"INFO"`, the Go services) and
+  from logfmt (`level=info`, Grafana). Lines without a level have no `level`.
+- **Retention:** `LOKI_RETENTION`, default 7 days (`168h`).
+- **No dependency:** the services keep the default log driver. If Loki or
+  Alloy stops, the services do not notice, and `make logs` still works.
 
 ## Settings
 
@@ -105,8 +120,10 @@ memory.
 ## Layout
 
 ```
-compose.yaml      the database, logins and services
-sql/logins.sql    database logins of the services
-.env.example      settings and their defaults
-Makefile          make targets
+compose.yaml        the database, logins and services
+loki/config.yaml    Loki: storage and retention of logs
+alloy/config.alloy  Alloy: which logs go to Loki, and their labels
+sql/logins.sql      database logins of the services
+.env.example        settings and their defaults
+Makefile            make targets
 ```

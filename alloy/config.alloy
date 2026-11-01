@@ -1,0 +1,55 @@
+// Alloy reads the output of every container of the compose project "empiriq"
+// through the Docker socket and sends it to Loki. The services write to
+// stdout as usual; they know nothing about Loki.
+
+discovery.docker "stack" {
+  host = "unix:///var/run/docker.sock"
+  filter {
+    name   = "label"
+    values = ["com.docker.compose.project=empiriq"]
+  }
+}
+
+// Labels: the compose service and the container.
+discovery.relabel "stack" {
+  targets = []
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+}
+
+loki.source.docker "stack" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.docker.stack.targets
+  relabel_rules = discovery.relabel.stack.rules
+  forward_to    = [loki.process.level.receiver]
+}
+
+// The level as a label: "level":"INFO" (JSON of the Go services) or
+// level=info (logfmt of Grafana). Lines without a level have no label.
+loki.process "level" {
+  stage.regex {
+    expression = "(?i)\"?level\"?\\s*[=:]\\s*\"?(?P<level>[a-z]+)"
+  }
+  stage.template {
+    source   = "level"
+    template = "{{ ToLower .Value }}"
+  }
+  stage.labels {
+    values = { level = "" }
+  }
+  forward_to = [loki.write.loki.receiver]
+}
+
+loki.write "loki" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

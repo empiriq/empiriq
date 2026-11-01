@@ -101,6 +101,7 @@ services:
       EMPIRIQ_DB_NAME: ${EMPIRIQ_DB_NAME:-empiriq}
       EMPIRIQ_DB_USER: ${CONSOLE_DB_USER:-empiriq_console}
       EMPIRIQ_DB_PASSWORD: ${CONSOLE_DB_PASSWORD:-console}
+      LOKI_URL: http://loki:3100
     volumes:
       # For development: dashboards and provisioning come from the console
       # repository, so changes need no rebuild. The image has its own copy.
@@ -109,6 +110,32 @@ services:
       - grafana:/var/lib/grafana
     restart: unless-stopped
 
+  # Logs: Alloy reads the output of all containers and sends it to Loki. The
+  # console shows it on the page Logs. If Loki is down, the services do not
+  # notice: they write to the default json-file log driver as before.
+  loki:
+    image: grafana/loki:3.6.0
+    command: ["-config.file=/etc/loki/config.yaml", "-config.expand-env=true"]
+    environment:
+      LOKI_RETENTION: ${LOKI_RETENTION:-168h}
+    volumes:
+      - ./loki/config.yaml:/etc/loki/config.yaml:ro
+      - loki:/loki
+    restart: unless-stopped
+
+  alloy:
+    image: grafana/alloy:v1.20.0
+    command: ["run", "--server.http.listen-addr=0.0.0.0:12345",
+              "--storage.path=/var/lib/alloy/data", "/etc/alloy/config.alloy"]
+    depends_on: [loki]
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - alloy:/var/lib/alloy/data
+    restart: unless-stopped
+
 volumes:
   pgdata:
   grafana:
+  loki:
+  alloy:
