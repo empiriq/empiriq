@@ -81,7 +81,7 @@ These targets run psql in the database container as the owner.
 | `psql`        | an interactive psql |
 | `strategies`, `frames` | strategies and the last 20 frames |
 | `writers`, `streams`   | writers of market data, coverage of all streams |
-| `coverage`, `runs`, `backfillers` | history: coverage, last 20 backfill runs, backfillers |
+| `coverage`, `runs`, `backfillers`, `delays` | history: coverage, last 20 backfill runs, backfillers, measured publish delays |
 | `feeders`, `live` | feeders, live requests with their lag |
 | `live-request` | requests live data: `make live-request VENUE=binance-spot SYMBOL=BTCUSDT STREAMS=trade,depth` |
 | `instrument`  | registers an instrument for a venue without a service (services report theirs): `make instrument VENUE=binance-spot SYMBOL=BTCUSDT KIND=spot` |

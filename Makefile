@@ -18,7 +18,6 @@ SYMBOL ?= BTCUSDT
 STREAMS ?= trade
 FROM   ?=
 TO     ?=
-DELAY  ?= 0
 
 # Instruments: make instrument VENUE=binance-spot SYMBOL=BTCUSDT KIND=spot
 KIND  ?= perpetual
@@ -102,6 +101,10 @@ streams: ## Show the coverage of all streams: live and history.
 coverage: ## Show requested, covered and missing history.
 	@echo "select venue_id, symbol, stream, covered, missing, running, failed from api.history_coverage order by 1, 2, 3;" | $(PSQL)
 
+.PHONY: delays
+delays: ## Show the publish delays measured from live trades.
+	@echo "select venue_id, stream, delay, samples, measured_from, measured_to, updated_at from api.publish_delay order by 1, 2;" | $(PSQL)
+
 .PHONY: runs
 runs: ## Show the last 20 backfill runs.
 	@echo "select writer_id, venue_id, symbol, period, status, rows, rows_per_second, error from api.backfill_run order by writer_id desc limit 20;" | $(PSQL)
@@ -131,9 +134,9 @@ instrument: ## Register an instrument (VENUE, SYMBOL, KIND, BASE, QUOTE).
 	@echo "select api.register_instrument('$(VENUE)', '$(SYMBOL)', '$(KIND)', '$(BASE)', '$(QUOTE)');" | $(PSQL)
 
 .PHONY: request
-request: ## Request history (VENUE, SYMBOL, STREAMS, FROM, TO, DELAY), for example FROM=2026-06-01 TO=2026-06-02.
+request: ## Request history (VENUE, SYMBOL, STREAMS, FROM, TO), for example FROM=2026-06-01 TO=2026-06-02.
 	@test -n "$(FROM)" -a -n "$(TO)" || { echo "set FROM and TO, for example FROM=2026-06-01 TO=2026-06-02"; exit 1; }
-	@echo "select api.add_history_request(api.instrument_id('$(VENUE)', '$(SYMBOL)'), '{$(STREAMS)}', '$(FROM)', '$(TO)', interval '$(DELAY)');" | $(PSQL)
+	@echo "select api.add_history_request(api.instrument_id('$(VENUE)', '$(SYMBOL)'), '{$(STREAMS)}', '$(FROM)', '$(TO)');" | $(PSQL)
 
 .PHONY: check
 check: ## Check loaded trades of SYMBOL in [FROM, TO): count, id range, gaps, aggressor, delay.
