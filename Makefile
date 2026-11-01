@@ -36,7 +36,7 @@ help: ## Display this help.
 ##@ Stack
 
 .PHONY: up
-up: ## Build and start the database, the logins and all services.
+up: ## Build and start the database and all services.
 	$(COMPOSE) up -d --build
 	@echo "console: $(URL)"
 
@@ -74,10 +74,6 @@ lint: ## Check compose.yaml.
 .PHONY: psql
 psql: ## Open psql in the database.
 	$(COMPOSE) exec empiriq sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
-
-.PHONY: logins
-logins: ## Create the database logins of the services again, for example after a manual restore.
-	$(COMPOSE) run --rm logins
 
 ##@ Inspect
 

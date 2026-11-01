@@ -7,7 +7,6 @@ for a server.
 | Service              | Repository             | What it does |
 |----------------------|------------------------|--------------|
 | `empiriq`            | `../empiriq`           | PostgreSQL 18 with the empiriq migrations, on localhost:1792 |
-| `logins`             | this repository        | Creates the database logins of the services, then exits |
 | `binance-backfiller` | `../binance-backfiller`| Loads history from the Binance archive |
 | `binance-feeder`     | `../binance-feeder`    | Writes live trades of the live requests from the Binance WebSocket streams |
 | `console`            | `../console`           | Grafana with the console, on localhost:3000 |
@@ -33,8 +32,7 @@ make open     # the console: http://localhost:3000, admin / admin
 make help     # all targets
 ```
 
-`make up` starts the database first. When it is healthy, `logins` creates the
-logins. Then the services start.
+`make up` starts the database first. When it is healthy, the services start.
 
 - `make logs S=console` follows the logs of one service.
 - `make restart S=binance-backfiller` rebuilds and restarts one service, for
@@ -43,22 +41,34 @@ logins. Then the services start.
   Grafana. Then it starts everything again. The migrations run on the new
   database.
 
-## Database logins
+## Database login
 
-Each service logs in with its own login. Each login is a member of one role
-of empiriq, so it can do only what that role allows
-([empiriq ADR 0001](../empiriq/docs/adr/0001-database-is-the-api.md)).
+All services log in as the owner of the database: `POSTGRES_USER` and
+`POSTGRES_PASSWORD`. The stack is for development, so one login is enough.
 
-| Login                | Role               | Used by |
-|----------------------|--------------------|---------|
-| `empiriq_console`    | `empiriq_operator` | console |
-| `empiriq_backfiller` | `empiriq_feeder`   | binance-backfiller |
-| `empiriq_binance_feeder` | `empiriq_feeder` | binance-feeder |
-| `empiriq`            | owner              | migrations, `make psql` and the targets below |
+Feeders and backfillers switch to the role `empiriq_feeder` at connect:
 
-`sql/logins.sql` creates the logins and sets their passwords. It runs on
-every `make up`, so the logins come back after `make reset`. The logins live
-in the database: there is no other step after a reset.
+```
+postgres://empiriq:empiriq@empiriq:5432/empiriq?options=-c%20role%3Dempiriq_feeder
+```
+
+So they have only the privileges of that role, and a missing grant in `api`
+shows at once. This is a check, not protection: a service could reset the
+role. Grafana cannot set a role at connect, so the console works as the
+owner. It still changes data only through `api` functions.
+
+### Logins on a real installation
+
+Create a login for each service and give it its role
+([empiriq ADR 0001](../empiriq/docs/adr/0001-database-is-the-api.md)):
+
+```sql
+create role binance_feeder login password '...' in role empiriq_feeder;
+create role console login password '...' in role empiriq_operator;
+```
+
+Then use these logins in the database URLs of the services, without
+`options`.
 
 ## Logs
 
@@ -79,9 +89,8 @@ Copy `.env.example` to `.env` and change what you need. All values in
 `.env.example` are the defaults.
 
 - **Paths:** `EMPIRIQ_DIR`, `BINANCE_BACKFILLER_DIR`, `BINANCE_FEEDER_DIR`, `CONSOLE_DIR`.
-- **Database:** `EMPIRIQ_PG_PORT`, `EMPIRIQ_DB_NAME`, and the owner login
-  `EMPIRIQ_DB_ADMIN_USER` / `EMPIRIQ_DB_ADMIN_PASSWORD`.
-- **Logins of the services:** `CONSOLE_DB_*`, `BACKFILLER_DB_*`, `FEEDER_DB_*`.
+- **Database:** `EMPIRIQ_PG_PORT`, `POSTGRES_DB`, and the owner login
+  `POSTGRES_USER` / `POSTGRES_PASSWORD`, used by all services.
 - **Console:** `CONSOLE_PORT`, `CONSOLE_ADMIN_USER`, `CONSOLE_ADMIN_PASSWORD`.
   The admin password is used only when Grafana starts the first time.
 
@@ -110,8 +119,8 @@ These targets run psql in the database container as the owner.
   No rebuild is needed.
 - **Database.** A change of the migrations needs `make reset`. The migrations
   run only on an empty database.
-- **A new service.** Add it to `compose.yaml`. If it needs a database login,
-  add the login to `sql/logins.sql` and to `.env.example`.
+- **A new service.** Add it to `compose.yaml`. A new feeder or backfiller
+  uses the owner login with `options=-c%20role%3Dempiriq_feeder`.
 
 Tests of the services do not use the stack. `make smoke` in empiriq and
 `make test-integration` in binance-backfiller start their own database in
@@ -120,10 +129,9 @@ memory.
 ## Layout
 
 ```
-compose.yaml        the database, logins and services
+compose.yaml        the database and the services
 loki/config.yaml    Loki: storage and retention of logs
 alloy/config.alloy  Alloy: which logs go to Loki, and their labels
-sql/logins.sql      database logins of the services
 .env.example        settings and their defaults
 Makefile            make targets
 ```

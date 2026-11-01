@@ -3,26 +3,26 @@
 #   make help    list all targets
 #
 # The services are built from the repositories next to this one
-# (../empiriq, ../binance-backfiller, ../binance-feeder, ../console). Override the paths in .env.
+# (../empiriq, ../binance-backfiller, ../binance-feeder, ../console).
+# Override the paths in .env.
 #
 # The project name "empiriq" keeps the names of the network
 # (empiriq_default) and of the database volume (empiriq_pgdata).
 name: empiriq
 
-x-db-env: &db-env
-  PGHOST: empiriq
-  PGUSER: ${EMPIRIQ_DB_ADMIN_USER:-empiriq}
-  PGPASSWORD: ${EMPIRIQ_DB_ADMIN_PASSWORD:-empiriq}
-  PGDATABASE: ${EMPIRIQ_DB_NAME:-empiriq}
-
+# All services log in as the owner of the database (POSTGRES_USER). Feeders
+# and backfillers switch to their empiriq role at connect
+# (options=-c role=empiriq_feeder), so that the stack checks the grants of
+# api. Logins for each service are a matter of the installation, not of
+# this repository: see the README.
 services:
   # The empiriq database. The migrations run when the volume is empty.
   empiriq:
     image: postgres:18
     environment:
-      POSTGRES_USER: ${EMPIRIQ_DB_ADMIN_USER:-empiriq}
-      POSTGRES_PASSWORD: ${EMPIRIQ_DB_ADMIN_PASSWORD:-empiriq}
-      POSTGRES_DB: ${EMPIRIQ_DB_NAME:-empiriq}
+      POSTGRES_USER: ${POSTGRES_USER:-empiriq}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-empiriq}
+      POSTGRES_DB: ${POSTGRES_DB:-empiriq}
     ports:
       - "${EMPIRIQ_PG_PORT:-1792}:5432"
     volumes:
@@ -35,41 +35,13 @@ services:
       retries: 30
     restart: unless-stopped
 
-  # Creates or updates the database logins of the services, then exits.
-  # It runs on every "up", so the logins also come back after a reset.
-  logins:
-    image: postgres:18
+  binance-backfiller:
+    build: ${BINANCE_BACKFILLER_DIR:-../binance-backfiller}
     depends_on:
       empiriq:
         condition: service_healthy
     environment:
-      <<: *db-env
-      CONSOLE_DB_USER: ${CONSOLE_DB_USER:-empiriq_console}
-      CONSOLE_DB_PASSWORD: ${CONSOLE_DB_PASSWORD:-console}
-      BACKFILLER_DB_USER: ${BACKFILLER_DB_USER:-empiriq_backfiller}
-      BACKFILLER_DB_PASSWORD: ${BACKFILLER_DB_PASSWORD:-backfiller}
-      FEEDER_DB_USER: ${FEEDER_DB_USER:-empiriq_binance_feeder}
-      FEEDER_DB_PASSWORD: ${FEEDER_DB_PASSWORD:-feeder}
-    volumes:
-      - ./sql:/sql:ro
-    entrypoint:
-      - sh
-      - -c
-      - >-
-        psql -X -q -v ON_ERROR_STOP=1
-        -v console_user="$$CONSOLE_DB_USER" -v console_password="$$CONSOLE_DB_PASSWORD"
-        -v backfiller_user="$$BACKFILLER_DB_USER" -v backfiller_password="$$BACKFILLER_DB_PASSWORD"
-        -v feeder_user="$$FEEDER_DB_USER" -v feeder_password="$$FEEDER_DB_PASSWORD"
-        -f /sql/logins.sql
-    restart: "no"
-
-  binance-backfiller:
-    build: ${BINANCE_BACKFILLER_DIR:-../binance-backfiller}
-    depends_on:
-      logins:
-        condition: service_completed_successfully
-    environment:
-      BACKFILLER_DATABASE_URL: postgres://${BACKFILLER_DB_USER:-empiriq_backfiller}:${BACKFILLER_DB_PASSWORD:-backfiller}@empiriq:5432/${EMPIRIQ_DB_NAME:-empiriq}
+      BACKFILLER_DATABASE_URL: postgres://${POSTGRES_USER:-empiriq}:${POSTGRES_PASSWORD:-empiriq}@empiriq:5432/${POSTGRES_DB:-empiriq}?options=-c%20role%3Dempiriq_feeder
       BACKFILLER_NAME: binance-backfiller
       BACKFILLER_VENUES: binance-spot=spot,binance-futures-um=futures/um
       BACKFILLER_WORKERS: "2"
@@ -78,10 +50,10 @@ services:
   binance-feeder:
     build: ${BINANCE_FEEDER_DIR:-../binance-feeder}
     depends_on:
-      logins:
-        condition: service_completed_successfully
+      empiriq:
+        condition: service_healthy
     environment:
-      FEEDER_DATABASE_URL: postgres://${FEEDER_DB_USER:-empiriq_binance_feeder}:${FEEDER_DB_PASSWORD:-feeder}@empiriq:5432/${EMPIRIQ_DB_NAME:-empiriq}
+      FEEDER_DATABASE_URL: postgres://${POSTGRES_USER:-empiriq}:${POSTGRES_PASSWORD:-empiriq}@empiriq:5432/${POSTGRES_DB:-empiriq}?options=-c%20role%3Dempiriq_feeder
       FEEDER_NAME: binance-feeder
       FEEDER_VENUES: binance-spot=spot,binance-futures-um=futures/um
     restart: unless-stopped
@@ -89,8 +61,8 @@ services:
   console:
     build: ${CONSOLE_DIR:-../console}
     depends_on:
-      logins:
-        condition: service_completed_successfully
+      empiriq:
+        condition: service_healthy
     ports:
       - "${CONSOLE_PORT:-3000}:3000"
     environment:
@@ -98,9 +70,10 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: ${CONSOLE_ADMIN_PASSWORD:-admin}
       EMPIRIQ_DB_HOST: empiriq
       EMPIRIQ_DB_PORT: "5432"
-      EMPIRIQ_DB_NAME: ${EMPIRIQ_DB_NAME:-empiriq}
-      EMPIRIQ_DB_USER: ${CONSOLE_DB_USER:-empiriq_console}
-      EMPIRIQ_DB_PASSWORD: ${CONSOLE_DB_PASSWORD:-console}
+      # Grafana cannot set a role at connect, so the console uses the owner.
+      EMPIRIQ_DB_NAME: ${POSTGRES_DB:-empiriq}
+      EMPIRIQ_DB_USER: ${POSTGRES_USER:-empiriq}
+      EMPIRIQ_DB_PASSWORD: ${POSTGRES_PASSWORD:-empiriq}
       LOKI_URL: http://loki:3100
     volumes:
       # For development: dashboards and provisioning come from the console
