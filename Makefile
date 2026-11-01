@@ -102,8 +102,8 @@ delays: ## Show the publish delays measured from live trades.
 	@echo "select venue_id, stream, delay, samples, measured_from, measured_to, updated_at from api.publish_delay order by 1, 2;" | $(PSQL)
 
 .PHONY: runs
-runs: ## Show the last 20 backfill runs.
-	@echo "select writer_id, venue_id, symbol, period, status, rows, rows_per_second, error from api.backfill_run order by writer_id desc limit 20;" | $(PSQL)
+runs: ## Show the last 20 backfill runs (internal, ADR 0020).
+	@echo "select b.writer_id, i.venue_id, i.symbol, b.stream, b.period, b.status, b.rows, b.error from market.backfill_run b join core.instrument i on i.id = b.instrument_id order by b.writer_id desc limit 20;" | $(PSQL)
 
 .PHONY: backfillers
 backfillers: ## Show registered backfillers: capabilities, heartbeat and results of 24 hours.
