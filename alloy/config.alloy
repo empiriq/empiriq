@@ -32,16 +32,42 @@ loki.source.docker "stack" {
   forward_to    = [loki.process.level.receiver]
 }
 
-// The level as a label: "level":"INFO" (JSON of the Go services) or
-// level=info (logfmt of Grafana). Lines without a level have no label.
+// The level as a label. Lines without a level have no label.
 loki.process "level" {
-  stage.regex {
-    expression = "(?i)\"?level\"?\\s*[=:]\\s*\"?(?P<level>[a-z]+)"
+  // Postgres: "<time> [<pid>] ERROR:  ...": a level in capitals, a colon and
+  // two spaces. DETAIL, HINT, CONTEXT, STATEMENT and QUERY lines continue the
+  // line before, so join them: an error and its statement are one entry.
+  stage.match {
+    selector = "{service=\"empiriq\"}"
+
+    stage.multiline {
+      firstline     = "(^|\\s)(DEBUG[1-5]|LOG|INFO|NOTICE|WARNING|ERROR|FATAL|PANIC):  "
+      max_wait_time = "3s"
+    }
+    stage.regex {
+      expression = "(^|\\s)(?P<level>DEBUG[1-5]|LOG|INFO|NOTICE|WARNING|ERROR|FATAL|PANIC):  "
+    }
+    // The levels of the other services: debug, info, warn, error.
+    stage.template {
+      source   = "level"
+      template = "{{ if eq .Value \"DEBUG1\" \"DEBUG2\" \"DEBUG3\" \"DEBUG4\" \"DEBUG5\" }}debug{{ else if eq .Value \"WARNING\" }}warn{{ else if eq .Value \"ERROR\" \"FATAL\" \"PANIC\" }}error{{ else }}info{{ end }}"
+    }
   }
-  stage.template {
-    source   = "level"
-    template = "{{ ToLower .Value }}"
+
+  // Other services: "level":"INFO" (JSON of the Go services) or level=info
+  // (logfmt of Grafana, Alloy and Loki).
+  stage.match {
+    selector = "{service!=\"empiriq\"}"
+
+    stage.regex {
+      expression = "(?i)\"?level\"?\\s*[=:]\\s*\"?(?P<level>[a-z]+)"
+    }
+    stage.template {
+      source   = "level"
+      template = "{{ ToLower .Value }}"
+    }
   }
+
   stage.labels {
     values = { level = "" }
   }

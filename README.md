@@ -115,8 +115,11 @@ socket and sends it to Loki. The console shows it on the page **Logs**:
 filters for the service, the level and a text search.
 
 - **Labels:** `service` (the compose service), `container` and `level`.
-  Alloy takes the level from JSON (`"level":"INFO"`, the Go services) and
-  from logfmt (`level=info`, Grafana). Lines without a level have no `level`.
+  Alloy takes the level from JSON (`"level":"INFO"`, the Go services), from
+  logfmt (`level=info`, Grafana) and from Postgres (`LOG:`, `WARNING:`,
+  `ERROR:`, `FATAL:`, as `info`, `warn` and `error`). Postgres writes the
+  `DETAIL`, `HINT` and `STATEMENT` of an error as separate lines: Alloy joins
+  them with the error into one entry. Lines without a level have no `level`.
 - **Retention:** `LOKI_RETENTION`, default 7 days (`168h`).
 - **No dependency:** the services keep the default log driver. If Loki or
   Alloy stops, the services do not notice, and `make logs` still works.
