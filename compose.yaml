@@ -47,7 +47,6 @@ services:
         condition: service_healthy
     environment:
       BACKFILLER_DATABASE_URL: postgres://${POSTGRES_USER:-empiriq}:${POSTGRES_PASSWORD:-empiriq}@empiriq:5432/${POSTGRES_DB:-empiriq}?options=-c%20role%3Dempiriq_feeder
-      BACKFILLER_NAME: binance-backfiller
       BACKFILLER_VENUES: binance-spot=spot,binance-futures-um=futures/um
       BACKFILLER_WORKERS: "2"
     restart: unless-stopped
@@ -60,7 +59,6 @@ services:
         condition: service_healthy
     environment:
       FEEDER_DATABASE_URL: postgres://${POSTGRES_USER:-empiriq}:${POSTGRES_PASSWORD:-empiriq}@empiriq:5432/${POSTGRES_DB:-empiriq}?options=-c%20role%3Dempiriq_feeder
-      FEEDER_NAME: binance-feeder
       FEEDER_VENUES: binance-spot=spot,binance-futures-um=futures/um
     restart: unless-stopped
 

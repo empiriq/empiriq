@@ -182,13 +182,13 @@ runs: ## Show the last 20 backfill runs (internal, ADR 0020).
 
 .PHONY: backfillers
 backfillers: ## Show registered backfillers: capabilities, heartbeat and results of 24 hours.
-	@echo "select id, name, capabilities, alive, heartbeat_age, running, done_24h, failed_24h, rows_24h from api.backfiller order by id;" | $(PSQL)
+	@echo "select name, capabilities, alive, heartbeat_age, running, done_24h, failed_24h, rows_24h from api.backfiller order by name;" | $(PSQL)
 
 ##@ Live
 
 .PHONY: feeders
 feeders: ## Show registered feeders: capabilities, heartbeat and streams.
-	@echo "select id, name, capabilities, alive, heartbeat_age, streams from api.feeder order by id;" | $(PSQL)
+	@echo "select name, capabilities, alive, heartbeat_age, streams from api.feeder order by name;" | $(PSQL)
 
 .PHONY: live
 live: ## Show live requests: status, feeders and lag.
