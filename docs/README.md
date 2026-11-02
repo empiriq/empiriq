@@ -5,7 +5,7 @@ kinds of documents, one for each need of a reader.
 
 | Section | Use it to | Contents |
 |---------|-----------|----------|
-| **Tutorials** (`tutorials/`) | Learn by doing | *Planned:* a first strategy in 15 minutes with `docker compose`; a first backtest |
+| **Tutorials** (`tutorials/`) | Learn by doing | [Your first strategy](tutorials/first-strategy.md): start empiriq, load live and historical trades, run a strategy on history. *Planned:* a first backtest with a simulated reconciler |
 | **How-to guides** (`how-to/`) | Do a specific task | *Planned:* write a feeder, write a backfiller, write a reconciler, run a backtest, add a venue, set up the console |
 | **Reference** (`reference/`) | Look up facts | [Glossary](reference/glossary.md) (ubiquitous language), [Market data](reference/market-data.md) (contract for feeders and backfillers). *Planned:* reference of the `api` schema, generated from `COMMENT ON`; reconciler protocol; intent types |
 | **Explanation** (`explanation/`) | Understand the design | [Architecture](explanation/architecture.md) |

@@ -38,10 +38,28 @@ $$;
 - **The database is the API.** You can write feeders and reconcilers in any
   language that has a PostgreSQL driver.
 
+## Quickstart
+
+Clone the repositories of empiriq next to each other (see
+[Repositories](#repositories)). Then, in this repository:
+
+```sh
+make build && make up     # build the images and start everything
+make open                 # the console: http://localhost:3000
+
+make sql F=examples/01-live-trades.sql   # live trades of BTCUSDT
+make sql F=examples/02-history.sql       # the trades of yesterday
+make sql F=examples/03-strategy.sql      # a strategy on the history of yesterday
+```
+
+The tutorial [Your first strategy](docs/tutorials/first-strategy.md) explains
+each step.
+
 ## Documentation
 
+- [Your first strategy](docs/tutorials/first-strategy.md): a tutorial of 15
+  minutes. Start here.
 - [Architecture](docs/explanation/architecture.md): how and why empiriq works.
-  Start here.
 - [Glossary](docs/reference/glossary.md): the terms of the project.
 - [Market data](docs/reference/market-data.md): the contract for feeders and
   backfillers.
@@ -199,6 +217,7 @@ These targets run psql in the database container as the owner.
 | Target        | Shows or does |
 |---------------|---------------|
 | `psql`        | an interactive psql |
+| `sql`         | runs a SQL file: `make sql F=examples/03-strategy.sql` |
 | `strategies`, `frames` | strategies and the last 20 frames |
 | `writers`, `streams`   | writers of market data, coverage of all streams |
 | `coverage`, `runs`, `backfillers`, `delays` | history: coverage, last 20 backfill runs, backfillers, measured publish delays |
@@ -230,6 +249,7 @@ memory.
 
 ```
 docs/               the documentation of the project
+examples/           SQL for the tutorial: live trades, history, a strategy
 docker-bake.hcl     how the images are built: sources, versions, tags
 versions.env        the version of each image
 compose.yaml        the database and the services, from the images

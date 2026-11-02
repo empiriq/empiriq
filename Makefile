@@ -150,6 +150,11 @@ lint: ## Check compose.yaml and docker-bake.hcl.
 psql: ## Open psql in the database.
 	$(COMPOSE) exec empiriq sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
 
+.PHONY: sql
+sql: ## Run a SQL file in the database, for example make sql F=examples/01-live-trades.sql.
+	@test -n "$(F)" || { echo "set F, for example F=examples/01-live-trades.sql"; exit 1; }
+	@$(PSQL) < $(F)
+
 ##@ Inspect
 
 .PHONY: strategies
