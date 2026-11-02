@@ -27,6 +27,9 @@ EMPIRIQ_REVISION            ?= $(call rev,$(EMPIRIQ_DIR))
 BINANCE_BACKFILLER_REVISION ?= $(call rev,$(BINANCE_BACKFILLER_DIR))
 BINANCE_FEEDER_REVISION     ?= $(call rev,$(BINANCE_FEEDER_DIR))
 CONSOLE_REVISION            ?= $(call rev,$(CONSOLE_DIR))
+# Bake asks before it reads a directory outside this repository: allow
+# exactly the repositories it builds.
+BAKE_ALLOW = $(foreach d,$(EMPIRIQ_DIR) $(BINANCE_BACKFILLER_DIR) $(BINANCE_FEEDER_DIR) $(CONSOLE_DIR),--allow=fs.read=$(d))
 endif
 
 # docker buildx bake and docker compose read these from the environment.
@@ -78,7 +81,7 @@ ifeq ($(SOURCE),git)
 	  test "$$v" != dev || { echo "SOURCE=git needs git tags in versions.env, not dev"; exit 1; }; \
 	done
 endif
-	docker buildx bake --load $(S)
+	docker buildx bake -f docker-bake.hcl $(BAKE_ALLOW) --load $(S)
 
 .PHONY: images
 images: ## Show the built images of empiriq.
@@ -139,7 +142,7 @@ open: ## Open the console in the browser.
 
 .PHONY: lint
 lint: ## Check compose.yaml and docker-bake.hcl.
-	@$(COMPOSE) config -q && docker buildx bake --print >/dev/null && echo ok
+	@$(COMPOSE) config -q && docker buildx bake -f docker-bake.hcl --print >/dev/null && echo ok
 
 ##@ Database
 
