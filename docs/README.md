@@ -1,0 +1,30 @@
+# Documentation
+
+The documentation follows [Diátaxis](https://diataxis.fr/). Diátaxis has four
+kinds of documents, one for each need of a reader.
+
+| Section | Use it to | Contents |
+|---------|-----------|----------|
+| **Tutorials** (`tutorials/`) | Learn by doing | *Planned:* a first strategy in 15 minutes with `docker compose`; a first backtest |
+| **How-to guides** (`how-to/`) | Do a specific task | *Planned:* write a feeder, write a backfiller, write a reconciler, run a backtest, add a venue, set up the console |
+| **Reference** (`reference/`) | Look up facts | [Glossary](reference/glossary.md) (ubiquitous language), [Market data](reference/market-data.md) (contract for feeders and backfillers). *Planned:* reference of the `api` schema, generated from `COMMENT ON`; reconciler protocol; intent types |
+| **Explanation** (`explanation/`) | Understand the design | [Architecture](explanation/architecture.md) |
+
+[ADRs](adr/README.md) record the decisions and their reasons.
+
+## Conventions
+
+- Write all documentation in English.
+- The documentation of the project is here, in the `stack` repository: how
+  empiriq works, the glossary, the contracts between services and the ADRs.
+  Each service repository has a README for building and testing that
+  service only.
+- Every object in `api` has a `COMMENT ON`. The reference is generated from
+  these comments, so the comments are the authoritative text. The reference
+  and the changelog of `api` stay next to the schema, in the `empiriq`
+  repository.
+- A change to `api` updates the reference and the changelog in the same pull
+  request. If it changes a contract or a decision, it also updates the
+  documents here.
+- Follow the writing rules in [CLAUDE.md](../CLAUDE.md): short sentences,
+  active voice, terms from the glossary.

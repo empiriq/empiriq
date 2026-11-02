@@ -1,6 +1,57 @@
-# stack
+# empiriq
 
-The empiriq stack builds the images of all repositories and runs them
+**Algorithmic trading where the database is the platform.**
+
+empiriq keeps the current state of your trading accounts in PostgreSQL:
+balances, positions and orders. It also keeps the market data for these
+accounts. Strategies are SQL functions. They declare what the account
+*should* look like. Small external services load market data and reconcile the
+account with the venue.
+
+```sql
+-- A strategy is a function from context to desired state.
+create function strategies.sma_cross(ctx api.strategy_context)
+  returns setof api.intent language sql stable as $$
+  with bar as (   -- closes of the last 30 closed 1-minute bars
+    select (array_agg(price order by trade_time desc))[1] as close,
+           row_number() over (order by date_bin('1 minute', trade_time, '2000-01-01Z') desc) as rn
+      from api.trades(2, date_bin('1 minute', ctx.as_of, '2000-01-01Z') - interval '30 minutes',
+                      date_bin('1 minute', ctx.as_of, '2000-01-01Z'), ctx.as_of)
+     group by date_bin('1 minute', trade_time, '2000-01-01Z'))
+  select api.target_position(2, case when fast > slow then 1 else 0 end)
+    from (select avg(close) filter (where rn <= 10) as fast, avg(close) as slow from bar) ma
+$$;
+```
+
+> **Status: early draft.** The schema and the API will change. Do not use it
+> with real money yet.
+
+## Ideas
+
+- **Declarative.** You state *what* you want: a balance, a position or a set
+  of orders. Planners and reconcilers decide *how*.
+- **Desired state and observed state.** Strategies never call the venue.
+  Reconcilers make the account match the desired state, like Kubernetes
+  controllers.
+- **One code path for backtests and live trading.** Strategies use the logical
+  time `as_of`, never `now()`.
+- **The database is the API.** You can write feeders and reconcilers in any
+  language that has a PostgreSQL driver.
+
+## Documentation
+
+- [Architecture](docs/explanation/architecture.md): how and why empiriq works.
+  Start here.
+- [Glossary](docs/reference/glossary.md): the terms of the project.
+- [Market data](docs/reference/market-data.md): the contract for feeders and
+  backfillers.
+- [ADRs](docs/adr/README.md): the decisions and their reasons.
+- [docs/README.md](docs/README.md) lists all documents and the rules for
+  writing them.
+
+## Repositories
+
+This repository builds the images of all repositories and runs them
 together: `docker buildx bake` builds, Docker Compose runs. Use it on your
 computer for development, or to try empiriq without cloning every repository.
 
@@ -98,7 +149,7 @@ owner. It still changes data only through `api` functions.
 ### Logins on a real installation
 
 Create a login for each service and give it its role
-([empiriq ADR 0001](../empiriq/docs/adr/0001-database-is-the-api.md)):
+([empiriq ADR 0001](docs/adr/0001-database-is-the-api.md)):
 
 ```sql
 create role binance_feeder login password '...' in role empiriq_feeder;
@@ -178,6 +229,7 @@ memory.
 ## Layout
 
 ```
+docs/               the documentation of the project
 docker-bake.hcl     how the images are built: sources, versions, tags
 versions.env        the version of each image
 compose.yaml        the database and the services, from the images
