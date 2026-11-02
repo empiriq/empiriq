@@ -15,13 +15,13 @@ kinds of documents, one for each need of a reader.
 ## Conventions
 
 - Write all documentation in English.
-- The documentation of the project is here, in the `stack` repository: how
+- The documentation of the project is here, in the `empiriq` repository: how
   empiriq works, the glossary, the contracts between services and the ADRs.
   Each service repository has a README for building and testing that
   service only.
 - Every object in `api` has a `COMMENT ON`. The reference is generated from
   these comments, so the comments are the authoritative text. The reference
-  and the changelog of `api` stay next to the schema, in the `empiriq`
+  and the changelog of `api` stay next to the schema, in the `database`
   repository.
 - A change to `api` updates the reference and the changelog in the same pull
   request. If it changes a contract or a decision, it also updates the

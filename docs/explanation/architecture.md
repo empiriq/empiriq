@@ -454,7 +454,7 @@ empiriq has five services. Each service runs in its own container.
 
 | Service      | Purpose                                                                                     | Runs as          | Repository |
 |--------------|---------------------------------------------------------------------------------------------|------------------|------------|
-| `empiriq`    | PostgreSQL with the schema, the engine and `api`. **The contract** for all other services.  | Database         | `empiriq` |
+| `empiriq`    | PostgreSQL with the schema, the engine and `api`. **The contract** for all other services.  | Database         | `database` |
 | `feeder`     | Writes live market data from one venue or data source.                                      | Long-running     | TBD |
 | `backfiller` | Loads requested historical market data for backtests and analysis.                          | Long-running     | One repository for each source, for example `binance-backfiller` |
 | `reconciler` | Reconciles accounts with one venue, reports observed state and starts frames. A simulated reconciler serves the `paper` and `backtest` modes. | Long-running | TBD |
@@ -463,28 +463,29 @@ empiriq has five services. Each service runs in its own container.
 A deployment usually runs one feeder and one reconciler for each venue.
 
 Each service has its own repository. The repositories are next to each other
-in one directory, so that relative paths such as `../empiriq` work:
+in one directory, so that relative paths such as `../database` work:
 
 ```
 empiriq/
-  empiriq/              the empiriq service: schema, engine and api
+  database/             the empiriq service: schema, engine and api
   binance-backfiller/   a backfiller for the Binance archive
   binance-feeder/       a feeder for the Binance WebSocket streams
   console/              the console
-  stack/                the documentation; builds the images and starts them together
+  empiriq/              the documentation; builds the images and starts them together
 ```
 
 **Images.** Each service repository has one `Dockerfile` and builds one image.
-It knows nothing about the other services or about compose. `stack` builds all
+It knows nothing about the other services or about compose. The `empiriq`
+repository builds all
 images with `docker buildx bake`, from the repositories next to it or from
 GitHub by tag, and starts them with `docker compose`.
 
-`stack` is not a service. All
+The `empiriq` repository is not a service. All
 services log in as the owner there; feeders and backfillers switch to
 `empiriq_feeder` at connect, so the grants are checked. A real installation
 gives each service a login with one role of empiriq.
 
-The `stack` repository starts `empiriq` and the services together with
+The `empiriq` repository starts the service `empiriq` and the other services together with
 `docker compose`. The quickstart will add a simulated reconciler and an
 example strategy to it. For a backtest, a
 backfiller loads the requested history first.

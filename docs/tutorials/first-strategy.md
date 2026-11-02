@@ -11,20 +11,20 @@ account.
 ## 1. Get the repositories
 
 empiriq has one repository for each service. Clone them next to each other,
-so that the `stack` repository finds them:
+so that the `empiriq` repository finds them:
 
 ```
 empiriq/
-  empiriq/              the database: schema, engine and api
+  database/             the database: schema, engine and api
   binance-feeder/       live trades from Binance
   binance-backfiller/   history from the Binance archive
   console/              the console
-  stack/                this repository
+  empiriq/              this repository: the documentation and the stack
 ```
 
 ## 2. Start empiriq
 
-In `stack`:
+In the `empiriq` repository:
 
 ```sh
 make build    # build the images of all repositories: a few minutes the first time
@@ -107,7 +107,7 @@ make reset    # deletes all data: the database and the settings of Grafana
 ```
 
 Then run the three files again. To write your own strategy, copy
-`strategies.sma_cross` from the migrations of the `empiriq` repository
+`strategies.sma_cross` from the migrations of the `database` repository
 (`migrations/0008_example_strategies.sql`) and read
 [Writing a strategy](../explanation/architecture.md#writing-a-strategy).
 

@@ -75,7 +75,7 @@ computer for development, or to try empiriq without cloning every repository.
 
 | Service              | Repository             | What it does |
 |----------------------|------------------------|--------------|
-| `empiriq`            | `../empiriq`           | PostgreSQL 18 with the empiriq migrations in the image, on localhost:1792 |
+| `empiriq`            | `../database`          | PostgreSQL 18 with the empiriq migrations in the image, on localhost:1792 |
 | `binance-backfiller` | `../binance-backfiller`| Loads history from the Binance archive |
 | `binance-feeder`     | `../binance-feeder`    | Writes live trades of the live requests from the Binance WebSocket streams |
 | `console`            | `../console`           | Grafana with the console, on localhost:3000 |
@@ -127,15 +127,16 @@ bake` with the variables of `versions.env` and `.env`.
   with the version `dev`:
   ```
   empiriq/
-    empiriq/
+    database/
     binance-backfiller/
     binance-feeder/
     console/
-    stack/                this repository
+    empiriq/              this repository
   ```
 - `git`: GitHub, at the tags of `versions.env`. No clones are needed:
   ```sh
-  make build SOURCE=git GITHUB_ORG=<org>
+  make build SOURCE=git                    # the organization empiriq
+  make build SOURCE=git GITHUB_ORG=<org>   # a fork
   ```
 
 **Versions.** `versions.env` has one version for each image. A set of tags
@@ -200,7 +201,7 @@ Copy `.env.example` to `.env` and change what you need. All values in
 
 - **Images:** `SOURCE`, `GITHUB_ORG`, `REGISTRY`, `PULL_POLICY`. The versions
   are in `versions.env`.
-- **Paths for `SOURCE=local`:** `EMPIRIQ_DIR`, `BINANCE_BACKFILLER_DIR`,
+- **Paths for `SOURCE=local`:** `DATABASE_DIR`, `BINANCE_BACKFILLER_DIR`,
   `BINANCE_FEEDER_DIR`, `CONSOLE_DIR`.
 - **Database:** `EMPIRIQ_PG_PORT`, `POSTGRES_DB`, and the owner login
   `POSTGRES_USER` / `POSTGRES_PASSWORD`, used by all services.
@@ -240,7 +241,7 @@ through an image:
 - **A new service.** Add it to `compose.yaml`. A new feeder or backfiller
   uses the owner login with `options=-c%20role%3Dempiriq_feeder`.
 
-Tests of the services do not use the stack. `make smoke` in empiriq builds
+Tests of the services do not use the stack. `make smoke` in database builds
 and runs its own test image. `make test-integration` in binance-backfiller and
 binance-feeder starts the image `empiriq/empiriq:dev` with the data in
 memory.

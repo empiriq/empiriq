@@ -1,7 +1,7 @@
 # Builds the images of all repositories with docker buildx bake.
 #   make build                    all images, from the repositories next to this one
 #   make build S=console          one image
-#   make build SOURCE=git GITHUB_ORG=<org>   from GitHub, at the tags of versions.env
+#   make build SOURCE=git         from GitHub, at the tags of versions.env
 #
 # The Makefile exports the variables from versions.env and .env.
 
@@ -9,7 +9,7 @@ variable "SOURCE" {
   # local: the repositories next to this one. git: GitHub, at the version tag.
   default = "local"
 }
-variable "GITHUB_ORG" { default = "" }
+variable "GITHUB_ORG" { default = "empiriq" }
 variable "REGISTRY" {
   # Prefix of the image names, for example "ghcr.io/<org>/". Empty: local images.
   default = ""
@@ -20,7 +20,7 @@ variable "BINANCE_BACKFILLER_VERSION" { default = "dev" }
 variable "BINANCE_FEEDER_VERSION" { default = "dev" }
 variable "CONSOLE_VERSION" { default = "dev" }
 
-variable "EMPIRIQ_DIR" { default = "../empiriq" }
+variable "DATABASE_DIR" { default = "../database" }
 variable "BINANCE_BACKFILLER_DIR" { default = "../binance-backfiller" }
 variable "BINANCE_FEEDER_DIR" { default = "../binance-feeder" }
 variable "CONSOLE_DIR" { default = "../console" }
@@ -52,7 +52,7 @@ group "default" {
 }
 
 target "empiriq" {
-  context = src("empiriq", EMPIRIQ_DIR, EMPIRIQ_VERSION)
+  context = src("database", DATABASE_DIR, EMPIRIQ_VERSION)
   target  = "empiriq"
   args    = { VERSION = EMPIRIQ_VERSION, REVISION = revision(EMPIRIQ_REVISION, EMPIRIQ_VERSION) }
   tags    = [image("empiriq", EMPIRIQ_VERSION)]

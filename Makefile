@@ -12,10 +12,10 @@ include versions.env
 # Where bake takes the sources: local (the repositories next to this one) or
 # git (GitHub, at the tags of versions.env).
 SOURCE     ?= local
-GITHUB_ORG ?=
+GITHUB_ORG ?= empiriq
 # Prefix of the image names, for example ghcr.io/<org>/. Empty: local images.
 REGISTRY   ?=
-EMPIRIQ_DIR            ?= ../empiriq
+DATABASE_DIR           ?= ../database
 BINANCE_BACKFILLER_DIR ?= ../binance-backfiller
 BINANCE_FEEDER_DIR     ?= ../binance-feeder
 CONSOLE_DIR            ?= ../console
@@ -23,19 +23,19 @@ CONSOLE_DIR            ?= ../console
 # Git revisions for the image labels, from the repositories next to this one.
 rev = $(shell git -C $(1) rev-parse --short HEAD 2>/dev/null)
 ifeq ($(SOURCE),local)
-EMPIRIQ_REVISION            ?= $(call rev,$(EMPIRIQ_DIR))
+EMPIRIQ_REVISION            ?= $(call rev,$(DATABASE_DIR))
 BINANCE_BACKFILLER_REVISION ?= $(call rev,$(BINANCE_BACKFILLER_DIR))
 BINANCE_FEEDER_REVISION     ?= $(call rev,$(BINANCE_FEEDER_DIR))
 CONSOLE_REVISION            ?= $(call rev,$(CONSOLE_DIR))
 # Bake asks before it reads a directory outside this repository: allow
 # exactly the repositories it builds.
-BAKE_ALLOW = $(foreach d,$(EMPIRIQ_DIR) $(BINANCE_BACKFILLER_DIR) $(BINANCE_FEEDER_DIR) $(CONSOLE_DIR),--allow=fs.read=$(d))
+BAKE_ALLOW = $(foreach d,$(DATABASE_DIR) $(BINANCE_BACKFILLER_DIR) $(BINANCE_FEEDER_DIR) $(CONSOLE_DIR),--allow=fs.read=$(d))
 endif
 
 # docker buildx bake and docker compose read these from the environment.
 export SOURCE GITHUB_ORG REGISTRY PULL_POLICY \
        EMPIRIQ_VERSION BINANCE_BACKFILLER_VERSION BINANCE_FEEDER_VERSION CONSOLE_VERSION \
-       EMPIRIQ_DIR BINANCE_BACKFILLER_DIR BINANCE_FEEDER_DIR CONSOLE_DIR \
+       DATABASE_DIR BINANCE_BACKFILLER_DIR BINANCE_FEEDER_DIR CONSOLE_DIR \
        EMPIRIQ_REVISION BINANCE_BACKFILLER_REVISION BINANCE_FEEDER_REVISION CONSOLE_REVISION
 
 DB_IMAGE = $(REGISTRY)empiriq/empiriq:$(EMPIRIQ_VERSION)
@@ -74,7 +74,7 @@ help: ## Display this help.
 ##@ Images
 
 .PHONY: build
-build: ## Build all images, or one with S=<image>. SOURCE=git GITHUB_ORG=<org> builds from GitHub.
+build: ## Build all images, or one with S=<image>. SOURCE=git builds from GitHub.
 ifeq ($(SOURCE),git)
 	@test -n "$(GITHUB_ORG)" || { echo "SOURCE=git needs GITHUB_ORG"; exit 1; }
 	@for v in $(EMPIRIQ_VERSION) $(BINANCE_BACKFILLER_VERSION) $(BINANCE_FEEDER_VERSION) $(CONSOLE_VERSION); do \
