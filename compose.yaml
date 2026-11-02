@@ -71,7 +71,7 @@ services:
       empiriq:
         condition: service_healthy
     ports:
-      # Only this computer: the console has no login (anonymous Viewer).
+      # Only this computer: the console has no login (anonymous Admin).
       - "127.0.0.1:${CONSOLE_PORT:-3000}:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${CONSOLE_ADMIN_USER:-admin}
