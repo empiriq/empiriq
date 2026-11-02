@@ -63,8 +63,8 @@ flowchart TB
   G <-->|"api views and functions"| pg
 ```
 
-This repository contains the `empiriq` service: the database. The other
-services have their own repositories, and they use only the public `api`
+The `database` service holds the database, in the `database` repository.
+The other services have their own repositories, and they use only the public `api`
 schema. See [Services](#services).
 
 | Schema       | Purpose                                                        | Stability |
@@ -454,7 +454,7 @@ empiriq has five services. Each service runs in its own container.
 
 | Service      | Purpose                                                                                     | Runs as          | Repository |
 |--------------|---------------------------------------------------------------------------------------------|------------------|------------|
-| `empiriq`    | PostgreSQL with the schema, the engine and `api`. **The contract** for all other services.  | Database         | `database` |
+| `database`   | PostgreSQL with the schema, the engine and `api`. **The contract** for all other services.  | Database         | `database` |
 | `feeder`     | Writes live market data from one venue or data source.                                      | Long-running     | TBD |
 | `backfiller` | Loads requested historical market data for backtests and analysis.                          | Long-running     | One repository for each source, for example `binance-backfiller` |
 | `reconciler` | Reconciles accounts with one venue, reports observed state and starts frames. A simulated reconciler serves the `paper` and `backtest` modes. | Long-running | TBD |
@@ -467,7 +467,7 @@ in one directory, so that relative paths such as `../database` work:
 
 ```
 empiriq/
-  database/             the empiriq service: schema, engine and api
+  database/             the database service: schema, engine and api
   binance-backfiller/   a backfiller for the Binance archive
   binance-feeder/       a feeder for the Binance WebSocket streams
   console/              the console
@@ -485,7 +485,7 @@ services log in as the owner there; feeders and backfillers switch to
 `empiriq_feeder` at connect, so the grants are checked. A real installation
 gives each service a login with one role of empiriq.
 
-The `empiriq` repository starts the service `empiriq` and the other services together with
+The `empiriq` repository starts the service `database` and the other services together with
 `docker compose`. The quickstart will add a simulated reconciler and an
 example strategy to it. For a backtest, a
 backfiller loads the requested history first.

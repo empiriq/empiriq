@@ -15,7 +15,7 @@ so that the `empiriq` repository finds them:
 
 ```
 empiriq/
-  database/             the database: schema, engine and api
+  database/             the database service: schema, engine and api
   binance-feeder/       live trades from Binance
   binance-backfiller/   history from the Binance archive
   console/              the console

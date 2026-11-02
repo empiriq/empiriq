@@ -38,7 +38,7 @@ loki.process "level" {
   // two spaces. DETAIL, HINT, CONTEXT, STATEMENT and QUERY lines continue the
   // line before, so join them: an error and its statement are one entry.
   stage.match {
-    selector = "{service=\"empiriq\"}"
+    selector = "{service=\"database\"}"
 
     stage.multiline {
       firstline     = "(^|\\s)(DEBUG[1-5]|LOG|INFO|NOTICE|WARNING|ERROR|FATAL|PANIC):  "

@@ -21,15 +21,15 @@ x-image: &local-image
 
 services:
   # The empiriq database. The migrations in the image run when the volume is empty.
-  empiriq:
-    image: ${REGISTRY:-}empiriq/empiriq:${EMPIRIQ_VERSION:-dev}
+  database:
+    image: ${REGISTRY:-}empiriq/database:${DATABASE_VERSION:-dev}
     <<: *local-image
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-empiriq}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-empiriq}
       POSTGRES_DB: ${POSTGRES_DB:-empiriq}
     ports:
-      - "${EMPIRIQ_PG_PORT:-1792}:5432"
+      - "${DATABASE_PORT:-1792}:5432"
     volumes:
       - pgdata:/var/lib/postgresql
     healthcheck:
@@ -43,10 +43,10 @@ services:
     image: ${REGISTRY:-}empiriq/binance-backfiller:${BINANCE_BACKFILLER_VERSION:-dev}
     <<: *local-image
     depends_on:
-      empiriq:
+      database:
         condition: service_healthy
     environment:
-      BACKFILLER_DATABASE_URL: postgres://${POSTGRES_USER:-empiriq}:${POSTGRES_PASSWORD:-empiriq}@empiriq:5432/${POSTGRES_DB:-empiriq}?options=-c%20role%3Dempiriq_feeder
+      BACKFILLER_DATABASE_URL: postgres://${POSTGRES_USER:-empiriq}:${POSTGRES_PASSWORD:-empiriq}@database:5432/${POSTGRES_DB:-empiriq}?options=-c%20role%3Dempiriq_feeder
       BACKFILLER_VENUES: binance-spot=spot,binance-futures-um=futures/um
       BACKFILLER_WORKERS: "2"
     restart: unless-stopped
@@ -55,10 +55,10 @@ services:
     image: ${REGISTRY:-}empiriq/binance-feeder:${BINANCE_FEEDER_VERSION:-dev}
     <<: *local-image
     depends_on:
-      empiriq:
+      database:
         condition: service_healthy
     environment:
-      FEEDER_DATABASE_URL: postgres://${POSTGRES_USER:-empiriq}:${POSTGRES_PASSWORD:-empiriq}@empiriq:5432/${POSTGRES_DB:-empiriq}?options=-c%20role%3Dempiriq_feeder
+      FEEDER_DATABASE_URL: postgres://${POSTGRES_USER:-empiriq}:${POSTGRES_PASSWORD:-empiriq}@database:5432/${POSTGRES_DB:-empiriq}?options=-c%20role%3Dempiriq_feeder
       FEEDER_VENUES: binance-spot=spot,binance-futures-um=futures/um
     restart: unless-stopped
 
@@ -66,7 +66,7 @@ services:
     image: ${REGISTRY:-}empiriq/console:${CONSOLE_VERSION:-dev}
     <<: *local-image
     depends_on:
-      empiriq:
+      database:
         condition: service_healthy
     ports:
       # Only this computer: the console has no login (anonymous Admin).
@@ -74,7 +74,7 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: ${CONSOLE_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${CONSOLE_ADMIN_PASSWORD:-admin}
-      EMPIRIQ_DB_HOST: empiriq
+      EMPIRIQ_DB_HOST: database
       EMPIRIQ_DB_PORT: "5432"
       # Grafana cannot set a role at connect, so the console uses the owner.
       EMPIRIQ_DB_NAME: ${POSTGRES_DB:-empiriq}

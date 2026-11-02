@@ -23,7 +23,7 @@ CONSOLE_DIR            ?= ../console
 # Git revisions for the image labels, from the repositories next to this one.
 rev = $(shell git -C $(1) rev-parse --short HEAD 2>/dev/null)
 ifeq ($(SOURCE),local)
-EMPIRIQ_REVISION            ?= $(call rev,$(DATABASE_DIR))
+DATABASE_REVISION           ?= $(call rev,$(DATABASE_DIR))
 BINANCE_BACKFILLER_REVISION ?= $(call rev,$(BINANCE_BACKFILLER_DIR))
 BINANCE_FEEDER_REVISION     ?= $(call rev,$(BINANCE_FEEDER_DIR))
 CONSOLE_REVISION            ?= $(call rev,$(CONSOLE_DIR))
@@ -34,11 +34,11 @@ endif
 
 # docker buildx bake and docker compose read these from the environment.
 export SOURCE GITHUB_ORG REGISTRY PULL_POLICY \
-       EMPIRIQ_VERSION BINANCE_BACKFILLER_VERSION BINANCE_FEEDER_VERSION CONSOLE_VERSION \
+       DATABASE_VERSION BINANCE_BACKFILLER_VERSION BINANCE_FEEDER_VERSION CONSOLE_VERSION \
        DATABASE_DIR BINANCE_BACKFILLER_DIR BINANCE_FEEDER_DIR CONSOLE_DIR \
-       EMPIRIQ_REVISION BINANCE_BACKFILLER_REVISION BINANCE_FEEDER_REVISION CONSOLE_REVISION
+       DATABASE_REVISION BINANCE_BACKFILLER_REVISION BINANCE_FEEDER_REVISION CONSOLE_REVISION
 
-DB_IMAGE = $(REGISTRY)empiriq/empiriq:$(EMPIRIQ_VERSION)
+DB_IMAGE = $(REGISTRY)empiriq/database:$(DATABASE_VERSION)
 IMAGES = $(DB_IMAGE) \
          $(REGISTRY)empiriq/binance-backfiller:$(BINANCE_BACKFILLER_VERSION) \
          $(REGISTRY)empiriq/binance-feeder:$(BINANCE_FEEDER_VERSION) \
@@ -47,7 +47,7 @@ IMAGES = $(DB_IMAGE) \
 CONSOLE_PORT ?= 3000
 URL          = http://localhost:$(CONSOLE_PORT)
 COMPOSE      = docker compose
-PSQL         = $(COMPOSE) exec -T empiriq sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -v ON_ERROR_STOP=1 -X'
+PSQL         = $(COMPOSE) exec -T database sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -v ON_ERROR_STOP=1 -X'
 
 # History requests: make request SYMBOL=BTCUSDT FROM=2026-06-01 TO=2026-06-02
 VENUE  ?= binance-futures-um
@@ -77,7 +77,7 @@ help: ## Display this help.
 build: ## Build all images, or one with S=<image>. SOURCE=git builds from GitHub.
 ifeq ($(SOURCE),git)
 	@test -n "$(GITHUB_ORG)" || { echo "SOURCE=git needs GITHUB_ORG"; exit 1; }
-	@for v in $(EMPIRIQ_VERSION) $(BINANCE_BACKFILLER_VERSION) $(BINANCE_FEEDER_VERSION) $(CONSOLE_VERSION); do \
+	@for v in $(DATABASE_VERSION) $(BINANCE_BACKFILLER_VERSION) $(BINANCE_FEEDER_VERSION) $(CONSOLE_VERSION); do \
 	  test "$$v" != dev || { echo "SOURCE=git needs git tags in versions.env, not dev"; exit 1; }; \
 	done
 endif
@@ -91,7 +91,9 @@ images: ## Show the built images of empiriq.
 
 .PHONY: up
 up: check-images ## Start the database and all services from the built images.
-	$(COMPOSE) up -d
+	@# --remove-orphans: containers of services that compose.yaml no longer has,
+	@# for example after a rename, would keep their ports.
+	$(COMPOSE) up -d --remove-orphans
 	@echo "console: $(URL)"
 
 .PHONY: check-images
@@ -107,7 +109,7 @@ rebuild: ## After a change of the repositories: build all images, or one with S=
 	@# changed, the running database keeps its old schema: say so.
 	@old=$$(docker image inspect -f '{{.Id}}' $(DB_IMAGE) 2>/dev/null); \
 	$(MAKE) --no-print-directory build && \
-	$(COMPOSE) up -d $(S) && \
+	$(COMPOSE) up -d --remove-orphans $(S) && \
 	new=$$(docker image inspect -f '{{.Id}}' $(DB_IMAGE) 2>/dev/null) && \
 	if [ -n "$$old" ] && [ "$$old" != "$$new" ]; then \
 	  echo "The image of the database changed. Its migrations run only on a new database:"; \
@@ -148,7 +150,7 @@ lint: ## Check compose.yaml and docker-bake.hcl.
 
 .PHONY: psql
 psql: ## Open psql in the database.
-	$(COMPOSE) exec empiriq sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
+	$(COMPOSE) exec database sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
 
 .PHONY: sql
 sql: ## Run a SQL file in the database, for example make sql F=examples/01-live-trades.sql.

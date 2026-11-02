@@ -129,8 +129,9 @@ avoid. A word in *italics* has its own entry on this page.
 
 | Term | Meaning | In code | Do not use |
 |------|---------|---------|------------|
-| **service** | A part of empiriq that runs in its own container: `empiriq`, `feeder`, `backfiller`, `reconciler` or `console`. Each service has its own repository. | service names in `compose.yaml` | component, app, microservice |
-| **empiriq** | The service with the database: schema, engine and `api`. Also the name of the project. | service `empiriq` | db, database service, backend |
+| **service** | A part of empiriq that runs in its own container: `database`, `feeder`, `backfiller`, `reconciler` or `console`. Each service has its own repository. | service names in `compose.yaml` | component, app, microservice |
+| **database** | The service with PostgreSQL: schema, engine and `api`. The contract for all other services. | service and repository `database` | db, backend |
+| **empiriq** | The name of the project, of its GitHub organization and of the repository with the documentation. Not a service. | repository `empiriq` | |
 | **console** | The user interface of empiriq. Shows the state and changes desired state, only through `api`. The first console is built with Grafana. | service `console` | dashboard (as a service name), UI, admin panel |
 | **dashboard** | One page of the console, for example *Overview* or *History*. | Grafana dashboard | screen, view (view is SQL) |
 | **operator** | A person or the console that changes desired state through `api` functions. | role `empiriq_operator` | admin, user (as a role) |

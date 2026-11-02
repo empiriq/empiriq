@@ -75,7 +75,7 @@ computer for development, or to try empiriq without cloning every repository.
 
 | Service              | Repository             | What it does |
 |----------------------|------------------------|--------------|
-| `empiriq`            | `../database`          | PostgreSQL 18 with the empiriq migrations in the image, on localhost:1792 |
+| `database`           | `../database`          | PostgreSQL 18 with the empiriq migrations in the image, on localhost:1792 |
 | `binance-backfiller` | `../binance-backfiller`| Loads history from the Binance archive |
 | `binance-feeder`     | `../binance-feeder`    | Writes live trades of the live requests from the Binance WebSocket streams |
 | `console`            | `../console`           | Grafana with the console, on localhost:3000 |
@@ -116,7 +116,7 @@ bake` with the variables of `versions.env` and `.env`.
 
 | Image | Repository | Target |
 |-------|------------|--------|
-| `empiriq/empiriq:<version>` | empiriq | the stage `empiriq` of its Dockerfile |
+| `empiriq/database:<version>` | database | the stage `database` of its Dockerfile |
 | `empiriq/binance-backfiller:<version>` | binance-backfiller | the Dockerfile |
 | `empiriq/binance-feeder:<version>` | binance-feeder | the Dockerfile |
 | `empiriq/console:<version>` | console | the Dockerfile |
@@ -157,7 +157,7 @@ All services log in as the owner of the database: `POSTGRES_USER` and
 Feeders and backfillers switch to the role `empiriq_feeder` at connect:
 
 ```
-postgres://empiriq:empiriq@empiriq:5432/empiriq?options=-c%20role%3Dempiriq_feeder
+postgres://empiriq:empiriq@database:5432/empiriq?options=-c%20role%3Dempiriq_feeder
 ```
 
 So they have only the privileges of that role, and a missing grant in `api`
@@ -203,7 +203,7 @@ Copy `.env.example` to `.env` and change what you need. All values in
   are in `versions.env`.
 - **Paths for `SOURCE=local`:** `DATABASE_DIR`, `BINANCE_BACKFILLER_DIR`,
   `BINANCE_FEEDER_DIR`, `CONSOLE_DIR`.
-- **Database:** `EMPIRIQ_PG_PORT`, `POSTGRES_DB`, and the owner login
+- **Database:** `DATABASE_PORT`, `POSTGRES_DB`, and the owner login
   `POSTGRES_USER` / `POSTGRES_PASSWORD`, used by all services.
 - **Console:** `CONSOLE_PORT`, `CONSOLE_ADMIN_USER`, `CONSOLE_ADMIN_PASSWORD`.
   The admin password is used only when Grafana starts the first time. The
@@ -236,14 +236,14 @@ through an image:
 - **Code of a service:** `make build S=<service> && make restart S=<service>`.
 - **Dashboards of the console:** the same with `S=console`. It takes seconds:
   the image only copies the files.
-- **Migrations:** `make build S=empiriq && make reset`. The migrations run only
+- **Migrations:** `make build S=database && make reset`. The migrations run only
   on an empty database.
 - **A new service.** Add it to `compose.yaml`. A new feeder or backfiller
   uses the owner login with `options=-c%20role%3Dempiriq_feeder`.
 
 Tests of the services do not use the stack. `make smoke` in database builds
 and runs its own test image. `make test-integration` in binance-backfiller and
-binance-feeder starts the image `empiriq/empiriq:dev` with the data in
+binance-feeder starts the image `empiriq/database:dev` with the data in
 memory.
 
 ## Layout

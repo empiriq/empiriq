@@ -15,7 +15,7 @@ variable "REGISTRY" {
   default = ""
 }
 
-variable "EMPIRIQ_VERSION" { default = "dev" }
+variable "DATABASE_VERSION" { default = "dev" }
 variable "BINANCE_BACKFILLER_VERSION" { default = "dev" }
 variable "BINANCE_FEEDER_VERSION" { default = "dev" }
 variable "CONSOLE_VERSION" { default = "dev" }
@@ -27,7 +27,7 @@ variable "CONSOLE_DIR" { default = "../console" }
 
 # Git revisions for the image labels. The Makefile sets them from the
 # repositories next to this one; with SOURCE=git the tag is the revision.
-variable "EMPIRIQ_REVISION" { default = "" }
+variable "DATABASE_REVISION" { default = "" }
 variable "BINANCE_BACKFILLER_REVISION" { default = "" }
 variable "BINANCE_FEEDER_REVISION" { default = "" }
 variable "CONSOLE_REVISION" { default = "" }
@@ -48,14 +48,14 @@ function "revision" {
 }
 
 group "default" {
-  targets = ["empiriq", "binance-backfiller", "binance-feeder", "console"]
+  targets = ["database", "binance-backfiller", "binance-feeder", "console"]
 }
 
-target "empiriq" {
-  context = src("database", DATABASE_DIR, EMPIRIQ_VERSION)
-  target  = "empiriq"
-  args    = { VERSION = EMPIRIQ_VERSION, REVISION = revision(EMPIRIQ_REVISION, EMPIRIQ_VERSION) }
-  tags    = [image("empiriq", EMPIRIQ_VERSION)]
+target "database" {
+  context = src("database", DATABASE_DIR, DATABASE_VERSION)
+  target  = "database"
+  args    = { VERSION = DATABASE_VERSION, REVISION = revision(DATABASE_REVISION, DATABASE_VERSION) }
+  tags    = [image("database", DATABASE_VERSION)]
 }
 
 target "binance-backfiller" {
