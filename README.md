@@ -21,6 +21,7 @@ nothing about this repository or about compose.
 ```sh
 make build    # build the images of all repositories
 make up       # start the database and all services
+make rebuild  # after a change of the repositories: build again, restart what changed
 make open     # the console: http://localhost:3000, no login
 make help     # all targets
 ```
@@ -29,9 +30,12 @@ make help     # all targets
 It uses only built images: if one is missing, it says so.
 
 - `make logs S=console` follows the logs of one service.
-- `make build S=binance-feeder && make restart S=binance-feeder` builds one
-  image again and restarts its service, for example after a change of its
-  code.
+- `make rebuild` builds all images again and restarts the services whose
+  image changed. Docker builds again only what changed. If the image of the
+  database changed, `make rebuild` says so: the new migrations run only after
+  `make reset`, which deletes all data.
+- `make rebuild S=binance-feeder` builds one image again and restarts its
+  service, for example after a change of its code.
 - `make reset` deletes all data: the database and the settings and users of
   Grafana. Then it starts everything again. The migrations of the image run on
   the new database.

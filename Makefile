@@ -1,6 +1,7 @@
 # empiriq stack: builds the images of all repositories and runs them together
 #   make build   build the images (docker buildx bake, docker-bake.hcl)
 #   make up      start the database and all services
+#   make rebuild build the images again and restart what changed
 #   make help    list all targets
 #
 # Versions come from versions.env, settings from .env (see .env.example).
@@ -34,7 +35,8 @@ export SOURCE GITHUB_ORG REGISTRY PULL_POLICY \
        EMPIRIQ_DIR BINANCE_BACKFILLER_DIR BINANCE_FEEDER_DIR CONSOLE_DIR \
        EMPIRIQ_REVISION BINANCE_BACKFILLER_REVISION BINANCE_FEEDER_REVISION CONSOLE_REVISION
 
-IMAGES = $(REGISTRY)empiriq/empiriq:$(EMPIRIQ_VERSION) \
+DB_IMAGE = $(REGISTRY)empiriq/empiriq:$(EMPIRIQ_VERSION)
+IMAGES = $(DB_IMAGE) \
          $(REGISTRY)empiriq/binance-backfiller:$(BINANCE_BACKFILLER_VERSION) \
          $(REGISTRY)empiriq/binance-feeder:$(BINANCE_FEEDER_VERSION) \
          $(REGISTRY)empiriq/console:$(CONSOLE_VERSION)
@@ -95,6 +97,20 @@ check-images:
 	@if [ "$(or $(PULL_POLICY),never)" = never ]; then for i in $(IMAGES); do \
 	  docker image inspect $$i >/dev/null 2>&1 || { echo "no image $$i: run make build"; exit 1; }; \
 	done; fi
+
+.PHONY: rebuild
+rebuild: ## After a change of the repositories: build all images, or one with S=<image>, and restart the services whose image changed.
+	@# The migrations run only on a new volume. If the image of the database
+	@# changed, the running database keeps its old schema: say so.
+	@old=$$(docker image inspect -f '{{.Id}}' $(DB_IMAGE) 2>/dev/null); \
+	$(MAKE) --no-print-directory build && \
+	$(COMPOSE) up -d $(S) && \
+	new=$$(docker image inspect -f '{{.Id}}' $(DB_IMAGE) 2>/dev/null) && \
+	if [ -n "$$old" ] && [ "$$old" != "$$new" ]; then \
+	  echo "The image of the database changed. Its migrations run only on a new database:"; \
+	  echo "run make reset to apply them (it deletes all data)."; \
+	fi
+	@echo "console: $(URL)"
 
 .PHONY: down
 down: ## Stop all services (data stays).
