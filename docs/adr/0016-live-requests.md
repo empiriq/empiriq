@@ -1,7 +1,7 @@
 # 0016. Live requests: feeders register, operators declare live streams
 
 **Status:** Proposed. Refines [0012](0012-backfiller-registry.md) and
-[0014](0014-live-coverage.md). Refined by [0018](0018-services-report-instruments.md).
+[0014](0014-live-coverage.md). Refined by [0018](0018-services-report-instruments.md). Refined by [0021](0021-services-identified-by-name.md): feeders are identified by their name.
 
 ## Context
 

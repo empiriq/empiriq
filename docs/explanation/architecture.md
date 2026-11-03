@@ -526,7 +526,7 @@ backfiller loads the requested history first.
      its claims are released.
 
    Open points: what "flat" means for spot, how to execute (market orders or
-   passive orders with a timeout), and the link to a kill switch (question 9).
+   passive orders with a timeout), and the link to a kill switch (question 8).
 4. **Balance conversion paths.** Today only direct `asset/funding` spot pairs
    work. Inverse pairs and routes with more steps (`ETH → BTC → USDT`) need a
    design.

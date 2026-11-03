@@ -1,6 +1,6 @@
 # 0012. Backfiller registry: services report, work is controlled
 
-**Status:** Proposed. Refines [0010](0010-declarative-history.md). Refined by [0016](0016-live-requests.md): feeders register the same way. Refined by [0018](0018-services-report-instruments.md): services report instruments.
+**Status:** Proposed. Refines [0010](0010-declarative-history.md). Refined by [0016](0016-live-requests.md): feeders register the same way. Refined by [0018](0018-services-report-instruments.md): services report instruments. Refined by [0021](0021-services-identified-by-name.md): backfillers are identified by their name.
 
 ## Context
 

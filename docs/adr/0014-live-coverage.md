@@ -33,7 +33,8 @@ Option C.
 - Otherwise the report starts a new period at `since`, or at
   `complete_until`.
 - A feeder passes `since` after each connect and reconnect: the time since
-  which it stored every event, for example the time of its subscription.
+  which it stored every event, for example the time when it connected to
+  the stream of the venue.
 - `api.stream_summary` shows, for each stream, the union of live coverage and
   history coverage, the uncovered periods between them, and the state of the
   live feed. It reads only metadata, never trades.
