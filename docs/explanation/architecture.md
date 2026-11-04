@@ -166,11 +166,10 @@ transaction. The helper functions use two rules for visibility:
   `event_time <= as_of`. The `trade_time` of a trade (when it happened) only
   puts the trade into a period. It never controls visibility.
 - Inside a frame, the **writer** of the row decides
-  ([ADR 0009](../adr/0009-writers.md)). Every row has a writer: a feeder or a
-  backfill run. If the writer was open at frame start, the row is visible
-  only if its `seq` is not higher than the **cutoff** of that writer: its
-  highest `seq` at frame start. If the writer was closed before frame start,
-  all its rows are visible. Rows of a writer that started later are invisible.
+  ([ADR 0009](../adr/0009-writers.md)). Every row has a writer: the feeder or
+  the backfiller that wrote it. The row is visible only if its `seq` is not
+  higher than the **cutoff** of that writer: its highest `seq` at frame
+  start. Rows of a writer that started later are invisible.
 
 The second rule makes frames repeatable. A trade can arrive in the database
 after a frame, although its `event_time` is before `as_of`. The frame did not
@@ -382,13 +381,14 @@ through SQL ([ADR 0010](../adr/0010-declarative-history.md)):
    the instruments of its venues with `api.report_instruments()`.
 3. It listens on `empiriq_history` and also checks regularly. It calls
    `api.lease_history(name)` to get its next missing period, only for
-   its capabilities. Each leased period is a backfill run with its own writer.
-4. It loads only the rows inside the leased period, in short transactions. It
+   its capabilities. Each leased period is a backfill run.
+4. It loads only the rows inside the leased period, in short transactions,
+   with the writer from `api.register_backfiller()`. It
    sets `event_time = trade_time + publish_delay`, because historical sources
    have no publish time. The backfill run gives the delay, measured from live trades
    of the venue ([ADR 0019](../adr/0019-measured-publish-delay.md)).
-5. It ends the run with `api.finish_backfill(writer_id, rows)`, or with an
-   error text. This closes the writer. On success the period is covered.
+5. It ends the run with `api.finish_backfill(run_id, rows)`, or with an
+   error text. On success the period is covered.
 
 `api.history_coverage` shows the requested, covered and missing periods of
 each stream. How a backfiller maps a period to the units of its source (for

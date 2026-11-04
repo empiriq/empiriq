@@ -63,4 +63,4 @@ keys make this safe, and the stream stays covered if one feeder stops.
 - There is no balancing between feeders: each writes all streams it can. A
   limit for each feeder is TBD.
 - A feeder writes with one writer for its whole life. Frames record cutoffs
-  for that writer, as for any open writer ([ADR 0009](0009-writers.md)).
+  for that writer, as for any writer ([ADR 0009](0009-writers.md)).

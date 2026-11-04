@@ -33,7 +33,7 @@ select api.add_history_request(instrument_id, 'trade', from, to, publish_delay);
 Each call adds a row to `market.history_request`: one instrument, one stream,
 one period of any length, and the publish delay for the rows (ADR 0009). The
 call sends `NOTIFY empiriq_history`. Requests only add. Removing history is a
-separate, explicit action (by writer or by period), because other requests,
+separate, explicit action (by period), because other requests,
 frames and backtests can use the same rows.
 
 ### Observed state: coverage
@@ -56,7 +56,8 @@ function:
 1. finds the first missing period of any request that no running run covers
    and that did not fail recently;
 2. cuts it to at most `max_span`;
-3. starts a backfill run for it (a new writer) and returns the run.
+3. starts a backfill run for it and returns the run. The backfiller writes
+   the rows with its own writer ([ADR 0009](0009-writers.md)).
 
 The backfiller loads only rows inside the leased period and ends the run with
 `api.finish_backfill()`. On success the period becomes covered. On failure it
@@ -64,8 +65,7 @@ becomes missing again, and it can be leased again after `retry_after`.
 
 A backfill run is not permanent. If its backfiller sends no heartbeat for
 `stale_after` ([ADR 0012](0012-backfiller-registry.md)), the run is marked
-`abandoned` and its writer is closed. The period then becomes missing
-again. Backfillers lease one after the other, so several backfillers never
+`abandoned`. The period then becomes missing again. Backfillers lease one after the other, so several backfillers never
 lease the same period.
 
 ### Units of the source are a detail of the backfiller

@@ -88,7 +88,7 @@ shape. The columns are a range, so an aggregated source stays possible later.
 | `FirstTradeID` | `first_trade_id` | `bigint`      | Primary key, together with `instrument_id` |
 | `LastTradeID`  | `last_trade_id`  | `bigint`      | `>= first_trade_id`. Equal for raw trades. |
 | *proposed:* `IsBuyerMaker` | `aggressor` | `core.order_side` | `sell` if the buyer was the maker, else `buy`. Null if unknown. |
-| —              | `writer_id`      | `bigint`      | From `api.register_feeder()` or `api.lease_history()` |
+| —              | `writer_id`      | `bigint`      | From `api.register_feeder()` or `api.register_backfiller()` |
 | —              | `seq`            | `bigint`      | Set by the database |
 | —              | `received_at`    | `timestamptz` | Default `clock_timestamp()` |
 
@@ -148,15 +148,16 @@ that the database assigns at insert.
 - A feeder registers once at start (see [Live requests](#live-requests)).
   `api.register_feeder()` returns the id of its writer. Put it into every
   row. After a restart, the same name returns the same writer.
-- A backfill run gets its own writer from `api.lease_history()` (see
+- A backfiller registers the same way. `api.register_backfiller()` returns
+  the id of its writer, for the rows of all its backfill runs (see
   [Backfill](#backfill)).
 - **One rule:** a writer commits its transactions for one instrument one after
-  the other. Parallel work on different instruments is allowed.
+  the other. Parallel work on different instruments is allowed. A backfiller
+  loads one period of one instrument at a time.
 
-Frames record, for each open writer, its highest `seq` as a cutoff. A frame
-sees no row of that writer above the cutoff. When a writer is finished, it
-calls `api.close_writer(writer_id)`. Frames that start later see all its rows.
-A closed writer cannot write again.
+Frames record, for each writer, its highest `seq` as a cutoff. A frame sees
+no row of that writer above the cutoff. Writers do not close: a writer lives
+as long as its service.
 
 ## Live requests
 
@@ -246,18 +247,18 @@ The name identifies the backfiller in all later calls. Then it sends
 `select api.backfiller_heartbeat('my-backfiller@host1')` every
 `heartbeat_interval`, and works in a loop:
 
-1. Lease the next missing period that it can load. The result has a new
-   `writer_id`, the instrument, the stream, the period and the publish delay.
+1. Lease the next missing period that it can load. The result has the
+   `run_id`, the instrument, the stream, the period and the publish delay.
    No row means no work:
    ```sql
    select * from api.lease_history('my-backfiller@host1');
    ```
-2. Write only the rows inside the period, with this `writer_id`, in short
-   transactions.
-3. Finish the run. This also closes the writer:
+2. Write only the rows inside the period, with the `writer_id` from
+   `api.register_backfiller()`, in short transactions.
+3. Finish the run:
    ```sql
-   select api.finish_backfill($writer_id, $rows);              -- success: the period is covered
-   select api.finish_backfill($writer_id, $rows, 'error text'); -- failure: the period is missing again
+   select api.finish_backfill($run_id, $rows);              -- success: the period is covered
+   select api.finish_backfill($run_id, $rows, 'error text'); -- failure: the period is missing again
    ```
 
 When there is no work, wait for `NOTIFY empiriq_history` or for a timer.
@@ -265,8 +266,8 @@ When there is no work, wait for `NOTIFY empiriq_history` or for a timer.
 - **Retries.** A failed period can be leased again after `retry_after`
   (default 10 minutes).
 - **Abandoned runs.** If a backfiller sends no heartbeat for `stale_after`
-  (default 5 minutes), its running runs are marked `abandoned`, and their
-  writers are closed. Then their periods are leased again.
+  (default 5 minutes), its running runs are marked `abandoned`. Then their
+  periods are leased again.
 - **Paused requests.** An operator can pause a request
   (`api.pause_history_request()`). Backfillers get no new runs for it until
   it is resumed.
@@ -375,7 +376,7 @@ func aggressor(t Trade) any {
 	return "buy"
 }
 
-// writerID comes from api.register_feeder() or api.lease_history().
+// writerID comes from api.register_feeder() or api.register_backfiller().
 func writeTrades(ctx context.Context, conn *pgx.Conn, writerID int64, ids map[string]int64, batch []Trade) error {
 	tx, err := conn.Begin(ctx)
 	if err != nil {

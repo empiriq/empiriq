@@ -34,7 +34,8 @@ what services report: observed state.
 ### Backfillers register and send heartbeats
 
 - A backfiller calls `api.register_backfiller(name, venues, streams,
-  version, settings)` when it starts. It works like "apply" on the name.
+  version, settings)` when it starts. It works like "apply" on the name and
+  returns the id of its writer ([ADR 0009](0009-writers.md)).
 - The **name** identifies the backfiller in all later calls: it is the
   primary key of `market.backfiller`. Another name is another process. A
   service takes its name from an environment variable; its image sets a

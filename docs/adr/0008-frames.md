@@ -52,9 +52,9 @@ frame ([ADR 0022](0022-frames-belong-to-a-world.md)).
 
 Every row in `market.trade` and `market.depth` has a writer and a `seq`,
 assigned at insert. At frame start, the engine records a **cutoff** for each
-subscribed stream and each open writer: its highest `seq`. The frame sees a
-row only if `event_time <= as_of` and the cutoff of its writer allows it.
-[ADR 0009](0009-writers.md) has the rules for open and closed writers.
+subscribed stream and each writer: its highest `seq`. The frame sees a row
+only if `event_time <= as_of` and `seq <=` the cutoff of its writer
+([ADR 0009](0009-writers.md)).
 
 A replay of a recorded frame uses the same cutoffs, so it sees exactly the same
 rows. Late rows are invisible in both runs.
@@ -102,7 +102,7 @@ its error.
 - Frames run in the transaction of the last `api.reconciled()`. A slow
   strategy makes that reconciler slow. A separate runner remains an option.
 - Cutoffs need an index on `(instrument_id, writer_id, seq)`. Their cost is
-  one index lookup for each subscribed stream and open writer in a frame.
+  one index lookup for each subscribed stream and writer in a frame.
 - The observed state that a strategy reads is the current state. Rebuilding
   it from the event journal for an exact replay is future work.
 - How a strategy sends intents to several accounts of its world is an open

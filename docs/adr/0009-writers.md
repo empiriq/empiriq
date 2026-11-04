@@ -28,41 +28,31 @@ sequencer.
 
 ## Decision
 
-### Every row has a writer
+### A writer is a service process
 
-- `market.writer` registers each process that writes market data. A feeder
-  gets its writer from `api.register_feeder()` at start
-  ([ADR 0016](0016-live-requests.md)). Each backfill run is its own writer,
-  created by `api.lease_history()`.
+- `market.writer` has one writer for each process that writes market data:
+  each feeder and each backfiller. A service gets its writer when it
+  registers: `api.register_feeder()` and `api.register_backfiller()` return
+  its id. The same name returns the same writer after a restart.
 - Every row of `market.trade` and `market.depth` has a `writer_id`.
 - One rule remains: a writer commits its transactions for one instrument one
   after the other. Then `seq` grows in commit order for each writer and
-  instrument.
+  instrument. So a backfiller loads several instruments in parallel, but one
+  period of one instrument at a time.
 
-### Cutoffs for each open writer
+### Cutoffs for each writer
 
-At frame start, the engine records a cutoff for each subscribed stream and each
-**open** writer: the highest `seq` of that writer, or 0 if it has no rows yet.
+At frame start, the engine records a cutoff for each subscribed stream and
+each writer with rows in it: the highest `seq` of that writer. A frame sees a
+row if `event_time <= as_of` and `seq <=` the cutoff of its writer.
 
-### Closed writers
+A writer that did not exist at frame start has no cutoff. Its rows are
+invisible to that frame and to its replay.
 
-A writer that has finished calls `api.close_writer()`. A backfill run does this
-in `api.finish_backfill()`. Closing gives the writer a `close_order`. Closes get
-their `close_order` one after the other. Each frame records the highest
-`close_order` at its start as `close_horizon`.
+### Writers do not close
 
-A frame sees a row if `event_time <= as_of` and one of these is true for its
-writer:
-
-- the writer was open at frame start, and `seq <=` its cutoff;
-- the writer was closed before frame start: `close_order <= close_horizon`.
-
-A writer that did not exist at frame start has neither. Its rows are invisible
-to that frame and to its replay. A closed writer cannot write again (a trigger
-rejects the insert).
-
-So frames record cutoffs only for open writers: usually the feeders and at
-most a few running backfills. Old backfill runs cost nothing.
+A writer lives as long as its service. A finished backfill run needs no
+step of its own: its rows are below the cutoffs of all later frames.
 
 ### Not physical partitions
 
@@ -72,12 +62,15 @@ same trade could exist once for each writer, and bars would count it twice.
 
 ## Consequences
 
-- Feeders and backfillers do not block each other. A backfiller can work on
-  several instruments in parallel.
+- Feeders and backfillers do not block each other.
 - No locks, no `xid` columns, no snapshots. Logical dumps work, because `seq`
   and `writer_id` are plain data.
-- Each row has its origin. A bad backfill run can be removed with
-  `delete ... where writer_id = ...`.
-- Each frame stores one cutoff for each subscribed stream and open writer.
-- A trigger checks on each insert that the writer is open. This costs one
-  index lookup for each row.
+- Each row has its origin: the service that wrote it. The rows of one
+  backfill run are the rows of its writer in the instrument, stream and
+  period of the run.
+- The number of cutoffs in a frame depends on the number of services, not on
+  the history: one for each subscribed stream and writer with rows in it.
+- Inserts need no check of the writer. Two processes with the same name write
+  with one writer and break the commit order. Run one process for each name.
+- The writer of a service that is gone stays. Its cutoffs do not change any
+  more.
