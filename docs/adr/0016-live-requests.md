@@ -7,7 +7,6 @@
 - Refines [0012. Backfiller registry: services report, work is controlled](0012-backfiller-registry.md).
 - Refines [0014. Live coverage: feeders report continuous periods](0014-live-coverage.md).
 - Refined by [0018](0018-services-report-instruments.md): feeders report instruments.
-- Refined by [0021](0021-services-identified-by-name.md): feeders are identified by their name.
 
 ## Context
 
@@ -24,9 +23,11 @@ work has desired state. Live data is work too.
 
 ### Feeders register and send heartbeats
 
-- A feeder calls `api.register_feeder(name, source, venues, streams, version,
-  settings)` when it starts. It works like "apply" and returns the id of the
-  feeder and of its writer. The writer has the same name as the feeder.
+- A feeder calls `api.register_feeder(name, venues, streams, version,
+  settings)` when it starts. It works like "apply" on the name, like a
+  backfiller ([ADR 0012](0012-backfiller-registry.md)). It returns the id of
+  its writer. The writer has the same name as the feeder, and every row of
+  market data stores the writer id.
 - Its **capabilities** are all pairs of the venues and streams
   (`market.feeder_stream`), like those of a backfiller.
 - `api.feeder` shows each feeder: whether it is alive (a heartbeat within 3
@@ -39,7 +40,7 @@ work has desired state. Live data is work too.
 - An operator calls `api.add_live_request()`, `api.pause_live_request()`,
   `api.resume_live_request()` and `api.withdraw_live_request()`. Each call
   sends `NOTIFY empiriq_live`.
-- `api.live_streams(feeder_id)` returns the active live requests that match
+- `api.live_streams(name)` returns the active live requests that match
   the capabilities of the feeder. The call counts as a heartbeat.
 - A feeder calls it at start, after each notification and regularly. It
   subscribes to new streams at the venue, and unsubscribes from streams that

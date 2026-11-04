@@ -20,6 +20,13 @@ account. This has three problems:
 - Each simulated reconciler moves its own time in a backtest. Several
   simulated accounts have no common clock.
 
+A barrier for all participants was tried before, in
+[ADR 0003](0003-cycle-barrier.md), and [ADR 0008](0008-frames.md) removed it.
+Its problems do not come back here. Nobody has to start a frame: the last
+reconciler opens the next one. Feeders do not take part: cutoffs make frames
+repeatable without waiting for them. A slow venue delays only its own world,
+not all accounts.
+
 ## Decision
 
 ### A world has one clock
@@ -60,8 +67,7 @@ the `seq` of the last account event, as before.
   `update ... set pending = pending - 1 returning pending`. The row lock
   orders concurrent calls, so exactly one transaction sees 0. A count of
   reconciliations would not work: two concurrent transactions do not see
-  each other, and the frame would never close. This is the counter of
-  [ADR 0003](0003-cycle-barrier.md).
+  each other, and the frame would never close.
 - The transaction that sees 0 is the end of the frame. In that transaction,
   the database calls the frame handler `core.on_frame(frame_id)`, opens the
   next frame and sends `NOTIFY empiriq_frame`.

@@ -9,7 +9,6 @@
 - Refined by [0012](0012-backfiller-registry.md): backfillers lease only for their capabilities.
 - Refined by [0014](0014-live-coverage.md): live coverage.
 - Refined by [0019](0019-measured-publish-delay.md): measured publish delay.
-- Refined by [0020](0020-backfill-runs-are-internal.md): backfill runs are internal.
 
 ## Context
 

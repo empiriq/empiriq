@@ -5,7 +5,6 @@
 **Related:**
 
 - Refines [0010. Declarative history: requests, coverage and leases](0010-declarative-history.md).
-- Refined by [0020](0020-backfill-runs-are-internal.md): no backfill runs on the board.
 
 ## Context
 
@@ -38,20 +37,25 @@ calling functions of `api`. It never reads or writes `market.*` or `core.*`.
 
 So `api` gets views shaped for display:
 
-| View                  | Shows                                                              |
-|-----------------------|--------------------------------------------------------------------|
-| `api.history_request` | History requests, with the part of the period that is still missing |
-| `api.backfill_run`    | Backfill runs, with duration and rows per second                    |
-| `api.writer`          | Writers and whether they are open                                   |
-| `api.stream_health`   | Live streams: lag of `complete_until` and age of the last heartbeat |
+| View                  | Shows                                                                                                      |
+|-----------------------|------------------------------------------------------------------------------------------------------------|
+| `api.history_request` | History requests: the part of the period that is still missing, the failed runs in it and the newest error |
+| `api.writer`          | Writers and whether they are open                                                                          |
+| `api.stream_health`   | Live streams: lag of `complete_until` and age of the last heartbeat                                        |
 
 And control functions:
 
-| Function                    | Does                                                                  |
-|-----------------------------|-----------------------------------------------------------------------|
-| `api.withdraw_history_request()`    | Deletes a history request. Loaded rows stay.                          |
-| `api.retry_backfill_run()`      | Lets backfillers lease the period of a failed run now                 |
-| `api.discard_backfill_run()`    | Deletes the rows of a finished run. Its period is missing again.      |
+| Function                         | Does                                                                                         |
+|----------------------------------|----------------------------------------------------------------------------------------------|
+| `api.withdraw_history_request()` | Deletes a history request. Loaded rows stay.                                                 |
+| `api.retry_history_request()`    | Lets backfillers load the failed periods of a request now, without waiting for `retry_after` |
+
+### Backfill runs are internal
+
+The board shows history requests, not backfill runs. `market.backfill_run`
+stays: it is the coverage, it blocks leased periods, and each run is a
+writer. There is no function to discard a run. The owner can delete the rows
+of a run in SQL if it is really needed.
 
 `api.add_history_request()` gets the argument `p_requested_by`. The board passes
 the name of its user, so the request shows the person and not the database
@@ -75,9 +79,9 @@ users with fewer rights, the board controls that itself.
 - Everybody with access to the board can change desired state. There is no
   read-only access to the database for people. A read-only role can come back
   later, if a use case needs it.
-- `api.discard_backfill_run()` deletes rows that past frames may have seen. A
-  backtest over the period gives other results after a new load. Use it for
-  bad data only.
+- The board has no page of backfill runs. The page of a history request
+  shows why it is incomplete and offers Retry. Debugging of single runs uses
+  SQL on `market.backfill_run`, as the owner.
 - A failed run counts as failed in `api.history_coverage` only while its
   period overlaps a missing period. After a successful retry, or after the
   request is withdrawn, the stream shows no failures.

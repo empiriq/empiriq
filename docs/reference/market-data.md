@@ -313,7 +313,7 @@ of the source for the same period:
 shows the failed runs of a request (`failed_runs`) and the newest error
 (`last_error`). To load the failed periods now, call
 `api.retry_history_request(id)`. Backfill runs themselves are internal
-([ADR 0020](../adr/0020-backfill-runs-are-internal.md)).
+([ADR 0011](../adr/0011-board.md)).
 
 **Depth.** Venues usually do not provide historical depth snapshots. The
 history of depth comes from the recordings of the live feeder or from a data
