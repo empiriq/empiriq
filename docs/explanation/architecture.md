@@ -10,8 +10,8 @@ backfillers, reconcilers and the board are separate
 [services](#services). They communicate only with the database.
 
 **Designed for:** decisions within one second or faster. Examples are market
-making, intraday strategies and portfolio rebalancing. Backtests and research
-run the same code as live trading.
+making, arbitrage between venues, intraday strategies and portfolio
+rebalancing. Backtests and research run the same code as live trading.
 
 **The database is an investment, not only a cost.** PostgreSQL in the
 decision loop adds some latency compared with an in-process engine. In return,
