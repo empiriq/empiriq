@@ -1,0 +1,23 @@
+# Names in the docs that the code does not have, on purpose.
+# make check-docs fails for every other api.*, market.* or core.* name in the
+# docs that is not in ../database/migrations, and for a name here that is.
+#
+# [planned]: decided or proposed, not in the code yet. Allowed in all docs.
+#            Remove the name when the code has it.
+# [removed]: removed from the code. Allowed only in ADRs, as history.
+
+[planned]
+core.world          # ADR 0022
+core.world.clock    # ADR 0022
+api.start_world     # ADR 0022
+core.on_frame       # ADR 0022
+api.replay_frame    # architecture, open question 2
+api.best_prices     # glossary, open decisions
+
+[removed]
+api.start_cycle     # ADR 0003, removed by ADR 0008
+api.ack             # ADR 0003
+api.nack            # ADR 0003
+api.expire_tasks    # ADR 0003
+api.bars            # removed by ADR 0013
+api.bar             # removed by ADR 0013

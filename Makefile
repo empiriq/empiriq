@@ -146,6 +146,11 @@ open: ## Open the board in the browser.
 lint: ## Check compose.yaml and docker-bake.hcl.
 	@$(COMPOSE) config -q && docker buildx bake -f docker-bake.hcl --print >/dev/null && echo ok
 
+.PHONY: check-docs
+check-docs: ## Check the docs against the code: names in the database, links, ADR numbers.
+	@python3 scripts/check-docs.py --database $(DATABASE_DIR) \
+	  --repo $(BOARD_DIR) --repo $(BINANCE_FEEDER_DIR) --repo $(BINANCE_BACKFILLER_DIR)
+
 ##@ Database
 
 .PHONY: psql
@@ -184,7 +189,7 @@ delays: ## Show the publish delays measured from live trades.
 	@echo "select venue_id, stream, delay, samples, measured_from, measured_to, updated_at from api.publish_delay order by 1, 2;" | $(PSQL)
 
 .PHONY: runs
-runs: ## Show the last 20 backfill runs (internal, ADR 0020).
+runs: ## Show the last 20 backfill runs (internal, ADR 0011).
 	@echo "select b.writer_id, i.venue_id, i.symbol, b.stream, b.period, b.status, b.rows, b.error from market.backfill_run b join core.instrument i on i.id = b.instrument_id order by b.writer_id desc limit 20;" | $(PSQL)
 
 .PHONY: backfillers

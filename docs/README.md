@@ -30,3 +30,7 @@ kinds of documents, one for each need of a reader.
   documents here.
 - Follow the writing rules in [CLAUDE.md](../CLAUDE.md): short sentences,
   active voice, terms from the glossary.
+- Run `make check-docs` before a pull request. It checks that the names of
+  `api`, `market` and `core` exist in the database, that links work and that
+  ADR numbers exist. A name that the code does not have yet, or no longer
+  has, goes into [code-names.txt](code-names.txt).
