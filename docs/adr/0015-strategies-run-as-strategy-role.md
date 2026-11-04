@@ -1,7 +1,11 @@
 # 0015. Strategies run as `empiriq_strategy` and read market data only through `api`
 
-**Status:** Proposed. Refines [0006](0006-strategies-are-stable-functions.md)
-and [0008](0008-frames.md).
+**Status:** Proposed
+
+**Related:**
+
+- Refines [0006. Strategies are STABLE SQL functions](0006-strategies-are-stable-functions.md).
+- Refines [0008. Frames: reconciliation drives strategies, cutoffs make them deterministic](0008-frames.md).
 
 ## Context
 

@@ -1,6 +1,10 @@
 # 0004. Three intent levels compiled to orders
 
-**Status:** Proposed. Refined by [0017](0017-venue-trading-rules.md): the planner does not round to the lot size.
+**Status:** Proposed
+
+**Related:**
+
+- Refined by [0017](0017-venue-trading-rules.md): the planner does not round to the lot size.
 
 ## Context
 

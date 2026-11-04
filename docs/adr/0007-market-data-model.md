@@ -1,6 +1,10 @@
 # 0007. Market data: raw trades and depth snapshots, all other values derived
 
-**Status:** Proposed. Refined by [0013](0013-strategies-build-bars.md): strategies build bars from `api.trades()`.
+**Status:** Proposed
+
+**Related:**
+
+- Refined by [0013](0013-strategies-build-bars.md): strategies build bars from `api.trades()`.
 
 ## Context
 

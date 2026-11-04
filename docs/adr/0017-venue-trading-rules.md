@@ -1,6 +1,10 @@
 # 0017. empiriq does not store the trading rules of venues
 
-**Status:** Proposed. Refines [0004](0004-intent-levels.md).
+**Status:** Proposed
+
+**Related:**
+
+- Refines [0004. Three intent levels compiled to orders](0004-intent-levels.md).
 
 ## Context
 

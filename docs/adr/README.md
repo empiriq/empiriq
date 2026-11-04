@@ -4,8 +4,19 @@ An ADR is a short record of a decision that shapes the project. It states the
 decision, the reasons and the costs. To change a decision, add a new ADR that
 replaces the old one. Do not change the decision in an accepted ADR.
 
-Format: `NNNN-title.md` with the sections *Status*, *Context*, *Decision* and
-*Consequences*.
+Format: `NNNN-title.md` with *Status*, optional *Related*, and the sections
+*Context*, *Decision* and *Consequences*.
+
+- **Status** is `Proposed`, `Accepted`, or `Superseded by` with a
+  link. A proposed ADR can still change. Only the project owner sets
+  `Accepted`.
+- **Related** is a list of links to other ADRs:
+  - `Supersedes` / `Refines`: the older ADRs that this ADR changes, with
+    their titles.
+  - `Refined by`: the newer ADRs that change this one, with one short phrase
+    about the change.
+- If a new ADR refines or supersedes an older one, update both ADRs in the
+  same pull request.
 
 | #    | Decision                                                                  | Status   |
 |------|---------------------------------------------------------------------------|----------|

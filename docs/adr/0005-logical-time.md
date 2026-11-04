@@ -1,6 +1,10 @@
 # 0005. Logical time
 
-**Status:** Proposed. Refined by [0013](0013-strategies-build-bars.md): `api.bars()` is replaced by `api.trades()`.
+**Status:** Proposed
+
+**Related:**
+
+- Refined by [0013](0013-strategies-build-bars.md): `api.bars()` is replaced by `api.trades()`.
 
 ## Context
 

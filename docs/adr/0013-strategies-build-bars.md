@@ -1,7 +1,12 @@
 # 0013. Strategies build bars, the console gets trade buckets
 
-**Status:** Proposed. Refines [0005](0005-logical-time.md),
-[0007](0007-market-data-model.md) and [0008](0008-frames.md).
+**Status:** Proposed
+
+**Related:**
+
+- Refines [0005. Logical time](0005-logical-time.md).
+- Refines [0007. Market data: raw trades and depth snapshots, all other values derived](0007-market-data-model.md).
+- Refines [0008. Frames: reconciliation drives strategies, cutoffs make them deterministic](0008-frames.md).
 
 ## Context
 

@@ -1,6 +1,11 @@
 # 0009. Writers: cutoffs for each writer
 
-**Status:** Proposed. Refines [0008](0008-frames.md). Refined by [0010](0010-declarative-history.md): who starts backfill runs.
+**Status:** Proposed
+
+**Related:**
+
+- Refines [0008. Frames: reconciliation drives strategies, cutoffs make them deterministic](0008-frames.md).
+- Refined by [0010](0010-declarative-history.md): who starts backfill runs.
 
 ## Context
 

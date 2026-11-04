@@ -1,6 +1,14 @@
 # 0008. Frames: reconciliation drives strategies, cutoffs make them deterministic
 
-**Status:** Proposed. Supersedes [0003](0003-cycle-barrier.md). Refined by [0009](0009-writers.md): cutoffs for each writer. Refined by [0013](0013-strategies-build-bars.md): `api.bars()` is replaced by `api.trades()`. Refined by [0014](0014-live-coverage.md): live coverage. Refined by [0015](0015-strategies-run-as-strategy-role.md): strategies run as `empiriq_strategy`.
+**Status:** Proposed
+
+**Related:**
+
+- Supersedes [0003. Cycle barrier with NOTIFY and a trigger](0003-cycle-barrier.md).
+- Refined by [0009](0009-writers.md): cutoffs for each writer.
+- Refined by [0013](0013-strategies-build-bars.md): `api.bars()` is replaced by `api.trades()`.
+- Refined by [0014](0014-live-coverage.md): live coverage.
+- Refined by [0015](0015-strategies-run-as-strategy-role.md): strategies run as `empiriq_strategy`.
 
 ## Context
 

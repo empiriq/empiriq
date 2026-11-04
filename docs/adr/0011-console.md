@@ -1,6 +1,11 @@
 # 0011. Console: one user interface, only through `api`
 
-**Status:** Proposed. Refines [0010](0010-declarative-history.md). Refined by [0020](0020-backfill-runs-are-internal.md): no backfill runs in the console.
+**Status:** Proposed
+
+**Related:**
+
+- Refines [0010. Declarative history: requests, coverage and leases](0010-declarative-history.md).
+- Refined by [0020](0020-backfill-runs-are-internal.md): no backfill runs in the console.
 
 ## Context
 

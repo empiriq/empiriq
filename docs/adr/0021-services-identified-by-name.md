@@ -1,7 +1,11 @@
 # 0021. Feeders and backfillers are identified by their name
 
-**Status:** Proposed. Refines [0012](0012-backfiller-registry.md) and
-[0016](0016-live-requests.md).
+**Status:** Proposed
+
+**Related:**
+
+- Refines [0012. Backfiller registry: services report, work is controlled](0012-backfiller-registry.md).
+- Refines [0016. Live requests: feeders register, operators declare live streams](0016-live-requests.md).
 
 ## Context
 

@@ -1,6 +1,10 @@
 # 0006. Strategies are STABLE SQL functions
 
-**Status:** Proposed. Refined by [0015](0015-strategies-run-as-strategy-role.md): strategies run as `empiriq_strategy`.
+**Status:** Proposed
+
+**Related:**
+
+- Refined by [0015](0015-strategies-run-as-strategy-role.md): strategies run as `empiriq_strategy`.
 
 ## Context
 

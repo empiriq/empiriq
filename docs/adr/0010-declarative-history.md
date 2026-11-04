@@ -1,6 +1,15 @@
 # 0010. Declarative history: requests, coverage and leases
 
-**Status:** Proposed. Refines [0009](0009-writers.md). Refined by [0011](0011-console.md) [0012](0012-backfiller-registry.md) [0014](0014-live-coverage.md) and [0019](0019-measured-publish-delay.md): measured publish delay. Refined by [0020](0020-backfill-runs-are-internal.md): backfill runs are internal.
+**Status:** Proposed
+
+**Related:**
+
+- Refines [0009. Writers: cutoffs for each writer](0009-writers.md).
+- Refined by [0011](0011-console.md): one role for the console, and more control functions.
+- Refined by [0012](0012-backfiller-registry.md): backfillers lease only for their capabilities.
+- Refined by [0014](0014-live-coverage.md): live coverage.
+- Refined by [0019](0019-measured-publish-delay.md): measured publish delay.
+- Refined by [0020](0020-backfill-runs-are-internal.md): backfill runs are internal.
 
 ## Context
 

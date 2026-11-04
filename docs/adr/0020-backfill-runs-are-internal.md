@@ -1,7 +1,11 @@
 # 0020. Backfill runs are internal
 
-**Status:** Proposed. Refines [0010](0010-declarative-history.md) and
-[0011](0011-console.md).
+**Status:** Proposed
+
+**Related:**
+
+- Refines [0010. Declarative history: requests, coverage and leases](0010-declarative-history.md).
+- Refines [0011. Console: one user interface, only through `api`](0011-console.md).
 
 ## Context
 

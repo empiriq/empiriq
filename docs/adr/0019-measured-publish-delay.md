@@ -1,6 +1,10 @@
 # 0019. The publish delay is measured from live trades
 
-**Status:** Proposed. Refines [0010](0010-declarative-history.md).
+**Status:** Proposed
+
+**Related:**
+
+- Refines [0010. Declarative history: requests, coverage and leases](0010-declarative-history.md).
 
 ## Context
 
