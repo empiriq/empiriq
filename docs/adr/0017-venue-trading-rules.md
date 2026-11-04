@@ -27,7 +27,7 @@ can only be older than the original.
   `rejected` with the message of the venue in `status_reason`
   (`api.report_order()`). The operator sees it in `api."order"`.
 - A strategy that needs a price or quantity step rounds itself, for example
-  with a param. The example `strategies.grid` has the param `tick`.
+  with a param. The example `strategies.grid` has the param `price_step`.
 
 ## Consequences
 
