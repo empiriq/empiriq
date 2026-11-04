@@ -1,4 +1,4 @@
-# 0013. Strategies build bars, the console gets trade buckets
+# 0013. Strategies build bars, the board gets trade buckets
 
 **Status:** Proposed
 
@@ -18,7 +18,7 @@ period without trades. There are many other ways to build a bar:
 - bars that carry the last close into a period without trades;
 - bars with a volume-weighted average price or with buy and sell volume.
 
-Each way needs a new function or new parameters in `api`. The console also
+Each way needs a new function or new parameters in `api`. The board also
 needs bars for charts, but with other rules: an explicit time range, partial
 periods, no frames, and access for the operator.
 
@@ -35,7 +35,7 @@ periods, no frames, and access for the operator.
   periods are closed. The example `strategies.sma_cross` uses only periods
   that end before `as_of`.
 
-### The console reads trade buckets
+### The board reads trade buckets
 
 - `api.trade_buckets(instrument_id, from, to, bucket)` groups trades into
   periods of length `bucket`, aligned to UTC.
@@ -57,7 +57,7 @@ periods, no frames, and access for the operator.
 - A strategy that reads many trades is slower than with materialized bars.
   The open question of materialized bars from [ADR 0007](0007-market-data-model.md)
   stays open.
-- A chart in the console and a strategy can show different bars for the same
+- A chart on the board and a strategy can show different bars for the same
   period: the chart sees late trades that a frame did not see. This is
   intended. The chart shows what the database has now.
 - `api.bars()` and `api.bar` are removed. This is a breaking change of `api`.

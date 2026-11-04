@@ -31,7 +31,7 @@ venue are observed state.
   every hour. Both have the role `empiriq_feeder`.
 - An instrument keeps its id forever. A delisted instrument stays, with its
   market data and history.
-- The operator cannot register instruments any more. The console shows them
+- The operator cannot register instruments any more. The board shows them
   read-only. The owner can still call `api.register_instrument()` for a venue
   without a service, for example a paper venue.
 

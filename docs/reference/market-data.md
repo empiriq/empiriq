@@ -229,7 +229,7 @@ Someone requests it, and backfillers load what is missing:
 -- The result has one history request for each stream.
 select api.add_history_request($instrument_id, '{trade}', '2026-06-01', '2026-07-01');
 
--- console: requested, covered and missing periods
+-- board: requested, covered and missing periods
 select * from api.history_coverage;
 ```
 
@@ -336,7 +336,7 @@ To build bars of fixed periods, group the trades by
 period must end at or before `as_of`. `strategies.sma_cross` in
 `migrations/0008_example_strategies.sql` shows the pattern.
 
-## What the console gets
+## What the board gets
 
 `api.trade_buckets(instrument_id, from, to, bucket)` groups trades with
 `trade_time` in `[from, to)` into *trade buckets* for charts. Each row has:

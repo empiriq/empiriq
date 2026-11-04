@@ -5,7 +5,7 @@
 **Related:**
 
 - Refines [0009. Writers: cutoffs for each writer](0009-writers.md).
-- Refined by [0011](0011-console.md): one role for the console, and more control functions.
+- Refined by [0011](0011-board.md): one role for the board, and more control functions.
 - Refined by [0012](0012-backfiller-registry.md): backfillers lease only for their capabilities.
 - Refined by [0014](0014-live-coverage.md): live coverage.
 - Refined by [0019](0019-measured-publish-delay.md): measured publish delay.
@@ -81,7 +81,7 @@ and `api.set_strategy_status()`. A dashboard with controls uses this role. The
 role `empiriq_reader` stays read-only.
 
 > ADR 0011 replaces this section: `empiriq_operator` is the only role for
-> people and the console, and `empiriq_reader` is removed.
+> people and the board, and `empiriq_reader` is removed.
 
 ## Consequences
 

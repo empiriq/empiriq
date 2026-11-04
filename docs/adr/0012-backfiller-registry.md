@@ -67,7 +67,7 @@ backfillers.
 ## Consequences
 
 - Several backfillers for different venues work side by side.
-- The console shows backfillers like any other resource: alive or not, with
+- The board shows backfillers like any other resource: alive or not, with
   their runs, without code for it.
 - To stop a backfiller, stop its container. Its runs are abandoned after
   `stale_after` and leased again.

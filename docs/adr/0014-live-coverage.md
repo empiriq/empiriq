@@ -47,7 +47,7 @@ Option C.
 
 ## Consequences
 
-- The console shows lost periods of live data without reading trades.
+- The board shows lost periods of live data without reading trades.
 - The coverage is only as good as the feeder's reports. A feeder that loses
   events but reports a continuous `complete_until` hides the loss.
   `api.trade_gaps()` remains the check against the data.

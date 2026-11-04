@@ -43,7 +43,7 @@ avoid. A word in *italics* has its own entry on this page.
 | **volume** | Sum of trade quantities in a period, in the base asset. | `api.trade_buckets().volume` | |
 | **period** | A time bucket `[ts, ts + interval)`, aligned to UTC. | `date_bin(...)`, `api.trade_buckets().ts` | candle time, window |
 | **bar** | Values of the trades in one *closed period*, such as open, high, low, close and volume. A strategy builds its bars from `api.trades()`; `api` does not build bars. | | candle, kline, OHLC (as a noun) |
-| **trade bucket** | Open, high, low, close, volume and source of the trades in one period, for charts in the console. Ignores frames, and can be partial. Not a bar. | `api.trade_buckets()` | |
+| **trade bucket** | Open, high, low, close, volume and source of the trades in one period, for charts on the board. Ignores frames, and can be partial. Not a bar. | `api.trade_buckets()` | |
 | **closed period** | A period that has ended by `as_of`: `ts + interval <= as_of`. A strategy builds bars only from closed periods. | | |
 | **event time** | When the venue published an event. Market data is *visible* from this moment. | `event_time`, Go `EventTime` | timestamp, ts |
 | **trade time** | When a trade happened on the venue. Used to put trades into periods. | `trade_time`, Go `TradeTime` | |
@@ -129,12 +129,12 @@ avoid. A word in *italics* has its own entry on this page.
 
 | Term | Meaning | In code | Do not use |
 |------|---------|---------|------------|
-| **service** | A part of empiriq that runs in its own container: `database`, `feeder`, `backfiller`, `reconciler` or `console`. Each service has its own repository. | service names in `compose.yaml` | component, app, microservice |
+| **service** | A part of empiriq that runs in its own container: `database`, `feeder`, `backfiller`, `reconciler` or `board`. Each service has its own repository. | service names in `compose.yaml` | component, app, microservice |
 | **database** | The service with PostgreSQL: schema, engine and `api`. The contract for all other services. | service and repository `database` | db, backend |
 | **empiriq** | The name of the project, of its GitHub organization and of the repository with the documentation. Not a service. | repository `empiriq` | |
-| **console** | The user interface of empiriq. Shows the state and changes desired state, only through `api`. The first console is built with Grafana. | service `console` | dashboard (as a service name), UI, admin panel |
-| **dashboard** | One page of the console, for example *Overview* or *History*. | Grafana dashboard | screen, view (view is SQL) |
-| **operator** | A person or the console that changes desired state through `api` functions. | role `empiriq_operator` | admin, user (as a role) |
+| **board** | The user interface of empiriq: Grafana with the dashboards of empiriq. Shows the state and changes desired state, only through `api`. | service and repository `board` | board, dashboard (as a service name), UI, admin panel |
+| **dashboard** | One page of the board, for example *Overview* or *History*. Never the board itself. | Grafana dashboard | screen, view (view is SQL), board (for one page) |
+| **operator** | A person or the board that changes desired state through `api` functions. | role `empiriq_operator` | admin, user (as a role) |
 
 ## Reconciliation
 

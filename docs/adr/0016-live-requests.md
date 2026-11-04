@@ -53,7 +53,7 @@ keys make this safe, and the stream stays covered if one feeder stops.
 
 ## Consequences
 
-- The console shows feeders and live requests like any other resource, with
+- The board shows feeders and live requests like any other resource, with
   forms to add, pause, resume and withdraw.
 - A paused or withdrawn request stops its live coverage. The time until it
   is resumed is an uncovered period.

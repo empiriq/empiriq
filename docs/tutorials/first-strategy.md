@@ -18,7 +18,7 @@ empiriq/
   database/             the database service: schema, engine and api
   binance-feeder/       live trades from Binance
   binance-backfiller/   history from the Binance archive
-  console/              the console
+  board/                the board
   empiriq/              this repository: the documentation and the stack
 ```
 
@@ -29,12 +29,12 @@ In the `empiriq` repository:
 ```sh
 make build    # build the images of all repositories: a few minutes the first time
 make up       # start the database and all services
-make open     # the console: http://localhost:3000
+make open     # the board: http://localhost:3000
 ```
 
 `make up` starts the database first, then the services. At start, the feeder
 and the backfiller report the instruments of their venues. After a few
-seconds, the page **Instruments** of the console lists thousands of them.
+seconds, the page **Instruments** of the board lists thousands of them.
 
 ## 3. Write live trades
 
@@ -49,7 +49,7 @@ The file adds a live request for the trades of `BTCUSDT` on Binance USDⓈ-M
 futures. It shows the request and the newest trades. Run it again after a few
 seconds: new trades appear.
 
-In the console, open **Live requests** to see the request and its feeder.
+On the board, open **Live requests** to see the request and its feeder.
 Then open **Market data** and click `BTCUSDT` in the table **Streams**. The
 page **Chart** shows the candles of the trades as they arrive.
 
@@ -66,7 +66,7 @@ The file adds a history request for yesterday, 00:00 to 24:00 UTC, and shows
 the progress. Run it again until `missing` is empty: `{}`. A day of `BTCUSDT`
 has more than a million trades, so this takes a few minutes.
 
-In the console, **History requests** and **Market data** show the same
+On the board, **History requests** and **Market data** show the same
 progress.
 
 ## 5. Run a strategy

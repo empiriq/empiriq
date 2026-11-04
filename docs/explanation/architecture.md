@@ -6,7 +6,7 @@
 empiriq is an algorithmic trading platform built around PostgreSQL. The
 database holds the current state of every trading account. It also holds the
 market data for these accounts. Strategies are SQL functions. Feeders,
-backfillers, reconcilers and the console are separate
+backfillers, reconcilers and the board are separate
 [services](#services). They communicate only with the database.
 
 **Designed for:** decisions within one second or faster. Examples are market
@@ -22,7 +22,7 @@ you get these benefits:
 - SQL processes large volumes of trades and depth snapshots next to the data.
   The application does not have to load the data first.
 - Account state is transactional. It survives a restart of any component.
-- Strategies, the console and one-off analysis use the same data.
+- Strategies, the board and one-off analysis use the same data.
 
 **Not a goal:** high-frequency trading (HFT) where microseconds decide, for example
 with co-location or kernel bypass. A frame takes a few transactions, so the
@@ -50,7 +50,7 @@ flowchart TB
     D["desired state<br/>balances, positions, orders"]
   end
 
-  G["Console (Grafana)"]
+  G["Board (Grafana)"]
 
   EX -->|"market data, history"| services
   services -->|"place / cancel"| EX
@@ -418,7 +418,7 @@ documentation.
 | `empiriq_feeder`     | feeder, backfiller     | Write `market.*`, call `api.report_watermark()`                      |
 | `empiriq_reconciler` | reconciler             | Read `api.order_action`, call `api.report_*` and `api.reconciled()`  |
 | `empiriq_strategy`   | strategy authors, frames | Create functions in `strategies`. Read market data only through `api.trades()`, `api.last_quote()` and `api.depth_levels()`, and account views. Frames run strategies as this role ([ADR 0015](../adr/0015-strategies-run-as-strategy-role.md)). |
-| `empiriq_operator`   | console, people        | Read `api.*`, change desired state through `api` functions ([ADR 0011](../adr/0011-console.md)) |
+| `empiriq_operator`   | board, people          | Read `api.*`, change desired state through `api` functions ([ADR 0011](../adr/0011-board.md)) |
 
 All write operations use `SECURITY DEFINER` functions in `api` with a fixed
 `search_path`. So clients never need privileges on `core`.
@@ -440,7 +440,7 @@ depth snapshots in `market.depth`
 values when you read them:
 
 - strategies build bars from `api.trades()`;
-- `api.trade_buckets()` groups trades for charts in the console;
+- `api.trade_buckets()` groups trades for charts on the board;
 - `api.last_quote()` returns the best bid and best ask;
 - `api.depth_levels()` returns price levels with notional.
 
@@ -458,7 +458,7 @@ empiriq has five services. Each service runs in its own container.
 | `feeder`     | Writes live market data from one venue or data source.                                      | Long-running     | TBD |
 | `backfiller` | Loads requested historical market data for backtests and analysis.                          | Long-running     | One repository for each source, for example `binance-backfiller` |
 | `reconciler` | Reconciles accounts with one venue, reports observed state and starts frames. A simulated reconciler serves the `paper` and `backtest` modes. | Long-running | TBD |
-| `console`    | The user interface. Shows the state and changes desired state, only through `api` ([ADR 0011](../adr/0011-console.md)). Built with Grafana. | Long-running | `console` |
+| `board`      | The user interface. Shows the state and changes desired state, only through `api` ([ADR 0011](../adr/0011-board.md)). Built with Grafana. | Long-running | `board` |
 
 A deployment usually runs one feeder and one reconciler for each venue.
 
@@ -470,7 +470,7 @@ empiriq/
   database/             the database service: schema, engine and api
   binance-backfiller/   a backfiller for the Binance archive
   binance-feeder/       a feeder for the Binance WebSocket streams
-  console/              the console
+  board/                the board
   empiriq/              the documentation; builds the images and starts them together
 ```
 

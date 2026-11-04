@@ -46,7 +46,7 @@ its own container.
 | `feeder`     | Writes live market data from one venue or data source, for the active live requests.                                             |
 | `backfiller` | Loads requested history in backfill runs.                                                                                        |
 | `reconciler` | Reconciles accounts with one venue, reports observed state and starts frames.                                                    |
-| `console`    | The user interface: shows the state and changes desired state, only through `api`. Built with Grafana; its pages are dashboards. |
+| `board`      | The user interface: shows the state and changes desired state, only through `api`. Built with Grafana; its pages are dashboards. |
 
 ### Control is declarative
 
@@ -58,7 +58,7 @@ matches their capabilities. empiriq does not start or stop services.
 
 - You can write a service in any language that has a PostgreSQL driver.
 - A new venue needs a feeder, a backfiller and a reconciler. The database
-  and the console do not change.
+  and the board do not change.
 - The database adds latency compared with an in-process engine. The latency
   budget of a frame is in milliseconds.
 - `api` is the contract of every service, so it needs strict versioning.

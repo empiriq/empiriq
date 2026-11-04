@@ -38,7 +38,7 @@ too.
 | `feeder` | [0014](0014-live-coverage.md), [0016](0016-live-requests.md), [0018](0018-services-report-instruments.md), [0021](0021-services-identified-by-name.md) |
 | `backfiller` | [0010](0010-declarative-history.md), [0012](0012-backfiller-registry.md), [0018](0018-services-report-instruments.md), [0019](0019-measured-publish-delay.md), [0020](0020-backfill-runs-are-internal.md), [0021](0021-services-identified-by-name.md) |
 | `reconciler` | [0002](0002-desired-vs-observed.md), [0008](0008-frames.md), [0017](0017-venue-trading-rules.md) |
-| `console` | [0011](0011-console.md), [0020](0020-backfill-runs-are-internal.md) |
+| `board` | [0011](0011-board.md), [0020](0020-backfill-runs-are-internal.md) |
 
 ## All ADRs
 
@@ -55,9 +55,9 @@ too.
 | 0008 | [Frames: reconciliation drives strategies, cutoffs make them deterministic](0008-frames.md)                             | Proposed           |
 | 0009 | [Writers: cutoffs for each writer](0009-writers.md)                                                                     | Proposed           |
 | 0010 | [Declarative history: requests, coverage and leases](0010-declarative-history.md)                                       | Proposed           |
-| 0011 | [Console: one user interface, only through `api`](0011-console.md)                                                      | Proposed           |
+| 0011 | [Board: one user interface, only through `api`](0011-board.md)                                                          | Proposed           |
 | 0012 | [Backfiller registry: services report, work is controlled](0012-backfiller-registry.md)                                 | Proposed           |
-| 0013 | [Strategies build bars, the console gets trade buckets](0013-strategies-build-bars.md)                                  | Proposed           |
+| 0013 | [Strategies build bars, the board gets trade buckets](0013-strategies-build-bars.md)                                    | Proposed           |
 | 0014 | [Live coverage: feeders report continuous periods](0014-live-coverage.md)                                               | Proposed           |
 | 0015 | [Strategies run as `empiriq_strategy` and read market data only through `api`](0015-strategies-run-as-strategy-role.md) | Proposed           |
 | 0016 | [Live requests: feeders register, operators declare live streams](0016-live-requests.md)                                | Proposed           |

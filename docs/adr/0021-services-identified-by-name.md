@@ -41,7 +41,7 @@ A feeder and a backfiller had three fields that say who they are: `id`,
 - A service needs no state from the registration except the id of its writer
   (feeders only). The writer keeps a numeric id, because every row of market
   data stores it.
-- The console shows feeders and backfillers by name, also in the address of
+- The board shows feeders and backfillers by name, also in the address of
   the record page.
 - This is a breaking change of `api`. Feeders and backfillers change in the
   same release.
