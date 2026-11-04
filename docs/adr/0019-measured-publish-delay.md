@@ -4,7 +4,7 @@
 
 **Related:**
 
-- Refines [0010. Declarative history: requests, coverage and leases](0010-declarative-history.md).
+- Refines [0010. Declarative history: history requests, coverage and backfill runs](0010-declarative-history.md).
 
 ## Context
 

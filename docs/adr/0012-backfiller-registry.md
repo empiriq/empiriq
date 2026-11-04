@@ -4,7 +4,7 @@
 
 **Related:**
 
-- Refines [0010. Declarative history: requests, coverage and leases](0010-declarative-history.md).
+- Refines [0010. Declarative history: history requests, coverage and backfill runs](0010-declarative-history.md).
 - Refined by [0016](0016-live-requests.md): feeders register the same way.
 - Refined by [0018](0018-services-report-instruments.md): services report instruments.
 
@@ -41,15 +41,15 @@ what services report: observed state.
   default, so a second process of the same image needs only another value.
 - Its **capabilities** are all pairs of the venues and streams
   (`market.backfiller_stream`).
-- Its **settings** are its lease settings: `max_span`, `retry_after`,
+- Its **settings** apply to `api.lease_history()`: `max_span`, `retry_after`,
   `stale_after` and `heartbeat_interval`. The backfiller declares them once,
-  not with every lease.
+  not with every call.
 - It calls `api.backfiller_heartbeat(name)` every `heartbeat_interval`, also
   while a long run loads. `api.lease_history(name)` counts as a heartbeat too.
 - `api.backfiller` shows each backfiller, whether it is alive (a heartbeat
   within 3 intervals), its running runs and its results of the last 24 hours.
 
-### Leases match capabilities
+### Backfillers lease only what they can load
 
 `api.lease_history(name)` gives only periods of active requests whose venue
 and stream are capabilities of the backfiller. Each backfill run records the

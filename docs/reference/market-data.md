@@ -233,8 +233,8 @@ select api.add_history_request($instrument_id, '{trade}', '2026-06-01', '2026-07
 select * from api.history_coverage;
 ```
 
-A backfiller registers when it starts, with its capabilities and lease
-settings ([ADR 0012](../adr/0012-backfiller-registry.md)):
+A backfiller registers when it starts, with its capabilities and the settings
+of `api.lease_history()` ([ADR 0012](../adr/0012-backfiller-registry.md)):
 
 ```sql
 select api.register_backfiller('my-backfiller@host1',
@@ -264,7 +264,7 @@ When there is no work, wait for `NOTIFY empiriq_history` or for a timer.
 
 - **Retries.** A failed period can be leased again after `retry_after`
   (default 10 minutes).
-- **Expired leases.** If a backfiller sends no heartbeat for `stale_after`
+- **Abandoned runs.** If a backfiller sends no heartbeat for `stale_after`
   (default 5 minutes), its running runs are marked `abandoned`, and their
   writers are closed. Then their periods are leased again.
 - **Paused requests.** An operator can pause a request

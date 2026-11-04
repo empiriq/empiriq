@@ -5,7 +5,7 @@
 **Related:**
 
 - Refines [0008. Frames: reconciliation drives strategies, cutoffs make them deterministic](0008-frames.md).
-- Refines [0010. Declarative history: requests, coverage and leases](0010-declarative-history.md).
+- Refines [0010. Declarative history: history requests, coverage and backfill runs](0010-declarative-history.md).
 - Refined by [0016](0016-live-requests.md): live requests.
 
 ## Context

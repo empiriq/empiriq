@@ -1,4 +1,4 @@
-# 0010. Declarative history: requests, coverage and leases
+# 0010. Declarative history: history requests, coverage and backfill runs
 
 **Status:** Proposed
 
@@ -47,7 +47,7 @@ missing periods as multiranges:
 missing = union(requested periods) − union(covered periods)
 ```
 
-### Reconciliation: leases
+### Reconciliation: backfillers lease missing periods
 
 A backfiller is a long-running service. It listens on `empiriq_history`, and
 it also checks regularly. To get work, it calls `api.lease_history()`. The
@@ -62,9 +62,10 @@ The backfiller loads only rows inside the leased period and ends the run with
 `api.finish_backfill()`. On success the period becomes covered. On failure it
 becomes missing again, and it can be leased again after `retry_after`.
 
-A lease is not permanent. A run that is still `running` after `stale_after` is
-marked `abandoned` and its writer is closed. The period then becomes missing
-again. Leases are taken one after the other, so several backfillers never
+A backfill run is not permanent. If its backfiller sends no heartbeat for
+`stale_after` ([ADR 0012](0012-backfiller-registry.md)), the run is marked
+`abandoned` and its writer is closed. The period then becomes missing
+again. Backfillers lease one after the other, so several backfillers never
 lease the same period.
 
 ### Units of the source are a detail of the backfiller

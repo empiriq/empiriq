@@ -4,7 +4,7 @@
 
 **Related:**
 
-- Refines [0004. Three intent levels compiled to orders](0004-intent-levels.md).
+- Refines [0004. Three intent kinds planned into orders](0004-intent-kinds.md).
 
 ## Context
 

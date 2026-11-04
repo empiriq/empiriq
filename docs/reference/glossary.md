@@ -10,6 +10,8 @@ one of the two has a bug.
   commit messages.
 - **Do not use** the listed synonyms, also when they seem clearer in one place.
 - **New concept?** Add it here first, in the same pull request.
+- **Never "run" or "request" alone.** Say *backfill run* or *strategy run*,
+  *live request* or *history request*. A call to a venue is not a request.
 
 Each entry has the term, its meaning, its name in code and the words to
 avoid. A word in *italics* has its own entry on this page.
@@ -54,13 +56,14 @@ avoid. A word in *italics* has its own entry on this page.
 | **backfill run** | Loading of one stream for one period. It is its own writer. Done runs form the coverage. Internal: the operator sees history requests, not runs ([ADR 0011](../adr/0011-board.md)). | `market.backfill_run`, `api.finish_backfill()` | job, import |
 | **live request** | Desired live data: one stream of one instrument that feeders write all the time. An operator can pause, resume or withdraw it. | `market.live_request`, `api.add_live_request()`, `api.live_streams()` | subscription (that is for strategies), feed |
 | **history request** | Desired history: one stream for one period. An operator can pause, resume or withdraw it. | `market.history_request`, `api.add_history_request()`, `api.pause_history_request()`, `api.withdraw_history_request()` | order, job |
-| **capability** | One venue and one stream that a feeder can write or a backfiller can load. A feeder gets only live requests, and a backfiller only leases, for its capabilities. | `market.feeder_stream`, `market.backfiller_stream` | skill, feature |
+| **capability** | One venue and one stream that a feeder can write or a backfiller can load. A feeder gets only the live requests of its capabilities, and a backfiller leases only periods of its capabilities. | `market.feeder_stream`, `market.backfiller_stream` | skill, feature |
 | **heartbeat** (of a service) | A sign that a service is alive, sent every `heartbeat_interval`. A stream has its own heartbeat: the *watermark*. | `api.backfiller_heartbeat()`, `api.feeder_heartbeat()`, `heartbeat_at` | ping, keepalive |
 | **retry** (a history request) | Let backfillers lease the failed periods of a request now, without waiting for `retry_after`. | `api.retry_history_request()`, `retry_requested_at` | rerun, restart |
-| **coverage** | The periods of a stream for which every event is stored. *History coverage*: the union of the periods of all done backfill runs. With *live coverage*: the coverage of the stream. Missing = requested − history coverage. | `api.history_coverage`, `api.stream_summary.covered` | availability |
+| **coverage** | The periods of a stream for which every event is stored. *History coverage*: the union of the periods of all done backfill runs. With *live coverage*: the coverage of the stream. | `api.history_coverage`, `api.stream_summary.covered` | availability |
 | **live coverage** | A period in which one feeder stored every event of a stream, by `event_time`. `api.report_watermark()` extends it, or starts a new one after a reconnect or a long jump of `complete_until`. | `market.live_coverage`, `api.live_coverage` | uptime |
-| **uncovered period** | A period between the first and the last covered time of a stream that has no coverage. Lost live data, or history that was not loaded. Not a *gap*: a gap is about trade ids. | `api.stream_summary.uncovered` | hole, outage |
-| **lease** | A missing period that a backfiller got with `api.lease_history()`. It becomes a backfill run. It is abandoned when the backfiller sends no heartbeat for `stale_after`. | `api.lease_history()` | claim (claim is for strategies), lock, task |
+| **missing period** | A requested period without history coverage: history requests − history coverage. Compares desired state with observed state. Backfillers lease missing periods. | `api.history_coverage.missing` | gap, hole |
+| **uncovered period** | A period between the first and the last covered time of a stream that has no coverage. Compares with what is stored, not with requests: lost live data, or history that was not loaded. Not a *gap*: a gap is about trade ids. | `api.stream_summary.uncovered` | hole, outage |
+| **lease** (verb) | What a backfiller does with `api.lease_history()`: it takes a *missing period* that it can load, as a new backfill run. The run is abandoned when the backfiller sends no heartbeat for `stale_after`. | `api.lease_history()` | claim (claim is for strategies), lock, task; *lease* as a noun: say *backfill run* |
 | **publish delay** | Added to `trade_time` to get `event_time` for historical trades, because the source has no publish time. Measured from live trades of the venue: the 99th percentile of `event_time - trade_time`. | `market.publish_delay`, `api.publish_delay`, `market.backfill_run.publish_delay` | latency, lag |
 | **gap** | A range of source trade ids with no row. Not always lost data: some sources skip ids. | `api.trade_gaps()` | hole, missing data |
 | **seq** | Number that a market row gets at insert. Grows in commit order for each writer and instrument. | `market.trade.seq`, `market.depth.seq` | id, offset |
@@ -91,14 +94,14 @@ avoid. A word in *italics* has its own entry on this page.
 | **position** | Signed net exposure on a derivative instrument. For spot, exposure is the base asset balance. | `core.position.qty` | exposure (as a table name), holding |
 | **intent** | One row of strategy output. Kinds: `balance`, `position`, `order`, `state`. | `api.intent`, `api.target_*`, `api.*_order`, `api.set_state` | signal, command, action |
 | **full replace** | The output of a strategy run replaces the complete desired state of that strategy. A missing asset or instrument is no longer managed. | `core.apply_intents()` | snapshot semantics |
-| **intent level** | How declarative an intent is: `balance` → `position` → `order`. | `core.claim.level`, `api.intent.kind` | layer (see open decisions) |
+| **intent kind** | `balance`, `position`, `order` or `state`. The first three go from the most declarative to the least: `balance` → `position` → `order`. A claim has one of these three. | `api.intent.kind`; `core.claim.level` (to be renamed `kind`) | intent level, layer |
 | **target** | The desired amount in a balance or position intent. | `target` | goal, desired quantity |
 | **tolerance** | A delta at or below this does not cause an order. Prevents churn. Set it to at least one quantity step of the venue. | `tolerance` | threshold, epsilon, deadband |
 | **hints** | Free-form execution preferences passed through to planners and reconcilers. | `hints jsonb` | options, params |
 | **order key** | A strategy's own stable name for an order intent. Same key + same fields = no action. | `api.intent.key`, `core.desired_order.key` | order name, tag |
 | **revision** | Increments when an order intent with the same key changes. A new revision means a new client order id. | `core.desired_order.revision` | version, generation |
 | **satisfied** | A desired order whose observed order is terminal. It is not placed again. | | done, completed |
-| **claim** | Ownership of an asset or instrument in an account by one strategy at one intent level. | `core.claim` | lock, reservation |
+| **claim** | Ownership of an asset or instrument in an account by one strategy with one *intent kind*. | `core.claim` | lock, reservation |
 | **planner** | Engine code that turns balance and position targets into desired orders. | `core.plan()`, `origin = 'planner'` | optimizer, allocator |
 | **delta** | `target − observed − in-flight`. What a planner still has to trade. | | diff, gap |
 | **in-flight** | The unfilled quantity of planner orders that are desired or live. | | pending, open |
@@ -106,6 +109,7 @@ avoid. A word in *italics* has its own entry on this page.
 | **desired status** | `running` or `stopped`. Only running strategies get frames. | `core.strategy.desired_status`, `api.set_strategy_status()` | enabled, active |
 | **on stop** | What happens to the desired state of a stopped strategy: `keep` or `cancel`. | `core.strategy.on_stop` | |
 | **subscription** | A stream that a strategy reads. The engine records cutoffs only for subscribed streams. | `core.strategy_stream`, `api.subscribe()` | dependency, input |
+| **strategy run** | One run of one strategy in a frame. Reserved: its details come with the decision about the frame handler. | | run (alone) |
 | **strategy context** | The input of a strategy: ids, `as_of`, clock, params, strategy state. | `api.strategy_context`, `ctx` | |
 | **strategy state** | Data a strategy carries between frames. Always say "strategy state", never just "state". | `core.strategy_state`, `api.set_state()` | memory, storage |
 | **params** | Static configuration of a registered strategy. | `core.strategy.params` | config, settings, arguments |
@@ -160,8 +164,6 @@ qualified form from the first column.
 | Issue | Today | Proposal |
 |-------|-------|----------|
 | **"quote"** has two meanings: the quote asset of an instrument, and best bid/ask | `quote_asset` and `api.quote` / `api.last_quote()` | Keep "quote" only for the asset. Rename `api.quote` → `api.best_prices`, `api.last_quote()` → `api.best_prices()` |
-| **"level"** has two meanings: intent level and price level | `core.claim.level`, `api.depth_levels.level` | Always say "intent level" or "price level". Consider renaming `core.claim.level` → `intent_kind` to match `api.intent.kind` |
-| **"kind" and "level"** for the same thing | `api.intent.kind`, `core.claim.level` | Use one name for both: `kind` |
 | **"snapshot"** meant both a depth snapshot and the full-replace rule for strategy output | Docs now use **full replace**. Code has no name for the rule. | Keep "snapshot" only for depth snapshots |
 | **`qty` and `Quantity`** | SQL `qty`, Go `Quantity` | Term is "quantity". Keep the `qty` abbreviation in SQL, or rename columns to `quantity` everywhere |
 | **"side"** for order side and book side | `core.order_side`, `api.depth_levels.side` | Rename the depth column to `book_side` |

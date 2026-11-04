@@ -198,11 +198,11 @@ replay world moves `as_of` step by step, and its simulated reconcilers
 respond at once. History does not change during a backtest, so `event_time <= as_of`
 alone is deterministic.
 
-## Declarative state: three intent levels
+## Declarative state: three intent kinds
 
-A strategy can state what it wants at one of three intent levels:
+A strategy can state what it wants with one of three intent kinds:
 
-| Intent level | Constructor                                          | Meaning                                  | Table                   |
+| Intent kind  | Constructor                                          | Meaning                                  | Table                   |
 |--------------|------------------------------------------------------|------------------------------------------|-------------------------|
 | **balance**  | `api.target_balance('BTC', 0.5, 'USDT')`             | Hold 0.5 BTC. Convert from and to USDT.  | `core.desired_balance`  |
 | **position** | `api.target_position(instrument, 2)`                 | Hold a net position of +2.               | `core.desired_position` |
@@ -239,10 +239,10 @@ frame, the engine removes it. This has three consequences:
 
 ### Claims
 
-In one account, only **one strategy at one intent level** can target an asset
+In one account, only **one strategy with one intent kind** can target an asset
 or instrument. For example, a balance target on BTC funded from USDT claims
 two things: `asset:BTC` and the spot instrument `BTCUSDT`. If a run conflicts
-with an existing claim, it fails with a clear error. So intent levels never
+with an existing claim, it fails with a clear error. So intent kinds never
 mix on one instrument. For example, a strategy cannot target a position and
 also place orders on the same instrument.
 
@@ -287,7 +287,7 @@ stateDiagram-v2
   expired --> [*]
 ```
 
-Every reconciler eventually sees this case: a request times out, and nobody
+Every reconciler eventually sees this case: a call to the venue times out, and nobody
 knows if the venue accepted the order. The status `unknown` covers this case.
 `api.order_action` returns such orders with the action `resolve`. The reconciler
 must then query the venue.
@@ -319,9 +319,9 @@ select api.subscribe('my-strategy', 2, 'trade');
   - `api.balance`, `api.position` and `api."order"`.
 - **Language:** plain SQL and PL/pgSQL both work.
   `migrations/0008_example_strategies.sql` has three examples:
-  - a moving average crossover (position intent level);
-  - a grid with strategy state (order intent level);
-  - a fixed holding (balance intent level).
+  - a moving average crossover (position intents);
+  - a grid with strategy state (order intents);
+  - a fixed holding (balance intents).
 
 ### Starting and stopping
 
@@ -377,15 +377,15 @@ through SQL ([ADR 0010](../adr/0010-declarative-history.md)):
    `api.add_history_request(instrument_id, streams, from, to)`:
    one history request for each stream.
 2. The backfiller registers with `api.register_backfiller()`: its venues,
-   streams and lease settings. Then it sends heartbeats
+   streams and the settings of `api.lease_history()`. Then it sends heartbeats
    ([ADR 0012](../adr/0012-backfiller-registry.md)). Like a feeder, it reports
    the instruments of its venues with `api.report_instruments()`.
 3. It listens on `empiriq_history` and also checks regularly. It calls
    `api.lease_history(name)` to get its next missing period, only for
-   its capabilities. Each lease is a backfill run with its own writer.
+   its capabilities. Each leased period is a backfill run with its own writer.
 4. It loads only the rows inside the leased period, in short transactions. It
    sets `event_time = trade_time + publish_delay`, because historical sources
-   have no publish time. The lease gives the delay, measured from live trades
+   have no publish time. The backfill run gives the delay, measured from live trades
    of the venue ([ADR 0019](../adr/0019-measured-publish-delay.md)).
 5. It ends the run with `api.finish_backfill(writer_id, rows)`, or with an
    error text. This closes the writer. On success the period is covered.

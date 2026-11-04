@@ -48,7 +48,7 @@ work has desired state. Live data is work too.
 
 ### Every capable feeder writes
 
-Live requests have no lease. Every alive feeder with the capability writes
+Live requests are not leased. Every alive feeder with the capability writes
 the stream. Two feeders for the same venue write the same rows. The primary
 keys make this safe, and the stream stays covered if one feeder stops.
 

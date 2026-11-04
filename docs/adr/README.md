@@ -39,7 +39,7 @@ too.
 |------|------|
 | Whole project | [0000](0000-empiriq.md) |
 | Integration through the database | [0001](0001-database-is-the-api.md) |
-| Desired state and observed state | [0002](0002-desired-vs-observed.md), [0004](0004-intent-levels.md), [0017](0017-venue-trading-rules.md) |
+| Desired state and observed state | [0002](0002-desired-vs-observed.md), [0004](0004-intent-kinds.md), [0017](0017-venue-trading-rules.md) |
 | Frames and determinism | [0005](0005-logical-time.md), [0008](0008-frames.md), [0009](0009-writers.md), [0022](0022-frames-belong-to-a-world.md) |
 | `database`: strategies and engine | [0006](0006-strategies-are-stable-functions.md), [0013](0013-strategies-build-bars.md), [0015](0015-strategies-run-as-strategy-role.md) |
 | `database`: market data | [0007](0007-market-data-model.md), [0009](0009-writers.md), [0014](0014-live-coverage.md), [0019](0019-measured-publish-delay.md) |
@@ -56,13 +56,13 @@ too.
 | 0001 | [The database is the API](0001-database-is-the-api.md)                                                                  | Proposed           |
 | 0002 | [Separate desired state and observed state](0002-desired-vs-observed.md)                                                | Proposed           |
 | 0003 | [Cycle barrier with NOTIFY and a trigger](0003-cycle-barrier.md)                                                        | Superseded by 0008 |
-| 0004 | [Three intent levels compiled to orders](0004-intent-levels.md)                                                         | Proposed           |
+| 0004 | [Three intent kinds planned into orders](0004-intent-kinds.md)                                                          | Proposed           |
 | 0005 | [Logical time](0005-logical-time.md)                                                                                    | Proposed           |
 | 0006 | [Strategies are STABLE SQL functions](0006-strategies-are-stable-functions.md)                                          | Proposed           |
 | 0007 | [Market data: raw trades and depth snapshots, all other values derived](0007-market-data-model.md)                      | Proposed           |
 | 0008 | [Frames: reconciliation drives strategies, cutoffs make them deterministic](0008-frames.md)                             | Proposed           |
 | 0009 | [Writers: cutoffs for each writer](0009-writers.md)                                                                     | Proposed           |
-| 0010 | [Declarative history: requests, coverage and leases](0010-declarative-history.md)                                       | Proposed           |
+| 0010 | [Declarative history: history requests, coverage and backfill runs](0010-declarative-history.md)                        | Proposed           |
 | 0011 | [Board: one user interface, only through `api`](0011-board.md)                                                          | Proposed           |
 | 0012 | [Backfiller registry: services report, work is controlled](0012-backfiller-registry.md)                                 | Proposed           |
 | 0013 | [Strategies build bars, the board gets trade buckets](0013-strategies-build-bars.md)                                    | Proposed           |
