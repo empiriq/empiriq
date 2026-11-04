@@ -79,8 +79,8 @@ computer for development, or to try empiriq without cloning every repository.
 | `binance-backfiller` | `../binance-backfiller`| Loads history from the Binance archive |
 | `binance-feeder`     | `../binance-feeder`    | Writes live trades of the live requests from the Binance WebSocket streams |
 | `board`              | `../board`             | Grafana with the board, on localhost:3000 |
-| `log-store`          | this repository        | Loki: stores the logs of all containers (`loki/config.yaml`) |
-| `log-agent`          | this repository        | Alloy: reads the output of all containers and sends it to the log store (`alloy/config.alloy`) |
+| `log-store`          | this repository        | Loki: stores the logs of all containers (`etc/log-store.yaml`) |
+| `log-agent`          | this repository        | Alloy: reads the output of all containers and sends it to the log store (`etc/log-agent.alloy`) |
 
 Each service repository has one `Dockerfile` and builds one image. It knows
 nothing about this repository or about compose.
@@ -254,8 +254,9 @@ examples/           SQL for the tutorial: live trades, history, a strategy
 docker-bake.hcl     how the images are built: sources, versions, tags
 versions.env        the version of each image
 compose.yaml        the database and the services, from the images
-loki/config.yaml    Loki: storage and retention of logs
-alloy/config.alloy  Alloy: which logs go to Loki, and their labels
+etc/                the configuration of the log store and the log agent:
+  log-store.yaml    Loki: storage and retention of logs
+  log-agent.alloy   Alloy: which logs go to Loki, and their labels
 .env.example        settings and their defaults
 Makefile            make targets
 ```

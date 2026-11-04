@@ -93,11 +93,11 @@ services:
     image: grafana/loki:3.6.0
     # The new volume belongs to root, and the image runs as user 10001.
     user: "0"
-    command: ["-config.file=/etc/loki/config.yaml", "-config.expand-env=true"]
+    command: ["-config.file=/etc/loki/log-store.yaml", "-config.expand-env=true"]
     environment:
       LOKI_RETENTION: ${LOKI_RETENTION:-168h}
     volumes:
-      - ./loki/config.yaml:/etc/loki/config.yaml:ro
+      - ./etc/log-store.yaml:/etc/loki/log-store.yaml:ro
       - log_store_data:/loki
     restart: unless-stopped
 
@@ -105,10 +105,10 @@ services:
     container_name: empiriq-log-agent
     image: grafana/alloy:v1.20.0
     command: ["run", "--server.http.listen-addr=0.0.0.0:12345",
-              "--storage.path=/var/lib/alloy/data", "/etc/alloy/config.alloy"]
+              "--storage.path=/var/lib/alloy/data", "/etc/alloy/log-agent.alloy"]
     depends_on: [log-store]
     volumes:
-      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - ./etc/log-agent.alloy:/etc/alloy/log-agent.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - log_agent_data:/var/lib/alloy/data
     restart: unless-stopped
