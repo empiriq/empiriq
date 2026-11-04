@@ -45,7 +45,7 @@ flowchart TB
     direction LR
     M["market.*<br/>trades, depth snapshots"]
     O["observed state<br/>and account event journal"]
-    R["reconciliation<br/>starts frames"]
+    R["last reconciliation<br/>ends a frame"]
     S["strategies.*<br/>SQL functions"]
     D["desired state<br/>balances, positions, orders"]
   end
@@ -92,61 +92,69 @@ strategies.
 
 ## Frames
 
-The reconciler sets the rhythm of an account. Each pass of the reconciler over
-an account ends with one **frame** for each running strategy of the account
-([ADR 0008](../adr/0008-frames.md)).
+A **world** is a set of accounts with one clock and one mode. A **frame** is
+one step of a world at one `as_of`. The last reconciler of the world ends the
+frame ([ADR 0022](../adr/0022-frames-belong-to-a-world.md)).
+
+> **Not implemented yet.** Today each reconciliation of an account starts the
+> frames of the strategies on that account ([ADR 0008](../adr/0008-frames.md)).
 
 ```mermaid
 sequenceDiagram
   autonumber
   participant F as Feeder
-  participant X as Reconciler
+  participant X as Reconcilers
   participant DB as empiriq
 
   loop all the time
     F->>DB: COPY market data
     F->>DB: api.report_watermark()
   end
+  DB-->>X: NOTIFY empiriq_frame {world_id, frame_id, as_of}
   X->>DB: read api.order_action
   X->>X: place / cancel on the venue
   X->>DB: api.report_order / balance / position / fill
-  X->>DB: api.reconciled(account_id, as_of)
-  Note over DB: for each running strategy:<br/>create a frame, record cutoffs,<br/>run the strategy
-  DB->>DB: planners -> desired orders
-  DB-->>X: NOTIFY empiriq_frame {account_id}
+  X->>DB: api.reconciled(account_id, frame_id), for each account
+  Note over DB: the last call ends the frame:<br/>the frame handler runs the strategies<br/>and the planners, the next frame opens
+  DB-->>X: NOTIFY empiriq_frame {world_id, frame_id, as_of}
 ```
 
 1. Feeders write the streams of the active live requests all the time.
    For each stream they also send a heartbeat with `api.report_watermark()`,
    also when the market is quiet.
-2. The reconciler reads the order actions from `api.order_action` and sends
-   them to the venue. Then it reports the observed state. Every report also
-   goes into the account event journal.
-3. The reconciler calls `api.reconciled(account_id, as_of)`. For each running
-   strategy of the account, the engine creates a frame, records the cutoff of
-   each subscribed stream and runs the strategy.
-4. The planners run for the account. `NOTIFY empiriq_frame` wakes the
-   reconciler. Its next pass sends the new desired state to the venue.
+2. The database opens a frame of a world. `NOTIFY empiriq_frame` sends its id
+   and `as_of` to the reconcilers.
+3. Each reconciler sends the order actions to the venue and reports the
+   observed state. Every report also goes into the account event journal.
+   Then it calls `api.reconciled(account_id, frame_id)` for each of its
+   accounts in the world.
+4. The last call ends the frame. In its transaction, the frame handler runs
+   the running strategies of the world and the planners. Then the next frame
+   opens, and its `NOTIFY` sends the new desired state to the reconcilers.
 
 This design has these consequences:
 
-- **No scheduler.** The reconciler sets the rhythm. In a backtest, the
-  simulated reconciler moves `as_of` through history.
-- **Each account has its own rhythm.** A slow venue delays only its own
-  accounts.
-- **No frames on stale account state.** If the venue is not reachable, the
-  reconciler does not call `api.reconciled()`.
+- **No scheduler.** The slowest reconciler of a world sets its rhythm. In a
+  backtest world, the simulated reconcilers respond at once, so the world runs
+  as fast as the database.
+- **One `as_of` for all accounts of a world.** A strategy sees all accounts
+  of its world at the same `as_of`. This is what arbitrage between venues
+  needs.
+- **The slowest venue sets the rhythm** for all strategies of its world.
+- **Every frame needs every reconciler.** A reconciler calls
+  `api.reconciled()` also when the venue did not respond. A reconciler that
+  stops or hangs stops its world (open question 1).
 - **Quiet markets.** Frames also run when no new data arrived. A stale
   heartbeat shows a broken feeder. Its detection belongs to the container
   level.
 - **Isolation.** Each strategy runs in its own subtransaction. If a strategy
   fails, it keeps its previous desired state. `api.frame` shows the error.
-- **Order.** `as_of` increases for each account. `api.reconciled()` locks the
-  account, so the passes over one account run one after the other.
+- **Order.** `as_of` increases for each world. The next frame of a world
+  opens only when the previous one ends.
 
-Frames run in the transaction of `api.reconciled()`. This is simple and
-atomic. But a slow strategy also makes the reconciler slow. A separate runner
-for frames is an alternative. See the open questions.
+The frame handler runs in the transaction of the last `api.reconciled()`.
+This is simple and atomic. But a slow strategy also makes that reconciler
+slow. See the open questions.
 
 ## Time and determinism
 
@@ -177,17 +185,17 @@ has the details.
 
 So a strategy is a pure function of its inputs: visible market data, observed
 state, params and strategy state. For this reason, backtests and live trading
-use **the same code**. The mode is a property of the account:
+use **the same code**. The mode is a property of the world:
 
-| Mode       | Reconciler | `as_of`      | Cutoffs  | Market data                          |
-|------------|------------|--------------|----------|--------------------------------------|
-| `live`     | Real venue | Wall clock   | Recorded | Feeders, real time                   |
-| `paper`    | Simulated fills against live prices | Wall clock | Recorded | Feeders, real time |
-| `backtest` | Simulated fills against history | Replay of history | None | Backfiller, before the backtest |
+| Mode       | Accounts                                             | `as_of`                                      | Cutoffs  | Market data                      |
+|------------|------------------------------------------------------|----------------------------------------------|----------|----------------------------------|
+| `live`     | Real venues, or simulated accounts for paper trading | Wall clock                                   | Recorded | Feeders, real time               |
+| `backtest` | Simulated fills against history                      | The previous `as_of` + the step of the world | None     | Backfillers, before the backtest |
 
 A backtest needs no feeder. Request the history with `api.add_history_request()`
-before the backtest starts, and backfillers load it into `market.*`. Then the simulated reconciler moves `as_of` step
-by step. History does not change during a backtest, so `event_time <= as_of`
+before the backtest starts, and backfillers load it into `market.*`. Then the
+backtest world moves `as_of` step by step, and its simulated reconcilers
+respond at once. History does not change during a backtest, so `event_time <= as_of`
 alone is deterministic.
 
 ## Declarative state: three intent levels
@@ -331,8 +339,9 @@ select api.set_strategy_status('my-strategy', 'stopped');
   open orders. Positions stay.
 
 `api.strategy_status` shows the desired status and the result of the last
-frame. To start a backtest, create an account in the `backtest` mode, register
-strategies on it and start its simulated reconciler.
+frame. To start a backtest, create a world in the `backtest` mode with
+simulated accounts, register strategies on them, start the simulated
+reconcilers and call `api.start_world()`.
 
 ## Writing a feeder, a backfiller or a reconciler
 
@@ -391,7 +400,9 @@ details.
 
 **Reconciler**
 
-1. Do passes over each of its accounts. In each pass:
+1. Listen on `empiriq_frame`. Each notification opens a frame of a world,
+   with its `frame_id` and `as_of`.
+2. In each frame, do one pass over each of its accounts in that world:
    1. Read `api.order_action` and do each action:
       - `place`: report the order as `pending_new` with `api.report_order()`.
         Then send it to the venue.
@@ -399,13 +410,12 @@ details.
         report the result.
       - `resolve`: query the venue for the order status.
    2. Report the observed balances, positions, orders and fills.
-   3. Call `api.reconciled(account_id, as_of)`. If the venue was not
-      reachable, do not call it.
-2. Listen on `empiriq_frame`. A notification means new desired state: start
-   the next pass for that account. Do not expect the frames to be complete
-   when `api.reconciled()` returns. Today they are, but a separate runner may
-   run them later (open question 1).
-3. Always use the `client_order_id` from the database. This makes retries
+   3. Call `api.reconciled(account_id, frame_id)`. Call it also when the
+      venue did not respond. Otherwise the frame never ends.
+3. Do not expect the strategies to be done when `api.reconciled()` returns.
+   Today they are for the last reconciler, but the frame handler may change
+   (open question 1).
+4. Always use the `client_order_id` from the database. This makes retries
    safe.
 
 A full specification of these contracts will be part of the reference
@@ -423,14 +433,15 @@ documentation.
 All write operations use `SECURITY DEFINER` functions in `api` with a fixed
 `search_path`. So clients never need privileges on `core`.
 
-Frames run inside `api.reconciled()`, as the owner. The strategy itself runs
+The frame handler runs inside the last `api.reconciled()` of a frame, as the
+owner. The strategy itself runs
 as `empiriq_strategy` through `core.call_strategy()`. It cannot read
 `market.*` directly, only through the helper functions, which apply the
 frame rules ([ADR 0015](../adr/0015-strategies-run-as-strategy-role.md)).
 `STABLE` prevents direct writes.
 
 > **Known gap.** `api.balance`, `api.position` and `api."order"` show all
-> accounts to a strategy, not only the account of its frame.
+> accounts to a strategy, not only the accounts of its world.
 
 ## Time-series storage
 
@@ -457,7 +468,7 @@ empiriq has five services. Each service runs in its own container.
 | `database`   | PostgreSQL with the schema, the engine and `api`. **The contract** for all other services.  | Database         | `database` |
 | `feeder`     | Writes live market data from one venue or data source.                                      | Long-running     | TBD |
 | `backfiller` | Loads requested historical market data for backtests and analysis.                          | Long-running     | One repository for each source, for example `binance-backfiller` |
-| `reconciler` | Reconciles accounts with one venue, reports observed state and starts frames. A simulated reconciler serves the `paper` and `backtest` modes. | Long-running | TBD |
+| `reconciler` | Reconciles accounts with one venue, reports observed state and ends frames. A simulated reconciler serves paper trading and backtests. | Long-running | TBD |
 | `board`      | The user interface. Shows the state and changes desired state, only through `api` ([ADR 0011](../adr/0011-board.md)). Built with Grafana. | Long-running | `board` |
 
 A deployment usually runs one feeder and one reconciler for each venue.
@@ -492,17 +503,18 @@ backfiller loads the requested history first.
 
 ## Open questions
 
-1. **Who runs frames?** Today `api.reconciled()` runs them in the transaction
-   of the reconciler. Problems:
-   - a slow strategy blocks the reconciler, which then does not process venue
-     events;
+1. **Frame handler and deadline.** The frame handler runs in the transaction
+   of the last reconciler of a frame. Problems:
+   - a slow strategy blocks that reconciler, which then does not process
+     venue events;
    - `statement_timeout` can only stop the whole call, not one strategy;
-   - the long transaction holds the account lock.
+   - a reconciler that stops or hangs stops its world: the frame never ends.
 
-   Alternative: a `runner` service. `api.reconciled()` only inserts the
-   reconciliation. The runner takes it with `for update skip locked` and runs
-   each frame in its own transaction, with its own timeout. The contract for reconcilers stays the same, because
-   they wait for `NOTIFY empiriq_frame`.
+   Options: the reconcilers that wait call a function that removes silent
+   reconcilers from the frame after `stale_after`, based on heartbeats. A
+   procedure can run each strategy in its own transaction. A separate runner
+   for the handler stays possible. The contract for reconcilers stays the
+   same, because they wait for `NOTIFY empiriq_frame`.
 2. **Exact replay.** Cutoffs make market data repeatable. Other inputs of a
    frame are not recorded yet:
    - observed state: strategies read the current tables. Each account event
@@ -531,7 +543,10 @@ backfiller loads the requested history first.
    work. Inverse pairs and routes with more steps (`ETH → BTC → USDT`) need a
    design.
 5. **Strategies with more than one account,** for example arbitrage across
-   venues. Which reconciliations start their frames?
+   venues. With [ADR 0022](../adr/0022-frames-belong-to-a-world.md), a frame
+   has one `as_of` for all accounts of a world. Open: how a strategy sends
+   intents to several accounts, and how claims and `on_stop` work across
+   them. This is part of the decision about the frame handler.
 6. **Migration tooling.** Options: goose (Go ecosystem), sqitch, or versioned
    files with a `schema_migrations` table.
 7. **Time-series scaling.** Native partitioning or a time-series extension.
