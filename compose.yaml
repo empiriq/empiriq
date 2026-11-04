@@ -3,14 +3,6 @@
 #   make up      start everything
 #   make help    list all targets
 #
-# Every service runs from its image. Nothing of the repositories is mounted:
-# after a change, build the image again. The versions come from versions.env.
-#
-# The project name "empiriq" keeps the names of the network
-# (empiriq_default) and of the database volume (empiriq_pgdata).
-# container_name gives each container the name empiriq-<service>, without the
-# number that compose adds (empiriq-database-1). So each service runs as one
-# container: `docker compose up --scale` does not work.
 name: empiriq
 
 # All services log in as the owner of the database (POSTGRES_USER). Feeders
@@ -35,7 +27,7 @@ services:
     ports:
       - "${DATABASE_PORT:-1792}:5432"
     volumes:
-      - pgdata:/var/lib/postgresql
+      - database_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 2s
@@ -81,22 +73,21 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: ${BOARD_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${BOARD_ADMIN_PASSWORD:-admin}
-      EMPIRIQ_DB_HOST: database
-      EMPIRIQ_DB_PORT: "5432"
+      EMPIRIQ_DATABASE_HOST: database
+      EMPIRIQ_DATABASE_PORT: "5432"
       # Grafana cannot set a role at connect, so the board uses the owner.
-      EMPIRIQ_DB_NAME: ${POSTGRES_DB:-empiriq}
-      EMPIRIQ_DB_USER: ${POSTGRES_USER:-empiriq}
-      EMPIRIQ_DB_PASSWORD: ${POSTGRES_PASSWORD:-empiriq}
-      LOKI_URL: http://log-store:3100
+      EMPIRIQ_DATABASE_NAME: ${POSTGRES_DB:-empiriq}
+      EMPIRIQ_DATABASE_USER: ${POSTGRES_USER:-empiriq}
+      EMPIRIQ_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-empiriq}
+      EMPIRIQ_LOG_STORE_URL: http://log-store:3100
     volumes:
-      - grafana:/var/lib/grafana
+      - board_data:/var/lib/grafana
     restart: unless-stopped
 
   # Logs: the log agent (Alloy) reads the output of all containers and sends
   # it to the log store (Loki). The board shows it on the page Logs. If the
   # log store is down, the services do not notice: they write to the default
-  # json-file log driver as before. The volumes keep the names of the programs,
-  # like the volume grafana of the board.
+  # json-file log driver as before.
   log-store:
     container_name: empiriq-log-store
     image: grafana/loki:3.6.0
@@ -107,7 +98,7 @@ services:
       LOKI_RETENTION: ${LOKI_RETENTION:-168h}
     volumes:
       - ./loki/config.yaml:/etc/loki/config.yaml:ro
-      - loki:/loki
+      - log_store_data:/loki
     restart: unless-stopped
 
   log-agent:
@@ -119,11 +110,11 @@ services:
     volumes:
       - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - alloy:/var/lib/alloy/data
+      - log_agent_data:/var/lib/alloy/data
     restart: unless-stopped
 
 volumes:
-  pgdata:
-  grafana:
-  loki:
-  alloy:
+  database_data:
+  board_data:
+  log_store_data:
+  log_agent_data:
