@@ -23,7 +23,7 @@ output and what a strategy can do.
 - The implementation language is free: SQL, PL/pgSQL or any other language
   that supports `STABLE`.
 - Each run is a subtransaction. If a run fails, the previous desired state
-  stays. `api.frame` shows the error.
+  stays. `api.strategy_run` shows the error.
 
 ## Consequences
 

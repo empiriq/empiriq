@@ -40,26 +40,32 @@ world.
   simulated accounts. The simulator is a later decision.
 - Several replay worlds can run next to a live world in one database. Market
   data is shared by all worlds.
+- The owner creates worlds and their accounts in SQL (`core.world`,
+  `core.account.world_id`). An operator starts a world.
 
 ### A frame is a step of a world
 
 A **frame** is one step of a world at one `as_of`. The database opens a frame
-with `pending` = the number of accounts of the world. Then it sends
+with one open reconciliation for each account of the world and `pending` =
+the number of accounts. Then it sends
 `NOTIFY empiriq_frame {world_id, frame_id, as_of}`.
 
 - `as_of` increases from frame to frame of a world.
 - In a live world, `as_of` of a new frame is `clock_timestamp()`. In a
   replay world, it is the `as_of` of the previous frame plus the step of the
   world.
-- An operator starts a world with `api.start_world(world_id)`. It opens the
-  first frame if no frame of the world is open.
+- An operator starts a world with `api.start_world(world_id, as_of)`. It opens
+  the first frame if no frame of the world is open. A replay world starts at
+  `as_of`; a live world ignores it and starts now.
+- A replay world can end: after the frame at `replay_to`, it opens no frame.
 - An account that joins a world takes part from the next frame.
 
 ### The last reconciler closes the frame
 
 For each frame, a reconciler reconciles each of its accounts. Then it calls
-`api.reconciled(account_id, frame_id)`. This records the reconciliation with
-the `seq` of the last account event, as before.
+`api.reconciled(account_id, frame_id)`. This completes the reconciliation of
+the account in the frame, with the `seq` of the last account event. A second
+call for the same account and frame is an error.
 
 - The reconciler calls it for every frame and every account, also when the
   venue did not respond.
@@ -76,12 +82,29 @@ No scheduler is needed: the slowest reconciler of a world sets its rhythm.
 In a replay world, simulated reconcilers respond at once, so the world runs
 as fast as the database.
 
+### Cutoffs for each frame
+
+When a frame ends, before its strategies run, the engine records the cutoffs
+of the frame: for each stream that a running strategy of the world
+subscribed to, and each writer with rows in it, its highest `seq`
+([ADR 0009](0009-writers.md)). All strategies of the frame see the same rows.
+
+Frames of both clocks record cutoffs. Then a replay world stays repeatable
+also when a backfill loads history while it runs. After ADR 0009 a frame has
+few cutoffs: one for each subscribed stream and service.
+
+### Strategy runs
+
+The run of one strategy in a frame is a **strategy run**
+(`core.strategy_run`): its status, its error, the number of intents and its
+duration. A failing run keeps the previous desired state of its strategy.
+
 ### The frame handler is a separate decision
 
 What `core.on_frame()` does is not part of this decision. Its first version
-does what `core.run_frames()` does today: it runs the running strategies of
-the world and then the planners. A later ADR decides how strategies run in a
-frame.
+records the cutoffs, runs the running strategies of the world, one strategy
+run each, and then the planners of each account. A later ADR decides how
+strategies run in a frame.
 
 ## Consequences
 
@@ -97,7 +120,7 @@ frame.
 - The handler runs in the transaction of the last reconciler. A slow handler
   makes that reconciler slow, as today.
 - The clock of the world replaces the mode of the account (`live`, `paper`,
-  `backtest`). `core.frame` today stores
-  one run of one strategy; its name and shape change with the handler
-  decision.
+  `backtest`).
+- A frame of a replay world records cutoffs like a frame of a live world.
+  Visibility has no special case for backtests.
 - A world without accounts has no frames.

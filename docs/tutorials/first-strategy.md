@@ -82,25 +82,28 @@ make sql F=examples/03-strategy.sql
 
 The file does four things:
 
-1. It creates the account `demo` for paper trading (in code: `mode = 'paper'`).
+1. It creates the *world* `demo` with a replay clock: one *frame* for each
+   hour of yesterday. A world is a set of accounts with one clock. It also
+   creates the account `demo` in this world.
 2. It registers the strategy `sma-demo` on this account, with its parameters,
    and subscribes it to the trades of `BTCUSDT`.
-3. It runs a *frame* of the strategy for each hour of yesterday. A frame is
-   one run of all strategies of an account at one time `as_of`. The strategy
-   sees only the trades up to `as_of`, so the same frames give the same
-   result tomorrow.
-4. It shows the frames and the desired position after the last frame.
+3. It runs the frames of the world. A frame is one step of a world at one
+   time `as_of`: every running strategy of the world runs once, in a
+   *strategy run*. The strategy sees only the trades up to `as_of`, so the
+   same frames give the same result tomorrow.
+4. It shows the strategy runs and the desired position after the last frame.
 
-Usually a reconciler starts the frames: after each check of the account, it
-calls `api.reconciled()`. empiriq has no reconciler yet, so the file calls
-`api.reconciled()` itself, with times in the past.
+Usually reconcilers end the frames: after the reconciliation of each account
+in a frame, a reconciler calls `api.reconciled()`, and the last one ends the
+frame. empiriq has no reconciler yet, so the file calls `api.reconciled()`
+itself.
 
 ## 6. Change the strategy
 
 Open `examples/03-strategy.sql` and change the parameters, for example
 `'fast', 10, 'slow', 60`. Run the file again: `api.register_strategy()` works
-like "apply", so it updates the strategy. The frames of yesterday exist
-already, so no new frames run. To run them again, start from a clean database:
+like "apply", so it updates the strategy. The world `demo` ran already, so no
+new frames run. To run them again, start from a clean database:
 
 ```sh
 make reset    # deletes all data: the database and the settings of Grafana

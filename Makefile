@@ -165,12 +165,20 @@ sql: ## Run a SQL file in the database, for example make sql F=examples/01-live-
 ##@ Inspect
 
 .PHONY: strategies
-strategies: ## Show strategies: desired status and last frame.
+strategies: ## Show strategies: desired status and last strategy run.
 	@echo "select * from api.strategy_status order by strategy;" | $(PSQL)
 
+.PHONY: worlds
+worlds: ## Show worlds: clock, accounts and the open frame.
+	@echo "select id, name, clock, step, replay_to, accounts, open_frame_id, open_as_of, pending, last_as_of from api.world order by id;" | $(PSQL)
+
 .PHONY: frames
-frames: ## Show the last 20 frames.
-	@echo "select id, strategy, as_of, status, intents, duration, left(error, 60) as error from api.frame order by id desc limit 20;" | $(PSQL)
+frames: ## Show the last 20 frames of all worlds.
+	@echo "select id, world, as_of, pending, opened_at, closed_at, duration from api.frame order by id desc limit 20;" | $(PSQL)
+
+.PHONY: strategy-runs
+strategy-runs: ## Show the last 20 strategy runs.
+	@echo "select id, frame_id, strategy, as_of, status, intents, duration, left(error, 60) as error from api.strategy_run order by id desc limit 20;" | $(PSQL)
 
 .PHONY: writers
 writers: ## Show writers of market data.

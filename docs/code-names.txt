@@ -7,10 +7,6 @@
 # [removed]: removed from the code. Allowed only in ADRs, as history.
 
 [planned]
-core.world          # ADR 0022
-core.world.clock    # ADR 0022
-api.start_world     # ADR 0022
-core.on_frame       # ADR 0022
 api.replay_frame    # architecture, open question 2
 api.best_prices     # glossary, open decisions
 

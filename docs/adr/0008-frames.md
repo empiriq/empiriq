@@ -51,17 +51,17 @@ frame ([ADR 0022](0022-frames-belong-to-a-world.md)).
 ### Cutoffs make frames repeatable
 
 Every row in `market.trade` and `market.depth` has a writer and a `seq`,
-assigned at insert. At frame start, the engine records a **cutoff** for each
-subscribed stream and each writer: its highest `seq`. The frame sees a row
+assigned at insert. When a frame ends, before its strategies run, the engine
+records a **cutoff** for each subscribed stream and each writer: its highest
+`seq` ([ADR 0022](0022-frames-belong-to-a-world.md)). The frame sees a row
 only if `event_time <= as_of` and `seq <=` the cutoff of its writer
 ([ADR 0009](0009-writers.md)).
 
 A replay of a recorded frame uses the same cutoffs, so it sees exactly the same
 rows. Late rows are invisible in both runs.
 
-A replay world works on backfilled history. Its frames record
-no cutoffs, so `event_time <= as_of` alone decides. This is deterministic too,
-because history does not change during a backtest.
+A replay world works on backfilled history. Its frames record cutoffs too, so
+a backfill that runs during a backtest does not change it.
 
 ### Strategies subscribe to streams
 

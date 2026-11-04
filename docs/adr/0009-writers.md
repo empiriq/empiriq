@@ -42,12 +42,13 @@ sequencer.
 
 ### Cutoffs for each writer
 
-At frame start, the engine records a cutoff for each subscribed stream and
-each writer with rows in it: the highest `seq` of that writer. A frame sees a
+When a frame ends, before its strategies run, the engine records a cutoff for
+each subscribed stream and each writer with rows in it: the highest `seq` of
+that writer. A frame sees a
 row if `event_time <= as_of` and `seq <=` the cutoff of its writer.
 
-A writer that did not exist at frame start has no cutoff. Its rows are
-invisible to that frame and to its replay.
+A writer without rows at that moment has no cutoff. Its rows are invisible to
+that frame and to its replay.
 
 ### Writers do not close
 

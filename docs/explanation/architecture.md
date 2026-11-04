@@ -96,9 +96,6 @@ A **world** is a set of accounts with one clock. A **frame** is
 one step of a world at one `as_of`. The last reconciler of the world ends the
 frame ([ADR 0022](../adr/0022-frames-belong-to-a-world.md)).
 
-> **Not implemented yet.** Today each reconciliation of an account starts the
-> frames of the strategies on that account ([ADR 0008](../adr/0008-frames.md)).
-
 ```mermaid
 sequenceDiagram
   autonumber
@@ -148,7 +145,8 @@ This design has these consequences:
   heartbeat shows a broken feeder. Its detection belongs to the container
   level.
 - **Isolation.** Each strategy runs in its own subtransaction. If a strategy
-  fails, it keeps its previous desired state. `api.frame` shows the error.
+  fails, it keeps its previous desired state. `api.strategy_run` shows the
+  error.
 - **Order.** `as_of` increases for each world. The next frame of a world
   opens only when the previous one ends.
 
@@ -168,8 +166,9 @@ transaction. The helper functions use two rules for visibility:
 - Inside a frame, the **writer** of the row decides
   ([ADR 0009](../adr/0009-writers.md)). Every row has a writer: the feeder or
   the backfiller that wrote it. The row is visible only if its `seq` is not
-  higher than the **cutoff** of that writer: its highest `seq` at frame
-  start. Rows of a writer that started later are invisible.
+  higher than the **cutoff** of that writer: its highest `seq` when the frame
+  ended, before the strategies ran. Rows of a writer without a cutoff are
+  invisible.
 
 The second rule makes frames repeatable. A trade can arrive in the database
 after a frame, although its `event_time` is before `as_of`. The frame did not
@@ -189,13 +188,13 @@ use **the same code**. The clock is a property of the world:
 | Clock      | Accounts                                             | `as_of`                                      | Cutoffs  | Market data                      |
 |------------|------------------------------------------------------|----------------------------------------------|----------|----------------------------------|
 | `live`     | Real venues, or simulated accounts for paper trading | Wall clock                                   | Recorded | Feeders, real time               |
-| `replay`   | Simulated fills against history                      | The previous `as_of` + the step of the world | None     | Backfillers, before the backtest |
+| `replay`   | Simulated fills against history                      | The previous `as_of` + the step of the world | Recorded | Backfillers, before the backtest |
 
 A backtest needs no feeder. Request the history with `api.add_history_request()`
 before the backtest starts, and backfillers load it into `market.*`. Then the
 replay world moves `as_of` step by step, and its simulated reconcilers
-respond at once. History does not change during a backtest, so `event_time <= as_of`
-alone is deterministic.
+respond at once. Its frames record cutoffs like the frames of a live world, so
+a backtest stays repeatable also when a backfill runs at the same time.
 
 ## Declarative state: three intent kinds
 
@@ -325,7 +324,7 @@ select api.subscribe('my-strategy', 2, 'trade');
 ### Starting and stopping
 
 `core.strategy` works like a Kubernetes Deployment. `desired_status` is
-`running` or `stopped`, and only running strategies get frames.
+`running` or `stopped`, and only running strategies get strategy runs.
 
 ```sql
 select api.set_strategy_status('my-strategy', 'stopped');
@@ -401,7 +400,9 @@ details.
 **Reconciler**
 
 1. Listen on `empiriq_frame`. Each notification opens a frame of a world,
-   with its `frame_id` and `as_of`.
+   with its `frame_id` and `as_of`. NOTIFY is only a signal: at start and
+   after a reconnect, read the open reconciliations of its accounts from
+   `api.reconciliation` (`reconciled_at is null`).
 2. In each frame, do one pass over each of its accounts in that world:
    1. Read `api.order_action` and do each action:
       - `place`: report the order as `pending_new` with `api.report_order()`.
@@ -533,7 +534,7 @@ backfiller loads the requested history first.
    A possible design:
    - on stop, replace the desired state of the strategy with
      `target_position = 0` for each instrument that it claims;
-   - the strategy is `stopping` and gets no frames, but planners keep running;
+   - the strategy is `stopping` and gets no strategy runs, but planners keep running;
    - when all positions are 0 within the tolerance, it becomes `stopped` and
      its claims are released.
 

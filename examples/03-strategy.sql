@@ -5,13 +5,17 @@
 -- Load the history first (02-history.sql). This file runs the example
 -- strategy strategies.sma_cross (a moving average crossover) once for every
 -- hour of yesterday, and shows the position that it wants after each run.
--- Nothing is sent to Binance: the account is in the paper mode, and there is
+-- Nothing is sent to Binance: the account is in a replay world, and there is
 -- no reconciler yet.
 
--- An account. empiriq has no api function for accounts yet, so the owner of
--- the database inserts it.
-insert into core.account (venue_id, name, mode)
-values ('binance-futures-um', 'demo', 'paper')
+-- A replay world with one frame for each hour of yesterday (ADR 0022), and
+-- its account. empiriq has no api function for worlds and accounts yet, so
+-- the owner of the database inserts them.
+insert into core.world (name, clock, step, replay_to)
+values ('demo', 'replay', '1 hour', date_trunc('day', now(), 'UTC'))
+on conflict (name) do nothing;
+insert into core.account (venue_id, name, world_id)
+values ('binance-futures-um', 'demo', (select id from core.world where name = 'demo'))
 on conflict (name) do nothing;
 
 -- The strategy: it wants 0.01 BTC while the average of the last 5 closes of
@@ -21,20 +25,29 @@ select api.register_strategy('sma-demo', 'demo', 'strategies.sma_cross',
                             'fast', 5, 'slow', 20, 'size', 0.01, 'interval', '1 minute'));
 select api.subscribe('sma-demo', api.instrument_id('binance-futures-um', 'BTCUSDT'), 'trade');
 
--- A reconciler calls api.reconciled() after each check of the account, and
--- empiriq runs a frame of every running strategy of the account. Here we call
--- it by hand, with as_of in the past: once for each hour of yesterday. Hours
--- that already have a frame are skipped, so you can run this file again.
-select count(api.reconciled(a.id, t)) as frames
-  from api.account a,
-       date_trunc('day', now(), 'UTC') d,          -- today, 00:00 UTC
-       generate_series(d - interval '23 hours', d, interval '1 hour') t
- where a.name = 'demo'
-   and t > coalesce((select max(f.as_of) from api.frame f where f.account_id = a.id), '-infinity');
+-- A reconciler calls api.reconciled() for each frame of its world, and the
+-- last reconciliation ends the frame: the strategies run, and the next frame
+-- opens. Here we play the reconciler: we start the world at 01:00 yesterday
+-- and reconcile its frames until the world reaches replay_to. A world that
+-- ran already is not started again, so you can run this file again.
+do $$
+declare
+  v_world bigint := (select id from api.world where name = 'demo');
+  v_frame bigint;
+begin
+  if (select last_as_of from api.world where id = v_world) is not null then
+    return;
+  end if;
+  v_frame := api.start_world(v_world, (select replay_to - interval '23 hours' from api.world where id = v_world));
+  while v_frame is not null loop
+    perform api.reconciled((select id from api.account where name = 'demo'), v_frame);
+    v_frame := (select open_frame_id from api.world where id = v_world);
+  end loop;
+end $$;
 
--- The frames: when they ran, and how many intents the strategy returned.
+-- The strategy runs: at which as_of, and how many intents the strategy returned.
 select as_of, status, intents, error
-  from api.frame
+  from api.strategy_run
  where strategy = 'sma-demo'
  order by as_of;
 
