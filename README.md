@@ -45,7 +45,7 @@ Clone the repositories of empiriq next to each other (see
 
 ```sh
 make build && make up     # build the images and start everything
-make open                 # the console: http://localhost:3000
+make open                 # the board: http://localhost:3000
 
 make sql F=examples/01-live-trades.sql   # live trades of BTCUSDT
 make sql F=examples/02-history.sql       # the trades of yesterday
@@ -78,7 +78,7 @@ computer for development, or to try empiriq without cloning every repository.
 | `database`           | `../database`          | PostgreSQL 18 with the empiriq migrations in the image, on localhost:1792 |
 | `binance-backfiller` | `../binance-backfiller`| Loads history from the Binance archive |
 | `binance-feeder`     | `../binance-feeder`    | Writes live trades of the live requests from the Binance WebSocket streams |
-| `console`            | `../console`           | Grafana with the console, on localhost:3000 |
+| `board`              | `../board`             | Grafana with the board, on localhost:3000 |
 | `loki`               | this repository        | Stores the logs of all containers (`loki/config.yaml`) |
 | `alloy`              | this repository        | Reads the output of all containers and sends it to Loki (`alloy/config.alloy`) |
 
@@ -91,14 +91,14 @@ nothing about this repository or about compose.
 make build    # build the images of all repositories
 make up       # start the database and all services
 make rebuild  # after a change of the repositories: build again, restart what changed
-make open     # the console: http://localhost:3000, no login
+make open     # the board: http://localhost:3000, no login
 make help     # all targets
 ```
 
 `make up` starts the database first. When it is healthy, the services start.
 It uses only built images: if one is missing, it says so.
 
-- `make logs S=console` follows the logs of one service.
+- `make logs S=board` follows the logs of one service.
 - `make rebuild` builds all images again and restarts the services whose
   image changed. Docker builds again only what changed. If the image of the
   database changed, `make rebuild` says so: the new migrations run only after
@@ -119,7 +119,7 @@ bake` with the variables of `versions.env` and `.env`.
 | `empiriq/database:<version>` | database | the stage `database` of its Dockerfile |
 | `empiriq/binance-backfiller:<version>` | binance-backfiller | the Dockerfile |
 | `empiriq/binance-feeder:<version>` | binance-feeder | the Dockerfile |
-| `empiriq/console:<version>` | console | the Dockerfile |
+| `empiriq/board:<version>` | board | the Dockerfile |
 
 **Sources.** `SOURCE` decides where bake takes the code:
 
@@ -130,7 +130,7 @@ bake` with the variables of `versions.env` and `.env`.
     database/
     binance-backfiller/
     binance-feeder/
-    console/
+    board/
     empiriq/              this repository
   ```
 - `git`: GitHub, at the tags of `versions.env`. No clones are needed:
@@ -162,7 +162,7 @@ postgres://empiriq:empiriq@database:5432/empiriq?options=-c%20role%3Dempiriq_fee
 
 So they have only the privileges of that role, and a missing grant in `api`
 shows at once. This is a check, not protection: a service could reset the
-role. Grafana cannot set a role at connect, so the console works as the
+role. Grafana cannot set a role at connect, so the board works as the
 owner. It still changes data only through `api` functions.
 
 ### Logins on a real installation
@@ -172,7 +172,7 @@ Create a login for each service and give it its role
 
 ```sql
 create role binance_feeder login password '...' in role empiriq_feeder;
-create role console login password '...' in role empiriq_operator;
+create role board login password '...' in role empiriq_operator;
 ```
 
 Then use these logins in the database URLs of the services, without
@@ -181,7 +181,7 @@ Then use these logins in the database URLs of the services, without
 ## Logs
 
 Alloy reads the output of every container of the project through the Docker
-socket and sends it to Loki. The console shows it on the page **Logs**:
+socket and sends it to Loki. The board shows it on the page **Logs**:
 filters for the service, the level and a text search.
 
 - **Labels:** `service` (the compose service), `container` and `level`.
@@ -202,12 +202,12 @@ Copy `.env.example` to `.env` and change what you need. All values in
 - **Images:** `SOURCE`, `GITHUB_ORG`, `REGISTRY`, `PULL_POLICY`. The versions
   are in `versions.env`.
 - **Paths for `SOURCE=local`:** `DATABASE_DIR`, `BINANCE_BACKFILLER_DIR`,
-  `BINANCE_FEEDER_DIR`, `CONSOLE_DIR`.
+  `BINANCE_FEEDER_DIR`, `BOARD_DIR`.
 - **Database:** `DATABASE_PORT`, `POSTGRES_DB`, and the owner login
   `POSTGRES_USER` / `POSTGRES_PASSWORD`, used by all services.
-- **Console:** `CONSOLE_PORT`, `CONSOLE_ADMIN_USER`, `CONSOLE_ADMIN_PASSWORD`.
+- **Board:** `BOARD_PORT`, `BOARD_ADMIN_USER`, `BOARD_ADMIN_PASSWORD`.
   The admin password is used only when Grafana starts the first time. The
-  console has no login for operators, so it listens on `127.0.0.1` only.
+  board has no login for operators, so it listens on `127.0.0.1` only.
 
 Change the passwords before you run the stack on a server.
 
@@ -234,7 +234,7 @@ The stack mounts nothing of the service repositories. Every change goes
 through an image:
 
 - **Code of a service:** `make build S=<service> && make restart S=<service>`.
-- **Dashboards of the console:** the same with `S=console`. It takes seconds:
+- **Dashboards of the board:** the same with `S=board`. It takes seconds:
   the image only copies the files.
 - **Migrations:** `make build S=database && make reset`. The migrations run only
   on an empty database.

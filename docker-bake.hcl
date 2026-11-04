@@ -1,6 +1,6 @@
 # Builds the images of all repositories with docker buildx bake.
 #   make build                    all images, from the repositories next to this one
-#   make build S=console          one image
+#   make build S=board            one image
 #   make build SOURCE=git         from GitHub, at the tags of versions.env
 #
 # The Makefile exports the variables from versions.env and .env.
@@ -18,19 +18,19 @@ variable "REGISTRY" {
 variable "DATABASE_VERSION" { default = "dev" }
 variable "BINANCE_BACKFILLER_VERSION" { default = "dev" }
 variable "BINANCE_FEEDER_VERSION" { default = "dev" }
-variable "CONSOLE_VERSION" { default = "dev" }
+variable "BOARD_VERSION" { default = "dev" }
 
 variable "DATABASE_DIR" { default = "../database" }
 variable "BINANCE_BACKFILLER_DIR" { default = "../binance-backfiller" }
 variable "BINANCE_FEEDER_DIR" { default = "../binance-feeder" }
-variable "CONSOLE_DIR" { default = "../console" }
+variable "BOARD_DIR" { default = "../board" }
 
 # Git revisions for the image labels. The Makefile sets them from the
 # repositories next to this one; with SOURCE=git the tag is the revision.
 variable "DATABASE_REVISION" { default = "" }
 variable "BINANCE_BACKFILLER_REVISION" { default = "" }
 variable "BINANCE_FEEDER_REVISION" { default = "" }
-variable "CONSOLE_REVISION" { default = "" }
+variable "BOARD_REVISION" { default = "" }
 
 function "src" {
   params = [repo, dir, version]
@@ -48,7 +48,7 @@ function "revision" {
 }
 
 group "default" {
-  targets = ["database", "binance-backfiller", "binance-feeder", "console"]
+  targets = ["database", "binance-backfiller", "binance-feeder", "board"]
 }
 
 target "database" {
@@ -70,8 +70,8 @@ target "binance-feeder" {
   tags    = [image("binance-feeder", BINANCE_FEEDER_VERSION)]
 }
 
-target "console" {
-  context = src("console", CONSOLE_DIR, CONSOLE_VERSION)
-  args    = { VERSION = CONSOLE_VERSION, REVISION = revision(CONSOLE_REVISION, CONSOLE_VERSION) }
-  tags    = [image("console", CONSOLE_VERSION)]
+target "board" {
+  context = src("board", BOARD_DIR, BOARD_VERSION)
+  args    = { VERSION = BOARD_VERSION, REVISION = revision(BOARD_REVISION, BOARD_VERSION) }
+  tags    = [image("board", BOARD_VERSION)]
 }

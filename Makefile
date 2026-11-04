@@ -18,7 +18,7 @@ REGISTRY   ?=
 DATABASE_DIR           ?= ../database
 BINANCE_BACKFILLER_DIR ?= ../binance-backfiller
 BINANCE_FEEDER_DIR     ?= ../binance-feeder
-CONSOLE_DIR            ?= ../console
+BOARD_DIR              ?= ../board
 
 # Git revisions for the image labels, from the repositories next to this one.
 rev = $(shell git -C $(1) rev-parse --short HEAD 2>/dev/null)
@@ -26,26 +26,26 @@ ifeq ($(SOURCE),local)
 DATABASE_REVISION           ?= $(call rev,$(DATABASE_DIR))
 BINANCE_BACKFILLER_REVISION ?= $(call rev,$(BINANCE_BACKFILLER_DIR))
 BINANCE_FEEDER_REVISION     ?= $(call rev,$(BINANCE_FEEDER_DIR))
-CONSOLE_REVISION            ?= $(call rev,$(CONSOLE_DIR))
+BOARD_REVISION              ?= $(call rev,$(BOARD_DIR))
 # Bake asks before it reads a directory outside this repository: allow
 # exactly the repositories it builds.
-BAKE_ALLOW = $(foreach d,$(DATABASE_DIR) $(BINANCE_BACKFILLER_DIR) $(BINANCE_FEEDER_DIR) $(CONSOLE_DIR),--allow=fs.read=$(d))
+BAKE_ALLOW = $(foreach d,$(DATABASE_DIR) $(BINANCE_BACKFILLER_DIR) $(BINANCE_FEEDER_DIR) $(BOARD_DIR),--allow=fs.read=$(d))
 endif
 
 # docker buildx bake and docker compose read these from the environment.
 export SOURCE GITHUB_ORG REGISTRY PULL_POLICY \
-       DATABASE_VERSION BINANCE_BACKFILLER_VERSION BINANCE_FEEDER_VERSION CONSOLE_VERSION \
-       DATABASE_DIR BINANCE_BACKFILLER_DIR BINANCE_FEEDER_DIR CONSOLE_DIR \
-       DATABASE_REVISION BINANCE_BACKFILLER_REVISION BINANCE_FEEDER_REVISION CONSOLE_REVISION
+       DATABASE_VERSION BINANCE_BACKFILLER_VERSION BINANCE_FEEDER_VERSION BOARD_VERSION \
+       DATABASE_DIR BINANCE_BACKFILLER_DIR BINANCE_FEEDER_DIR BOARD_DIR \
+       DATABASE_REVISION BINANCE_BACKFILLER_REVISION BINANCE_FEEDER_REVISION BOARD_REVISION
 
 DB_IMAGE = $(REGISTRY)empiriq/database:$(DATABASE_VERSION)
 IMAGES = $(DB_IMAGE) \
          $(REGISTRY)empiriq/binance-backfiller:$(BINANCE_BACKFILLER_VERSION) \
          $(REGISTRY)empiriq/binance-feeder:$(BINANCE_FEEDER_VERSION) \
-         $(REGISTRY)empiriq/console:$(CONSOLE_VERSION)
+         $(REGISTRY)empiriq/board:$(BOARD_VERSION)
 
-CONSOLE_PORT ?= 3000
-URL          = http://localhost:$(CONSOLE_PORT)
+BOARD_PORT   ?= 3000
+URL          = http://localhost:$(BOARD_PORT)
 COMPOSE      = docker compose
 PSQL         = $(COMPOSE) exec -T database sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -v ON_ERROR_STOP=1 -X'
 
@@ -62,7 +62,7 @@ KIND  ?= perpetual
 BASE  ?= BTC
 QUOTE ?= USDT
 
-# make logs S=console, make restart S=binance-backfiller, make build S=console
+# make logs S=board, make restart S=binance-backfiller, make build S=board
 S ?=
 
 ##@ General
@@ -77,7 +77,7 @@ help: ## Display this help.
 build: ## Build all images, or one with S=<image>. SOURCE=git builds from GitHub.
 ifeq ($(SOURCE),git)
 	@test -n "$(GITHUB_ORG)" || { echo "SOURCE=git needs GITHUB_ORG"; exit 1; }
-	@for v in $(DATABASE_VERSION) $(BINANCE_BACKFILLER_VERSION) $(BINANCE_FEEDER_VERSION) $(CONSOLE_VERSION); do \
+	@for v in $(DATABASE_VERSION) $(BINANCE_BACKFILLER_VERSION) $(BINANCE_FEEDER_VERSION) $(BOARD_VERSION); do \
 	  test "$$v" != dev || { echo "SOURCE=git needs git tags in versions.env, not dev"; exit 1; }; \
 	done
 endif
@@ -94,7 +94,7 @@ up: check-images ## Start the database and all services from the built images.
 	@# --remove-orphans: containers of services that compose.yaml no longer has,
 	@# for example after a rename, would keep their ports.
 	$(COMPOSE) up -d --remove-orphans
-	@echo "console: $(URL)"
+	@echo "board: $(URL)"
 
 .PHONY: check-images
 check-images:
@@ -115,7 +115,7 @@ rebuild: ## After a change of the repositories: build all images, or one with S=
 	  echo "The image of the database changed. Its migrations run only on a new database:"; \
 	  echo "run make reset to apply them (it deletes all data)."; \
 	fi
-	@echo "console: $(URL)"
+	@echo "board: $(URL)"
 
 .PHONY: down
 down: ## Stop all services (data stays).
@@ -139,7 +139,7 @@ logs: ## Follow the logs of all services, or of one with S=<service>.
 	$(COMPOSE) logs -f $(S)
 
 .PHONY: open
-open: ## Open the console in the browser.
+open: ## Open the board in the browser.
 	@open $(URL) 2>/dev/null || xdg-open $(URL) 2>/dev/null || echo $(URL)
 
 .PHONY: lint

@@ -62,21 +62,21 @@ services:
       FEEDER_VENUES: binance-spot=spot,binance-futures-um=futures/um
     restart: unless-stopped
 
-  console:
-    image: ${REGISTRY:-}empiriq/console:${CONSOLE_VERSION:-dev}
+  board:
+    image: ${REGISTRY:-}empiriq/board:${BOARD_VERSION:-dev}
     <<: *local-image
     depends_on:
       database:
         condition: service_healthy
     ports:
-      # Only this computer: the console has no login (anonymous Admin).
-      - "127.0.0.1:${CONSOLE_PORT:-3000}:3000"
+      # Only this computer: the board has no login (anonymous Admin).
+      - "127.0.0.1:${BOARD_PORT:-3000}:3000"
     environment:
-      GF_SECURITY_ADMIN_USER: ${CONSOLE_ADMIN_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${CONSOLE_ADMIN_PASSWORD:-admin}
+      GF_SECURITY_ADMIN_USER: ${BOARD_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${BOARD_ADMIN_PASSWORD:-admin}
       EMPIRIQ_DB_HOST: database
       EMPIRIQ_DB_PORT: "5432"
-      # Grafana cannot set a role at connect, so the console uses the owner.
+      # Grafana cannot set a role at connect, so the board uses the owner.
       EMPIRIQ_DB_NAME: ${POSTGRES_DB:-empiriq}
       EMPIRIQ_DB_USER: ${POSTGRES_USER:-empiriq}
       EMPIRIQ_DB_PASSWORD: ${POSTGRES_PASSWORD:-empiriq}
@@ -86,7 +86,7 @@ services:
     restart: unless-stopped
 
   # Logs: Alloy reads the output of all containers and sends it to Loki. The
-  # console shows it on the page Logs. If Loki is down, the services do not
+  # board shows it on the page Logs. If Loki is down, the services do not
   # notice: they write to the default json-file log driver as before.
   loki:
     image: grafana/loki:3.6.0
