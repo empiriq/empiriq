@@ -106,7 +106,7 @@ avoid. A word in *italics* has its own entry on this page.
 | **desired status** | `running` or `stopped`. Only running strategies get frames. | `core.strategy.desired_status`, `api.set_strategy_status()` | enabled, active |
 | **on stop** | What happens to the desired state of a stopped strategy: `keep` or `cancel`. | `core.strategy.on_stop` | |
 | **subscription** | A stream that a strategy reads. The engine records cutoffs only for subscribed streams. | `core.strategy_stream`, `api.subscribe()` | dependency, input |
-| **strategy context** | The input of a strategy: ids, `as_of`, mode, params, strategy state. | `api.strategy_context`, `ctx` | |
+| **strategy context** | The input of a strategy: ids, `as_of`, clock, params, strategy state. | `api.strategy_context`, `ctx` | |
 | **strategy state** | Data a strategy carries between frames. Always say "strategy state", never just "state". | `core.strategy_state`, `api.set_state()` | memory, storage |
 | **params** | Static configuration of a registered strategy. | `core.strategy.params` | config, settings, arguments |
 
@@ -114,13 +114,15 @@ avoid. A word in *italics* has its own entry on this page.
 
 | Term | Meaning | In code | Do not use |
 |------|---------|---------|------------|
-| **world** | A set of *accounts* with one clock and one *mode*. Frames belong to a world. Several worlds can run in one database and share the market data. | `core.world`, `world_id`, `api.start_world()` | environment, universe, sandbox |
+| **world** | A set of *accounts* with one *clock*. Frames belong to a world. Several worlds can run in one database and share the market data. | `core.world`, `world_id`, `api.start_world()` | environment, universe, sandbox |
 | **reconciliation** | One completed pass of a reconciler over an account in a *frame*. It confirms the account for that frame ([ADR 0022](../adr/0022-frames-belong-to-a-world.md)). | `core.reconciliation`, `api.reconciled()` | sync, cycle |
 | **frame** | One step of a *world* at one `as_of`. It ends when the last account of the world is reconciled: then the *frame handler* runs and the next frame opens ([ADR 0022](../adr/0022-frames-belong-to-a-world.md)). Today `core.frame` still stores one run of one strategy. | `core.frame`, `api.frame` | tick, cycle, round, iteration, step |
 | **frame handler** | Engine code that runs at the end of a frame, in the transaction of the last reconciliation. Its first version runs the strategies and the planners of the world. | `core.on_frame()` | callback, hook |
 | **cutoff** | For a subscribed stream and a writer that is open at frame start: its highest `seq` (0 if none). A frame sees no row of that writer above it. A replay with the same cutoffs sees the same rows. | `core.frame_cutoff.seq_cutoff` | snapshot, watermark |
 | **as_of** | The logical time of a frame. Strategies use it instead of `now()`. Increases for each world. | `as_of`, `ctx.as_of`, `api.now()` | now, current time, timestamp |
-| **mode** | `live` or `backtest`. A property of the *world* ([ADR 0022](../adr/0022-frames-belong-to-a-world.md)). Paper trading is a live world with simulated accounts. Today the code still has the mode on the account, with `paper`. | `api.mode`, `core.account.mode` | environment, profile |
+| **clock** | How `as_of` of a *world* moves: `live` follows the wall clock, `replay` moves through history step by step ([ADR 0022](../adr/0022-frames-belong-to-a-world.md)). A *live world* or a *replay world* is a world with that clock. Today the code has a mode on the account instead (`live`, `paper`, `backtest`). | `core.world.clock` (planned); today `api.mode`, `core.account.mode` | mode, environment, profile |
+| **backtest** | A run of strategies over history, in a replay world. A use of a replay world, not a clock. | | simulation |
+| **paper trading** | Trading in a live world with simulated accounts. | | paper mode |
 | **account event** | One report of a reconciler: order, fill, balance or position. Stored in a journal. | `core.account_event`, `api.account_event` | update, message |
 | **feeder** | A long-running service that writes live market data from one venue or data source. Identified by its name. Registers with its capabilities, sends heartbeats and writes the active live requests. Has no desired state. | service `feeder`, `api.register_feeder()`, `api.feeder` | collector, ingester, connector, livefiller |
 | **backfiller** | A long-running service that loads requested history in backfill runs. Identified by its name. Registers with its capabilities and sends heartbeats. Has no desired state: empiriq does not start or stop it. | service `backfiller`, `api.register_backfiller()`, `api.backfiller` | importer, loader, replay feeder |

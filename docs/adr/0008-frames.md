@@ -59,7 +59,7 @@ row only if `event_time <= as_of` and the cutoff of its writer allows it.
 A replay of a recorded frame uses the same cutoffs, so it sees exactly the same
 rows. Late rows are invisible in both runs.
 
-A world in the `backtest` mode works on backfilled history. Its frames record
+A replay world works on backfilled history. Its frames record
 no cutoffs, so `event_time <= as_of` alone decides. This is deterministic too,
 because history does not change during a backtest.
 
@@ -87,9 +87,9 @@ known which account events a frame was based on.
 - `on_stop` defines what happens to the desired state when the strategy
   stops: `keep` leaves it, `cancel` removes it, so the reconciler cancels the
   open orders.
-- The mode (`live`, `backtest`) is a property of the world
+- The clock (`live`, `replay`) is a property of the world
   ([ADR 0022](0022-frames-belong-to-a-world.md)). Starting a backtest means:
-  create a world in the `backtest` mode with simulated accounts, add
+  create a replay world with simulated accounts, add
   strategies to them, start the simulated reconcilers and the world.
 
 `api.strategy_status` shows the observed side: the last frame, its status and

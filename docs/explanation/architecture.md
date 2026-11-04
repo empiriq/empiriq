@@ -92,7 +92,7 @@ strategies.
 
 ## Frames
 
-A **world** is a set of accounts with one clock and one mode. A **frame** is
+A **world** is a set of accounts with one clock. A **frame** is
 one step of a world at one `as_of`. The last reconciler of the world ends the
 frame ([ADR 0022](../adr/0022-frames-belong-to-a-world.md)).
 
@@ -135,7 +135,7 @@ sequenceDiagram
 This design has these consequences:
 
 - **No scheduler.** The slowest reconciler of a world sets its rhythm. In a
-  backtest world, the simulated reconcilers respond at once, so the world runs
+  replay world, the simulated reconcilers respond at once, so the world runs
   as fast as the database.
 - **One `as_of` for all accounts of a world.** A strategy sees all accounts
   of its world at the same `as_of`. This is what arbitrage between venues
@@ -185,16 +185,16 @@ has the details.
 
 So a strategy is a pure function of its inputs: visible market data, observed
 state, params and strategy state. For this reason, backtests and live trading
-use **the same code**. The mode is a property of the world:
+use **the same code**. The clock is a property of the world:
 
-| Mode       | Accounts                                             | `as_of`                                      | Cutoffs  | Market data                      |
+| Clock      | Accounts                                             | `as_of`                                      | Cutoffs  | Market data                      |
 |------------|------------------------------------------------------|----------------------------------------------|----------|----------------------------------|
 | `live`     | Real venues, or simulated accounts for paper trading | Wall clock                                   | Recorded | Feeders, real time               |
-| `backtest` | Simulated fills against history                      | The previous `as_of` + the step of the world | None     | Backfillers, before the backtest |
+| `replay`   | Simulated fills against history                      | The previous `as_of` + the step of the world | None     | Backfillers, before the backtest |
 
 A backtest needs no feeder. Request the history with `api.add_history_request()`
 before the backtest starts, and backfillers load it into `market.*`. Then the
-backtest world moves `as_of` step by step, and its simulated reconcilers
+replay world moves `as_of` step by step, and its simulated reconcilers
 respond at once. History does not change during a backtest, so `event_time <= as_of`
 alone is deterministic.
 
@@ -339,8 +339,8 @@ select api.set_strategy_status('my-strategy', 'stopped');
   open orders. Positions stay.
 
 `api.strategy_status` shows the desired status and the result of the last
-frame. To start a backtest, create a world in the `backtest` mode with
-simulated accounts, register strategies on them, start the simulated
+frame. To start a backtest, create a replay world with simulated
+accounts, register strategies on them, start the simulated
 reconcilers and call `api.start_world()`.
 
 ## Writing a feeder, a backfiller or a reconciler

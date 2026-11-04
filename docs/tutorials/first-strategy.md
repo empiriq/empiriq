@@ -82,7 +82,7 @@ make sql F=examples/03-strategy.sql
 
 The file does four things:
 
-1. It creates the account `demo` in the paper mode.
+1. It creates the account `demo` for paper trading (in code: `mode = 'paper'`).
 2. It registers the strategy `sma-demo` on this account, with its parameters,
    and subscribes it to the trades of `BTCUSDT`.
 3. It runs a *frame* of the strategy for each hour of yesterday. A frame is

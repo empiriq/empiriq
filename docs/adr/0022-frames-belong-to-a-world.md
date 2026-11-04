@@ -31,14 +31,14 @@ not all accounts.
 
 ### A world has one clock
 
-A **world** is a set of accounts with one clock and one mode. Each account
-belongs to one world.
+A **world** is a set of accounts with one clock. Each account belongs to one
+world.
 
-- The mode of a world is `live` or `backtest`. A live world follows the wall
-  clock. A backtest world moves through history.
-- Paper trading is a live world with simulated accounts. The simulator is a
-  later decision.
-- Several backtest worlds can run next to a live world in one database. Market
+- The **clock** of a world is `live` or `replay`. A live world follows the
+  wall clock. A replay world moves through history step by step.
+- A backtest runs in a replay world. Paper trading runs in a live world with
+  simulated accounts. The simulator is a later decision.
+- Several replay worlds can run next to a live world in one database. Market
   data is shared by all worlds.
 
 ### A frame is a step of a world
@@ -49,7 +49,7 @@ with `pending` = the number of accounts of the world. Then it sends
 
 - `as_of` increases from frame to frame of a world.
 - In a live world, `as_of` of a new frame is `clock_timestamp()`. In a
-  backtest world, it is the `as_of` of the previous frame plus the step of the
+  replay world, it is the `as_of` of the previous frame plus the step of the
   world.
 - An operator starts a world with `api.start_world(world_id)`. It opens the
   first frame if no frame of the world is open.
@@ -73,7 +73,7 @@ the `seq` of the last account event, as before.
   next frame and sends `NOTIFY empiriq_frame`.
 
 No scheduler is needed: the slowest reconciler of a world sets its rhythm.
-In a backtest world, simulated reconcilers respond at once, so the world runs
+In a replay world, simulated reconcilers respond at once, so the world runs
 as fast as the database.
 
 ### The frame handler is a separate decision
@@ -96,7 +96,8 @@ frame.
   world.
 - The handler runs in the transaction of the last reconciler. A slow handler
   makes that reconciler slow, as today.
-- The mode moves from the account to the world. `core.frame` today stores
+- The clock of the world replaces the mode of the account (`live`, `paper`,
+  `backtest`). `core.frame` today stores
   one run of one strategy; its name and shape change with the handler
   decision.
 - A world without accounts has no frames.

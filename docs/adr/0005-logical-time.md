@@ -26,8 +26,8 @@ the future. And the backtest runs the same code as live trading.
 - Helper functions use `as_of`. A strategy builds bars from `api.trades()`
   only for periods that are closed at `as_of` (`ts + interval <= as_of`,
   [ADR 0013](0013-strategies-build-bars.md)).
-- The modes `live` and `backtest` of a world differ in only two things: how
-  `as_of` moves, and where the market data comes from. A backtest has no
+- A live world and a replay world differ in only two things: how `as_of`
+  moves, and where the market data comes from. A backtest has no
   feeders: a backfiller loads the history before it starts.
 
 ## Consequences
