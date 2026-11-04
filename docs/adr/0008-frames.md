@@ -38,21 +38,16 @@ it fills gaps.
 strategy still runs, on unchanged data. A stale watermark shows a broken
 feeder. Detection of a broken feeder belongs to the container level, later.
 
-### A reconciliation starts frames
+### Reconciliations drive frames
 
-The reconciler is the clock of an account. After each pass over an account, it
-calls `api.reconciled(account_id, as_of)`. This inserts a row into
-`core.reconciliation` and runs one **frame** for each running strategy of the
-account. Then the planners run for the account, and
-`NOTIFY empiriq_frame` wakes the reconciler for its next pass.
+Reconcilers set the rhythm. A frame is one step of a world. When the last
+reconciler of the world confirms the frame, the frame ends: the strategies of
+the world run, then the planners, and `NOTIFY empiriq_frame` opens the next
+frame ([ADR 0022](0022-frames-belong-to-a-world.md)).
 
-- `as_of` of a frame is the `as_of` of the reconciliation. It increases for
-  each account.
-- Each account has its own rhythm. A slow venue delays only its own accounts.
-- No scheduler is needed. In a backtest, the simulated reconciler moves
+- No scheduler is needed. In a backtest, the simulated reconcilers move
   `as_of` through history.
-- If the venue is not reachable, the reconciler does not call
-  `api.reconciled`, so no frame runs on stale account state.
+- A reconciler confirms every frame, also when the venue did not respond.
 
 ### Cutoffs make frames repeatable
 
@@ -70,7 +65,7 @@ only if both conditions are true:
 A replay of a recorded frame uses the same cutoffs, so it sees exactly the same
 rows. Late rows are invisible in both runs.
 
-Accounts in the `backtest` mode work on backfilled history. They have no
+A world in the `backtest` mode works on backfilled history. They have no
 recorded cutoffs, so `event_time <= as_of` alone decides. This is
 deterministic too, because history does not change during a backtest.
 
@@ -78,7 +73,7 @@ deterministic too, because history does not change during a backtest.
 
 A strategy lists its streams in `core.strategy_stream` (instrument and event
 type). The engine records cutoffs only for these streams. Inside a frame, the
-helper functions (`api.bars()`, `api.last_quote()`, `api.depth_levels()`)
+helper functions (`api.trades()`, `api.last_quote()`, `api.depth_levels()`)
 raise an error for a stream without a subscription.
 
 ### Reconcilers write an event journal
@@ -98,9 +93,10 @@ known which account events a frame was based on.
 - `on_stop` defines what happens to the desired state when the strategy
   stops: `keep` leaves it, `cancel` removes it, so the reconciler cancels the
   open orders.
-- The mode (`live`, `paper`, `backtest`) is a property of the account.
-  Starting a backtest means: create an account in the `backtest` mode, add
-  strategies to it, start its simulated reconciler.
+- The mode (`live`, `backtest`) is a property of the world
+  ([ADR 0022](0022-frames-belong-to-a-world.md)). Starting a backtest means:
+  create a world in the `backtest` mode with simulated accounts, add
+  strategies to them, start the simulated reconcilers and the world.
 
 `api.strategy_status` shows the observed side: the last frame, its status and
 its error.
@@ -109,12 +105,12 @@ its error.
 
 - The global cycle, the worker registry, `api.ack()`, `api.nack()` and
   `api.start_cycle()` are removed.
-- Frames run in the transaction of `api.reconciled()`. A slow strategy makes
-  the reconciler slow. A separate runner remains an option.
+- Frames run in the transaction of the last `api.reconciled()`. A slow
+  strategy makes that reconciler slow. A separate runner remains an option.
 - Cutoffs need an index on `(instrument_id, seq)`. Their cost is one index
   lookup per subscribed stream and frame.
 - The observed state that a strategy reads is the current state. Rebuilding
   it from the event journal for an exact replay is future work.
-- Strategies on more than one account need a rule for which reconciliations
-  start their frames (open question).
+- How a strategy sends intents to several accounts of its world is an open
+  question.
 - Stopping with "close all positions" (`flatten`) is not supported yet.

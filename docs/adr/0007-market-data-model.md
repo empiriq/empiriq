@@ -37,7 +37,8 @@ see data before the venue published it.
   `(instrument_id, event_time)`.
 - Functions calculate derived values on read. The database does not store
   them:
-  - bars: `api.bars`;
+  - bars: strategies build them from `api.trades()`
+    ([ADR 0013](0013-strategies-build-bars.md));
   - best bid and best ask: `api.last_quote`;
   - notional and cumulative depth for each price level: `api.depth_levels`.
 - Prices and quantities are `numeric`. Feeders convert floats to exact
@@ -50,7 +51,7 @@ see data before the venue published it.
 - There is one authoritative data set. Every strategy and dashboard sees the
   same bars and best prices. To correct a bar, correct the trades. There are
   no aggregates to rewrite.
-- Each call to `api.bars` reads all trades in the window. This is acceptable
+- A strategy that builds bars reads all trades in the window. This is acceptable
   for minute bars over short windows. Long windows or many strategies will
   need materialized bars (open question).
 - Depth snapshots are large: N levels multiplied by the update rate. They need

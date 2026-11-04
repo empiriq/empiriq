@@ -17,15 +17,17 @@ the future. And the backtest runs the same code as live trading.
 
 - Each frame has an `as_of`. Strategies get it as `ctx.as_of`. `api.now()`
   returns it from a setting that the engine sets for the transaction.
-- `as_of` increases from frame to frame of an account. Two frames of an
-  account never have the same `as_of`.
+- `as_of` increases from frame to frame of a world
+  ([ADR 0022](0022-frames-belong-to-a-world.md)). Two frames of a world never
+  have the same `as_of`.
 - Market data is visible after the venue published it: `event_time <= as_of`
   ([ADR 0007](0007-market-data-model.md)). Inside a frame, the cutoffs of
   [ADR 0008](0008-frames.md) also apply.
-- Helper functions use `as_of`. `api.bars()` returns only periods that are
-  closed at `as_of` (`ts + interval <= as_of`).
-- The modes `live`, `paper` and `backtest` differ in only two things: who sets
-  `as_of`, and which feeders and reconcilers are registered. A backtest has no
+- Helper functions use `as_of`. A strategy builds bars from `api.trades()`
+  only for periods that are closed at `as_of` (`ts + interval <= as_of`,
+  [ADR 0013](0013-strategies-build-bars.md)).
+- The modes `live` and `backtest` of a world differ in only two things: how
+  `as_of` moves, and where the market data comes from. A backtest has no
   feeders: a backfiller loads the history before it starts.
 
 ## Consequences

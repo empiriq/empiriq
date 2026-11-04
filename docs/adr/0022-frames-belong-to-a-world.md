@@ -9,9 +9,9 @@
 
 ## Context
 
-With [ADR 0008](0008-frames.md), each account has its own rhythm. A
-reconciliation of an account starts the frames of the strategies on that
-account. This has three problems:
+Before this decision, each account had its own rhythm. A reconciliation of
+an account started the frames of the strategies on that account. This had
+three problems:
 
 - A strategy cannot use more than one account. Arbitrage between venues needs
   the state of several accounts at the same `as_of`.

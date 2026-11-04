@@ -75,12 +75,9 @@ the period, and filters the rows to the period.
 
 ### A role for control actions
 
-`empiriq_operator` can call control functions such as `api.add_history_request()`
-and `api.set_strategy_status()`. A dashboard with controls uses this role. The
-role `empiriq_reader` stays read-only.
-
-> ADR 0011 replaces this section: `empiriq_operator` is the only role for
-> people and the board, and `empiriq_reader` is removed.
+`empiriq_operator` calls the control functions, such as
+`api.add_history_request()` and `api.set_strategy_status()`. It is the only
+role for people and the board ([ADR 0011](0011-board.md)).
 
 ## Consequences
 

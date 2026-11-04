@@ -27,8 +27,8 @@ three.
   missing from the output.
 - Planners (`core.plan`) convert balance and position targets into desired
   orders with `origin = 'planner'`. They use
-  `delta = target − observed − in-flight`, a tolerance and rounding to the lot
-  size.
+  `delta = target − observed − in-flight` and a tolerance. They do not round
+  to the trading rules of the venue ([ADR 0017](0017-venue-trading-rules.md)).
 - Claims: in one account, only one strategy at one intent level can target an
   asset or instrument. A run with a conflict fails.
 - If an order intent with the same key changes, its revision increments. The
