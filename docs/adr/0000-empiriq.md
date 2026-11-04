@@ -24,8 +24,8 @@ High-frequency trading (HFT), where microseconds decide, is not a goal.
 ### The database is the center
 
 PostgreSQL holds the market data, the state of every account and the
-strategies. All other parts are services that talk only to the database,
-never to each other. The public contract is the `api` schema.
+strategies. All other services talk only to the database, never to each
+other. The public contract is the `api` schema.
 
 Two ideas shape the whole design:
 
@@ -35,18 +35,24 @@ Two ideas shape the whole design:
   the cutoffs of its streams. So a frame gives the same result in a replay
   and in a backtest.
 
-### Services
+### The database and the kinds of services
 
-empiriq has five services. Each service has its own repository and runs in
-its own container.
+The `database` is a special service: the shared database of empiriq. It is
+PostgreSQL with the schema, the engine and `api`. It runs strategies in
+frames and plans orders.
 
-| Service      | Does                                                                                                                             |
-|--------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `database`   | PostgreSQL with the schema, the engine and `api`. Runs strategies in frames and plans orders.                                    |
-| `feeder`     | Writes live market data from one venue or data source, for the active live requests.                                             |
-| `backfiller` | Loads requested history in backfill runs.                                                                                        |
-| `reconciler` | Reconciles accounts with one venue, reports observed state and starts frames.                                                    |
-| `board`      | The user interface: shows the state and changes desired state, only through `api`. Built with Grafana; its pages are dashboards. |
+Every other service has one of four kinds:
+
+| Kind       | Does                                                                                 |
+|------------|--------------------------------------------------------------------------------------|
+| feeder     | Writes live market data from a venue or a data source, for the active live requests. |
+| backfiller | Loads requested history in backfill runs.                                            |
+| reconciler | Reconciles accounts with a venue, reports observed state and starts frames.          |
+| other      | Any other work. It uses only `api` and has no contract of its own.                   |
+
+A feeder, a backfiller and a reconciler each follow a contract with the
+database: how they register, report and get their work. Each service has its
+own repository, for example `binance-feeder`, and runs in its own container.
 
 ### Control is declarative
 
@@ -58,12 +64,12 @@ matches their capabilities. empiriq does not start or stop services.
 
 - You can write a service in any language that has a PostgreSQL driver.
 - A new venue needs a feeder, a backfiller and a reconciler. The database
-  and the board do not change.
+  and the auxiliary services do not change.
 - The database adds latency compared with an in-process engine. The latency
   budget of a frame is in milliseconds.
 - `api` is the contract of every service, so it needs strict versioning.
-- A new ADR that adds a service or changes the role of one also updates the
-  table of services here.
+- A new ADR that adds a kind of service or changes the role of one also
+  updates the table of kinds here.
 
 The [architecture](../explanation/architecture.md) explains the design in
 detail. The [glossary](../reference/glossary.md) defines the terms.
