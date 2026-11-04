@@ -174,7 +174,7 @@ frames: ## Show the last 20 frames.
 
 .PHONY: writers
 writers: ## Show writers of market data.
-	@echo "select id, name, kind, open, created_at, closed_at from api.writer order by id;" | $(PSQL)
+	@echo "select id, name, kind, created_at from api.writer order by id;" | $(PSQL)
 
 .PHONY: streams
 streams: ## Show the coverage of all streams: live and history.
@@ -190,7 +190,7 @@ delays: ## Show the publish delays measured from live trades.
 
 .PHONY: runs
 runs: ## Show the last 20 backfill runs (internal, ADR 0011).
-	@echo "select b.writer_id, i.venue_id, i.symbol, b.stream, b.period, b.status, b.rows, b.error from market.backfill_run b join core.instrument i on i.id = b.instrument_id order by b.writer_id desc limit 20;" | $(PSQL)
+	@echo "select b.id, b.backfiller_name, i.venue_id, i.symbol, b.stream, b.period, b.status, b.rows, b.error from market.backfill_run b join core.instrument i on i.id = b.instrument_id order by b.id desc limit 20;" | $(PSQL)
 
 .PHONY: backfillers
 backfillers: ## Show registered backfillers: capabilities, heartbeat and results of 24 hours.
