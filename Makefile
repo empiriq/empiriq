@@ -178,7 +178,7 @@ writers: ## Show writers of market data.
 
 .PHONY: streams
 streams: ## Show the coverage of all streams: live and history.
-	@echo "select venue_id, symbol, stream, covered_from, covered_to, uncovered, missing, lag, heartbeat_age, running from api.stream_summary order by 1, 2, 3;" | $(PSQL)
+	@echo "select venue_id, symbol, stream, covered_from, covered_to, uncovered, requested_uncovered, lag, heartbeat_age, running from api.stream_summary order by 1, 2, 3;" | $(PSQL)
 
 .PHONY: coverage
 coverage: ## Show requested, covered and missing history.

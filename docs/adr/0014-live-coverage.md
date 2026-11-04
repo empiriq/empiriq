@@ -41,8 +41,9 @@ Option C.
   which it stored every event, for example the time when it connected to
   the stream of the venue.
 - `api.stream_summary` shows, for each stream, the union of live coverage and
-  history coverage, the uncovered periods between them, and the state of the
-  live feed. It reads only metadata, never trades.
+  history coverage, the uncovered periods between them, requested periods
+  without any coverage (`requested_uncovered`), and the lag and heartbeat age
+  of the live data. It reads only metadata, never trades.
 - `api.coverage_timeline` lists live and history periods for timelines.
 
 ## Consequences

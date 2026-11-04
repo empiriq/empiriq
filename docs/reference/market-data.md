@@ -215,10 +215,12 @@ connection broke, the time between the old and the new period becomes an
 uncovered period.
 
 `api.live_coverage` lists the periods. `api.stream_summary` shows the
-coverage of each stream from feeders and backfillers together.
+coverage of each stream from feeders and backfillers together, and
+`requested_uncovered`: requested periods without any coverage.
 `api.coverage_timeline` lists both kinds of periods for timelines.
 
-A backfiller does not send heartbeats.
+A backfiller reports no watermarks: watermarks are for live data. It sends
+the heartbeats of a service instead ([Backfill](#backfill)).
 
 ## Backfill
 

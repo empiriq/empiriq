@@ -37,11 +37,11 @@ calling functions of `api`. It never reads or writes `market.*` or `core.*`.
 
 So `api` gets views shaped for display:
 
-| View                  | Shows                                                                                                                    |
-|-----------------------|--------------------------------------------------------------------------------------------------------------------------|
-| `api.history_request` | History requests: the part of the period that is still missing, the failed runs in it and the newest error               |
-| `api.writer`          | Writers and whether they are open                                                                                        |
-| `api.stream_summary`  | Streams: live and history coverage, uncovered and missing periods, lag of `complete_until` and age of the last heartbeat |
+| View                  | Shows                                                                                                                                                |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `api.history_request` | History requests: the part of the period that is still missing, the failed runs in it and the newest error                                           |
+| `api.writer`          | Writers of market data: one for each feeder and each backfiller                                                                                      |
+| `api.stream_summary`  | Streams: live and history coverage, uncovered periods, requested periods without any coverage, lag of `complete_until` and age of the last heartbeat |
 
 And control functions:
 
