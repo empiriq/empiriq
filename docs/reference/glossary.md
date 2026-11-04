@@ -135,6 +135,8 @@ avoid. A word in *italics* has its own entry on this page.
 | **board** | The user interface of empiriq: Grafana with the dashboards of empiriq. Shows the state and changes desired state, only through `api`. | service and repository `board` | board, dashboard (as a service name), UI, admin panel |
 | **dashboard** | One page of the board, for example *Overview* or *History*. Never the board itself. | Grafana dashboard | screen, view (view is SQL), board (for one page) |
 | **operator** | A person or the board that changes desired state through `api` functions. | role `empiriq_operator` | admin, user (as a role) |
+| **log store** | The container of the stack that stores the logs of all containers: Loki. Not a *service*: it has no repository of its own and does not use `api`. | compose service `log-store` | |
+| **log agent** | The container of the stack that reads the output of all containers and sends it to the log store: Alloy. Not a *service*. | compose service `log-agent` | log collector, log shipper |
 
 ## Reconciliation
 

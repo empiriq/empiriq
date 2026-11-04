@@ -79,8 +79,8 @@ computer for development, or to try empiriq without cloning every repository.
 | `binance-backfiller` | `../binance-backfiller`| Loads history from the Binance archive |
 | `binance-feeder`     | `../binance-feeder`    | Writes live trades of the live requests from the Binance WebSocket streams |
 | `board`              | `../board`             | Grafana with the board, on localhost:3000 |
-| `loki`               | this repository        | Stores the logs of all containers (`loki/config.yaml`) |
-| `alloy`              | this repository        | Reads the output of all containers and sends it to Loki (`alloy/config.alloy`) |
+| `log-store`          | this repository        | Loki: stores the logs of all containers (`loki/config.yaml`) |
+| `log-agent`          | this repository        | Alloy: reads the output of all containers and sends it to the log store (`alloy/config.alloy`) |
 
 Each service repository has one `Dockerfile` and builds one image. It knows
 nothing about this repository or about compose.

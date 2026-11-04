@@ -87,16 +87,18 @@ services:
       EMPIRIQ_DB_NAME: ${POSTGRES_DB:-empiriq}
       EMPIRIQ_DB_USER: ${POSTGRES_USER:-empiriq}
       EMPIRIQ_DB_PASSWORD: ${POSTGRES_PASSWORD:-empiriq}
-      LOKI_URL: http://loki:3100
+      LOKI_URL: http://log-store:3100
     volumes:
       - grafana:/var/lib/grafana
     restart: unless-stopped
 
-  # Logs: Alloy reads the output of all containers and sends it to Loki. The
-  # board shows it on the page Logs. If Loki is down, the services do not
-  # notice: they write to the default json-file log driver as before.
-  loki:
-    container_name: empiriq-loki
+  # Logs: the log agent (Alloy) reads the output of all containers and sends
+  # it to the log store (Loki). The board shows it on the page Logs. If the
+  # log store is down, the services do not notice: they write to the default
+  # json-file log driver as before. The volumes keep the names of the programs,
+  # like the volume grafana of the board.
+  log-store:
+    container_name: empiriq-log-store
     image: grafana/loki:3.6.0
     # The new volume belongs to root, and the image runs as user 10001.
     user: "0"
@@ -108,12 +110,12 @@ services:
       - loki:/loki
     restart: unless-stopped
 
-  alloy:
-    container_name: empiriq-alloy
+  log-agent:
+    container_name: empiriq-log-agent
     image: grafana/alloy:v1.20.0
     command: ["run", "--server.http.listen-addr=0.0.0.0:12345",
               "--storage.path=/var/lib/alloy/data", "/etc/alloy/config.alloy"]
-    depends_on: [loki]
+    depends_on: [log-store]
     volumes:
       - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro

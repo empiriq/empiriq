@@ -76,6 +76,6 @@ loki.process "level" {
 
 loki.write "loki" {
   endpoint {
-    url = "http://loki:3100/loki/api/v1/push"
+    url = "http://log-store:3100/loki/api/v1/push"
   }
 }
