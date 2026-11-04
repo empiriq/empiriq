@@ -10,8 +10,8 @@ parts it has. It links to no other ADR: the other ADRs refine it. The
 
 empiriq is an algorithmic trading platform. It must support:
 
-- decisions within one second or faster: market making, intraday strategies
-  and portfolio rebalancing;
+- decisions within one second or faster: market making, arbitrage between
+  venues, intraday strategies and portfolio rebalancing;
 - backtests and research with the same code as live trading;
 - many venues, with code for each venue written by different people, often in
   different languages;
