@@ -40,7 +40,7 @@ when the venue published it. So the real delay can be measured.
   of `api.register_backfiller()`, else 0.
 - Each backfill run records the delay that it used
   (`market.backfill_run.publish_delay`).
-- History requests have no publish delay any more.
+- A history request has no publish delay of its own.
 - `api.publish_delay` shows the measurements. `api.measure_publish_delay()`
   measures a venue now.
 

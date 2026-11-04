@@ -60,4 +60,3 @@ periods, no frames, and access for the operator.
 - A chart on the board and a strategy can show different bars for the same
   period: the chart sees late trades that a frame did not see. This is
   intended. The chart shows what the database has now.
-- `api.bars()` and `api.bar` are removed. This is a breaking change of `api`.

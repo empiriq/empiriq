@@ -89,7 +89,6 @@ frame.
   writes intents to several accounts is part of the handler decision.
 - The reconciler no longer chooses `as_of`. It listens on `empiriq_frame`
   and calls `api.reconciled(account_id, frame_id)` for each of its accounts.
-  This is a breaking change of `api`.
 - A reconciler that stops or hangs stops its world: the frame never ends.
   Detection and a deadline are open questions. A venue that does not respond
   is not such a case: the reconciler still calls `api.reconciled()`.

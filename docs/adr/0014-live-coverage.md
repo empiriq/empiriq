@@ -53,7 +53,5 @@ Option C.
   `api.trade_gaps()` remains the check against the data.
 - Live periods use `event_time`. History periods use `trade_time`. At the
   boundaries the two can differ by the latency of the venue.
-- `api.report_watermark()` has a new signature with `writer_id`. This is a
-  breaking change of `api`.
 - A feeder that reports often writes one row update for each report. This is
   the same cost as the update of `market.watermark` before.

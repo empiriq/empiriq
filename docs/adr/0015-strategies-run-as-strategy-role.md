@@ -42,8 +42,8 @@ rule.
   `api.balance`, `api.position`, `api."order"`, `api.instrument` and the
   helper functions. These views still show all accounts. Filtering them by
   the account of the frame is TBD.
-- The operator can call `api.last_quote()` and `api.depth_levels()` too.
-  Before, they failed, because the operator has no `select` on `market`.
+- The operator can call `api.last_quote()` and `api.depth_levels()` too,
+  without `select` on `market`.
 - `SECURITY DEFINER` functions are not inlined by the planner. A strategy that
   joins `api.trades()` is not optimized across the call. For the current
   helper functions this costs little.

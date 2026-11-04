@@ -57,8 +57,8 @@ name of its backfiller (`backfill_run.backfiller_name`), or null if it was
 started by hand.
 
 A running run is abandoned when its backfiller sent no heartbeat for
-`stale_after`. Before, a run was abandoned when it was older than
-`stale_after`, even if its backfiller still worked on it.
+`stale_after`, not when it is older than `stale_after`. So a long run of a
+working backfiller is not abandoned.
 
 ### Work has desired state
 
@@ -77,7 +77,5 @@ backfillers.
 - A backfiller that stops without deregistering stays in the registry and
   shows as not alive. A row of a dead backfiller is harmless. Cleanup of old
   rows is TBD.
-- Feeders and reconcilers can follow the same pattern later: they register
-  and report, and only their work is controlled.
-- `api.lease_history()` and `api.start_backfill()` have new signatures. This
-  is a breaking change of `api`.
+- Feeders follow the same pattern ([ADR 0016](0016-live-requests.md)).
+  Reconcilers can follow it later.

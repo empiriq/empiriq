@@ -28,15 +28,14 @@ ack, and a barrier then ran all strategies. This model has four problems:
 
 ### Feeders write all the time
 
-A feeder starts to write market data when its service starts. It does not
-register and does not send an ack. The data of a feeder serves live trading
-and later backtests. A backfiller adds history before a strategy starts, and
-it fills gaps.
+Feeders write the streams of the live requests all the time, not in frames
+([ADR 0016](0016-live-requests.md)). Their data serves live trading and later
+backtests. A backfiller adds history and fills gaps.
 
-`market.watermark` becomes a heartbeat: for each stream, the feeder updates
-`complete_until` also when there are no events. In a quiet market the
-strategy still runs, on unchanged data. A stale watermark shows a broken
-feeder. Detection of a broken feeder belongs to the container level, later.
+For each stream, a feeder also reports a heartbeat, the watermark: it updates
+`complete_until` also when there are no events
+([ADR 0014](0014-live-coverage.md)). In a quiet market the strategies still
+run, on unchanged data. A stale watermark shows a broken feeder.
 
 ### Reconciliations drive frames
 
@@ -51,23 +50,18 @@ frame ([ADR 0022](0022-frames-belong-to-a-world.md)).
 
 ### Cutoffs make frames repeatable
 
-Every row in `market.trade` and `market.depth` has a `seq`, assigned at insert.
-One writer per stream commits in order, so `seq` grows in commit order inside
-a stream. A stream is one instrument and one event type (`trade` or `depth`).
-
-At frame start, the engine records a **cutoff** for each stream that the
-strategy subscribed to: the highest `seq` in the database. The frame sees a row
-only if both conditions are true:
-
-- `event_time <= as_of`;
-- `seq <= cutoff` of its stream.
+Every row in `market.trade` and `market.depth` has a writer and a `seq`,
+assigned at insert. At frame start, the engine records a **cutoff** for each
+subscribed stream and each open writer: its highest `seq`. The frame sees a
+row only if `event_time <= as_of` and the cutoff of its writer allows it.
+[ADR 0009](0009-writers.md) has the rules for open and closed writers.
 
 A replay of a recorded frame uses the same cutoffs, so it sees exactly the same
 rows. Late rows are invisible in both runs.
 
-A world in the `backtest` mode works on backfilled history. They have no
-recorded cutoffs, so `event_time <= as_of` alone decides. This is
-deterministic too, because history does not change during a backtest.
+A world in the `backtest` mode works on backfilled history. Its frames record
+no cutoffs, so `event_time <= as_of` alone decides. This is deterministic too,
+because history does not change during a backtest.
 
 ### Strategies subscribe to streams
 
@@ -107,8 +101,8 @@ its error.
   `api.start_cycle()` are removed.
 - Frames run in the transaction of the last `api.reconciled()`. A slow
   strategy makes that reconciler slow. A separate runner remains an option.
-- Cutoffs need an index on `(instrument_id, seq)`. Their cost is one index
-  lookup per subscribed stream and frame.
+- Cutoffs need an index on `(instrument_id, writer_id, seq)`. Their cost is
+  one index lookup for each subscribed stream and open writer in a frame.
 - The observed state that a strategy reads is the current state. Rebuilding
   it from the event journal for an exact replay is future work.
 - How a strategy sends intents to several accounts of its world is an open

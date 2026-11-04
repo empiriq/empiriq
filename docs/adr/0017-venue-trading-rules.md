@@ -20,7 +20,7 @@ can only be older than the original.
 ## Decision
 
 - `core.instrument`, `api.instrument` and `api.register_instrument()` have
-  no trading rules any more.
+  no trading rules.
 - The planner does not round. It sends `abs(delta)` if it is larger than the
   tolerance.
 - If the venue rejects an order, the reconciler reports the status
@@ -39,8 +39,6 @@ can only be older than the original.
   a tolerance of at least one step of the venue. A planner that stops after
   a rejection is TBD.
 - Small differences, for example from fees in the base asset, become orders
-  if the tolerance is 0. Before, the rounding to the lot size hid them.
+  if the tolerance is 0.
 - A backtest does not check trading rules. A simulated reconciler accepts
   orders that the venue would reject.
-- `api.register_instrument()` has a new signature. This is a breaking change
-  of `api`.
