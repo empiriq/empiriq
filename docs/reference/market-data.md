@@ -88,7 +88,7 @@ shape. The columns are a range, so an aggregated source stays possible later.
 | `FirstTradeID` | `first_trade_id` | `bigint`      | Primary key, together with `instrument_id` |
 | `LastTradeID`  | `last_trade_id`  | `bigint`      | `>= first_trade_id`. Equal for raw trades. |
 | *proposed:* `IsBuyerMaker` | `aggressor` | `core.order_side` | `sell` if the buyer was the maker, else `buy`. Null if unknown. |
-| —              | `writer_id`      | `bigint`      | From `api.register_feeder()` or `api.register_backfiller()` |
+| —              | `writer_id`      | `bigint`      | From `api.register_writer()` |
 | —              | `seq`            | `bigint`      | Set by the database |
 | —              | `received_at`    | `timestamptz` | Default `clock_timestamp()` |
 
@@ -117,7 +117,7 @@ The price levels are parallel arrays. Index 1 is the best level.
 | Go (`Depth` / `DepthLevel`) | Column          | Type          | Rules |
 |-----------------------------|-----------------|---------------|-------|
 | `Symbol`                    | `instrument_id` | `bigint`      | Get it from `api.instrument_id` |
-| —                           | `writer_id`     | `bigint`      | From `api.register_feeder()` |
+| —                           | `writer_id`     | `bigint`      | From `api.register_writer()` |
 | `EventTime`                 | `event_time`    | `timestamptz` | Primary key, together with `instrument_id` |
 | `Bids()` → `Price`          | `bid_price`     | `numeric[]`   | Strictly descending, `> 0` |
 | `Bids()` → `Quantity`       | `bid_qty`       | `numeric[]`   | Same length as `bid_price`, `> 0` |
@@ -146,10 +146,10 @@ Every process that writes market data is a **writer**
 that the database assigns at insert.
 
 - A feeder registers once at start (see [Live requests](#live-requests)).
-  `api.register_feeder()` returns the id of its writer. Put it into every
+  `api.register_writer()` returns the id of its writer. Put it into every
   row. After a restart, the same name returns the same writer.
-- A backfiller registers the same way. `api.register_backfiller()` returns
-  the id of its writer, for the rows of all its backfill runs (see
+- A backfiller registers the same way, with the kind `backfiller`. Its
+  writer id is for the rows of all its backfill runs (see
   [Backfill](#backfill)).
 - **One rule:** a writer commits its transactions for one instrument one after
   the other. Parallel work on different instruments is allowed. A backfiller
@@ -168,14 +168,14 @@ feeder works like this:
 1. At start, register. The name identifies the feeder. The result is the id
    of its writer:
    ```sql
-   select api.register_feeder('binance-feeder',
+   select api.register_writer('binance-feeder', 'feeder',
      array['binance-spot', 'binance-futures-um'], array['trade']::market.stream[],
      'v1.0.0', '{"heartbeat_interval": "30 seconds"}');
    ```
 2. `LISTEN empiriq_live`.
 3. Get the streams to write. The call is also a heartbeat:
    ```sql
-   select request_id, instrument_id, venue_id, symbol, stream from api.live_streams('binance-feeder');
+   select request_id, instrument_id, venue_id, symbol, stream from api.take_work('binance-feeder');
    ```
 4. Subscribe to new streams at the venue. Unsubscribe from streams that are
    not in the result any more.
@@ -237,26 +237,27 @@ select * from api.history_coverage;
 ```
 
 A backfiller registers when it starts, with its capabilities and the settings
-of `api.lease_history()` ([ADR 0012](../adr/0012-backfiller-registry.md)):
+of `api.take_work()` ([ADR 0012](../adr/0012-backfiller-registry.md)):
 
 ```sql
-select api.register_backfiller('my-backfiller@host1',
+select api.register_writer('my-backfiller@host1', 'backfiller',
          array['binance-spot'], array['trade']::market.stream[], '1.0',
          '{"max_span": "1 day", "heartbeat_interval": "30 seconds"}');
 ```
 
 The name identifies the backfiller in all later calls. Then it sends
-`select api.backfiller_heartbeat('my-backfiller@host1')` every
+`select api.writer_heartbeat('my-backfiller@host1')` every
 `heartbeat_interval`, and works in a loop:
 
 1. Lease the next missing period that it can load. The result has the
    `run_id`, the instrument, the stream, the period and the publish delay.
    No row means no work:
    ```sql
-   select * from api.lease_history('my-backfiller@host1');
+   select run_id, instrument_id, venue_id, symbol, stream, period, publish_delay
+     from api.take_work('my-backfiller@host1');
    ```
 2. Write only the rows inside the period, with the `writer_id` from
-   `api.register_backfiller()`, in short transactions.
+   `api.register_writer()`, in short transactions.
 3. Finish the run:
    ```sql
    select api.finish_backfill($run_id, $rows);              -- success: the period is covered
@@ -378,7 +379,7 @@ func aggressor(t Trade) any {
 	return "buy"
 }
 
-// writerID comes from api.register_feeder() or api.register_backfiller().
+// writerID comes from api.register_writer().
 func writeTrades(ctx context.Context, conn *pgx.Conn, writerID int64, ids map[string]int64, batch []Trade) error {
 	tx, err := conn.Begin(ctx)
 	if err != nil {

@@ -33,29 +33,30 @@ what services report: observed state.
 
 ### Backfillers register and send heartbeats
 
-- A backfiller calls `api.register_backfiller(name, venues, streams,
-  version, settings)` when it starts. It works like "apply" on the name and
-  returns the id of its writer ([ADR 0009](0009-writers.md)).
-- The **name** identifies the backfiller in all later calls: it is the
-  primary key of `market.backfiller`. Another name is another process. A
+- A backfiller calls `api.register_writer(name, 'backfiller', venues,
+  streams, version, settings)` when it starts. It works like "apply" on the
+  name and returns the id of its writer ([ADR 0009](0009-writers.md)). A
+  backfiller is a writer of the kind `backfiller`: `market.writer` keeps its
+  registration.
+- The **name** identifies the backfiller in all later calls: it is unique
+  in `market.writer`. Another name is another process. A
   service takes its name from an environment variable; its image sets a
   default, so a second process of the same image needs only another value.
 - Its **capabilities** are all pairs of the venues and streams
-  (`market.backfiller_stream`).
-- Its **settings** apply to `api.lease_history()`: `max_span`, `retry_after`,
+  (`market.writer_stream`).
+- Its **settings** apply to `api.take_work()`: `max_span`, `retry_after`,
   `stale_after` and `heartbeat_interval`. The backfiller declares them once,
   not with every call.
-- It calls `api.backfiller_heartbeat(name)` every `heartbeat_interval`, also
-  while a long run loads. `api.lease_history(name)` counts as a heartbeat too.
-- `api.backfiller` shows each backfiller, whether it is alive (a heartbeat
-  within 3 intervals), its running runs and its results of the last 24 hours.
+- It calls `api.writer_heartbeat(name)` every `heartbeat_interval`, also
+  while a long run loads. `api.take_work(name)` counts as a heartbeat too.
+- `api.writer` shows each writer: its kind, whether it is alive (a heartbeat
+  within 3 intervals) and its capabilities.
 
 ### Backfillers lease only what they can load
 
-`api.lease_history(name)` gives only periods of active requests whose venue
-and stream are capabilities of the backfiller. Each backfill run records the
-name of its backfiller (`backfill_run.backfiller_name`), or null if it was
-started by hand.
+`api.take_work(name)` gives a backfiller at most one period of active
+requests whose venue and stream are capabilities of the backfiller. Each
+backfill run records the writer of its backfiller (`backfill_run.writer_id`).
 
 A running run is abandoned when its backfiller sent no heartbeat for
 `stale_after`, not when it is older than `stale_after`. So a long run of a
@@ -71,12 +72,13 @@ backfillers.
 ## Consequences
 
 - Several backfillers for different venues work side by side.
-- The board shows backfillers like any other resource, by name: alive or
-  not, with their runs, without code for it.
+- The board shows backfillers with the feeders on the page Writers, by
+  name: alive or not, without code for it.
 - To stop a backfiller, stop its container. Its runs are abandoned after
   `stale_after` and leased again.
 - A backfiller that stops without deregistering stays in the registry and
   shows as not alive. A row of a dead backfiller is harmless. Cleanup of old
   rows is TBD.
-- Feeders follow the same pattern ([ADR 0016](0016-live-requests.md)).
+- Feeders follow the same pattern with the same functions
+  ([ADR 0016](0016-live-requests.md)).
   Reconcilers can follow it later.

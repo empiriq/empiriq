@@ -50,8 +50,8 @@ missing = union(requested periods) − union(covered periods)
 ### Reconciliation: backfillers lease missing periods
 
 A backfiller is a long-running service. It listens on `empiriq_history`, and
-it also checks regularly. To get work, it calls `api.lease_history()`. The
-function:
+it also checks regularly. To get work, it calls `api.take_work()`. For a
+backfiller the function:
 
 1. finds the first missing period of any request that no running run covers
    and that did not fail recently;

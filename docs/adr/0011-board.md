@@ -40,7 +40,7 @@ So `api` gets views shaped for display:
 | View                  | Shows                                                                                                                                                |
 |-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `api.history_request` | History requests: the part of the period that is still missing, the failed runs in it and the newest error                                           |
-| `api.writer`          | Writers of market data: one for each feeder and each backfiller                                                                                      |
+| `api.writer`          | Writers of market data: feeders and backfillers, alive or not, with their capabilities                                                               |
 | `api.stream_summary`  | Streams: live and history coverage, uncovered periods, requested periods without any coverage, lag of `complete_until` and age of the last heartbeat |
 
 And control functions:

@@ -347,14 +347,14 @@ Feeders, backfillers and reconcilers are long-running services.
 
 **Feeder**
 
-1. Register once at start with `api.register_feeder()`. Report the
+1. Register once at start with `api.register_writer(name, 'feeder', ...)`. Report the
    instruments of each venue with `api.report_instruments()`, at start and
    every hour ([ADR 0018](../adr/0018-services-report-instruments.md)). Write the streams
-   that `api.live_streams()` returns, and follow `NOTIFY empiriq_live`
+   that `api.take_work()` returns, and follow `NOTIFY empiriq_live`
    ([ADR 0016](../adr/0016-live-requests.md)).
 2. Write trades into `market.trade` and depth snapshots into `market.depth`.
    Use `COPY` into a staging table, then `insert ... on conflict do nothing`.
-   Put the id of the writer from `api.register_feeder()` into `writer_id`
+   Put the id of the writer from `api.register_writer()` into `writer_id`
    of every row. Commit the transactions for one
    instrument one after the other. This keeps `seq` in commit order for each
    writer and instrument.
@@ -374,15 +374,15 @@ through SQL ([ADR 0010](../adr/0010-declarative-history.md)):
 1. An operator or another service requests history with
    `api.add_history_request(instrument_id, streams, from, to)`:
    one history request for each stream.
-2. The backfiller registers with `api.register_backfiller()`: its venues,
-   streams and the settings of `api.lease_history()`. Then it sends heartbeats
+2. The backfiller registers with `api.register_writer(name, 'backfiller', ...)`:
+   its venues, streams and the settings of `api.take_work()`. Then it sends heartbeats
    ([ADR 0012](../adr/0012-backfiller-registry.md)). Like a feeder, it reports
    the instruments of its venues with `api.report_instruments()`.
 3. It listens on `empiriq_history` and also checks regularly. It calls
-   `api.lease_history(name)` to get its next missing period, only for
+   `api.take_work(name)` to get its next missing period, only for
    its capabilities. Each leased period is a backfill run.
 4. It loads only the rows inside the leased period, in short transactions,
-   with the writer from `api.register_backfiller()`. It
+   with the writer from `api.register_writer()`. It
    sets `event_time = trade_time + publish_delay`, because historical sources
    have no publish time. The backfill run gives the delay, measured from live trades
    of the venue ([ADR 0019](../adr/0019-measured-publish-delay.md)).

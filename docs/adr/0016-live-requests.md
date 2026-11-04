@@ -23,15 +23,15 @@ work has desired state. Live data is work too.
 
 ### Feeders register and send heartbeats
 
-- A feeder calls `api.register_feeder(name, venues, streams, version,
-  settings)` when it starts. It works like "apply" on the name, like a
-  backfiller ([ADR 0012](0012-backfiller-registry.md)). It returns the id of
-  its writer. The writer has the same name as the feeder, and every row of
-  market data stores the writer id.
+- A feeder calls `api.register_writer(name, 'feeder', venues, streams,
+  version, settings)` when it starts, like a backfiller
+  ([ADR 0012](0012-backfiller-registry.md)). It works like "apply" on the
+  name and returns the id of its writer. Every row of market data stores the
+  writer id.
 - Its **capabilities** are all pairs of the venues and streams
-  (`market.feeder_stream`), like those of a backfiller.
-- `api.feeder` shows each feeder: whether it is alive (a heartbeat within 3
-  heartbeat intervals), its capabilities and the number of streams it writes.
+  (`market.writer_stream`), like those of a backfiller.
+- `api.writer` shows each feeder with the backfillers: whether it is alive
+  (a heartbeat within 3 heartbeat intervals) and its capabilities.
 
 ### Live requests are the desired state of live data
 
@@ -40,8 +40,9 @@ work has desired state. Live data is work too.
 - An operator calls `api.add_live_request()`, `api.pause_live_request()`,
   `api.resume_live_request()` and `api.withdraw_live_request()`. Each call
   sends `NOTIFY empiriq_live`.
-- `api.live_streams(name)` returns the active live requests that match
-  the capabilities of the feeder. The call counts as a heartbeat.
+- `api.take_work(name)` returns all active live requests that match the
+  capabilities of the feeder. The call counts as a heartbeat and changes
+  nothing. A backfiller calls the same function and gets a backfill run.
 - A feeder calls it at start, after each notification and regularly. It
   subscribes to new streams at the venue, and unsubscribes from streams that
   are no longer returned.
@@ -54,7 +55,7 @@ keys make this safe, and the stream stays covered if one feeder stops.
 
 ## Consequences
 
-- The board shows feeders and live requests like any other resource, with
+- The board shows writers and live requests like any other resource, with
   forms to add, pause, resume and withdraw.
 - A paused or withdrawn request stops its live coverage. The time until it
   is resumed is an uncovered period.
