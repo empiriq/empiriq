@@ -8,6 +8,9 @@
 #
 # The project name "empiriq" keeps the names of the network
 # (empiriq_default) and of the database volume (empiriq_pgdata).
+# container_name gives each container the name empiriq-<service>, without the
+# number that compose adds (empiriq-database-1). So each service runs as one
+# container: `docker compose up --scale` does not work.
 name: empiriq
 
 # All services log in as the owner of the database (POSTGRES_USER). Feeders
@@ -22,6 +25,7 @@ x-image: &local-image
 services:
   # The empiriq database. The migrations in the image run when the volume is empty.
   database:
+    container_name: empiriq-database
     image: ${REGISTRY:-}empiriq/database:${DATABASE_VERSION:-dev}
     <<: *local-image
     environment:
@@ -40,6 +44,7 @@ services:
     restart: unless-stopped
 
   binance-backfiller:
+    container_name: empiriq-binance-backfiller
     image: ${REGISTRY:-}empiriq/binance-backfiller:${BINANCE_BACKFILLER_VERSION:-dev}
     <<: *local-image
     depends_on:
@@ -52,6 +57,7 @@ services:
     restart: unless-stopped
 
   binance-feeder:
+    container_name: empiriq-binance-feeder
     image: ${REGISTRY:-}empiriq/binance-feeder:${BINANCE_FEEDER_VERSION:-dev}
     <<: *local-image
     depends_on:
@@ -63,6 +69,7 @@ services:
     restart: unless-stopped
 
   board:
+    container_name: empiriq-board
     image: ${REGISTRY:-}empiriq/board:${BOARD_VERSION:-dev}
     <<: *local-image
     depends_on:
@@ -89,6 +96,7 @@ services:
   # board shows it on the page Logs. If Loki is down, the services do not
   # notice: they write to the default json-file log driver as before.
   loki:
+    container_name: empiriq-loki
     image: grafana/loki:3.6.0
     # The new volume belongs to root, and the image runs as user 10001.
     user: "0"
@@ -101,6 +109,7 @@ services:
     restart: unless-stopped
 
   alloy:
+    container_name: empiriq-alloy
     image: grafana/alloy:v1.20.0
     command: ["run", "--server.http.listen-addr=0.0.0.0:12345",
               "--storage.path=/var/lib/alloy/data", "/etc/alloy/config.alloy"]
