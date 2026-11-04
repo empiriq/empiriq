@@ -10,7 +10,9 @@ kinds of documents, one for each need of a reader.
 | **Reference** (`reference/`) | Look up facts | [Glossary](reference/glossary.md) (ubiquitous language), [Market data](reference/market-data.md) (contract for feeders and backfillers). *Planned:* reference of the `api` schema, generated from `COMMENT ON`; reconciler protocol; intent types |
 | **Explanation** (`explanation/`) | Understand the design | [Architecture](explanation/architecture.md) |
 
-[ADRs](adr/README.md) record the decisions and their reasons.
+[ADRs](adr/README.md) record the decisions and their reasons. Start with
+[ADR 0000](adr/0000-empiriq.md): it describes the whole project. The
+[ADRs by part](adr/README.md#by-part) lead from there to the details.
 
 ## Conventions
 

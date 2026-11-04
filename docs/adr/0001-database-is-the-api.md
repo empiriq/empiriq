@@ -2,6 +2,10 @@
 
 **Status:** Proposed
 
+**Related:**
+
+- Refines [0000. empiriq: a trading platform around PostgreSQL, built from services](0000-empiriq.md).
+
 ## Context
 
 Each venue needs its own feeder and reconciler. Different people will write

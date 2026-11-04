@@ -2,6 +2,10 @@
 
 **Status:** Proposed
 
+**Related:**
+
+- Refines [0000. empiriq: a trading platform around PostgreSQL, built from services](0000-empiriq.md).
+
 ## Context
 
 If strategies write orders directly, there is no difference between "what we

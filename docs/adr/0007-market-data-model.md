@@ -4,6 +4,7 @@
 
 **Related:**
 
+- Refines [0000. empiriq: a trading platform around PostgreSQL, built from services](0000-empiriq.md).
 - Refined by [0013](0013-strategies-build-bars.md): strategies build bars from `api.trades()`.
 
 ## Context

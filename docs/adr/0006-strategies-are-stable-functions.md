@@ -4,6 +4,7 @@
 
 **Related:**
 
+- Refines [0000. empiriq: a trading platform around PostgreSQL, built from services](0000-empiriq.md).
 - Refined by [0015](0015-strategies-run-as-strategy-role.md): strategies run as `empiriq_strategy`.
 
 ## Context

@@ -5,6 +5,7 @@
 **Related:**
 
 - Supersedes [0003. Cycle barrier with NOTIFY and a trigger](0003-cycle-barrier.md).
+- Refines [0000. empiriq: a trading platform around PostgreSQL, built from services](0000-empiriq.md).
 - Refined by [0009](0009-writers.md): cutoffs for each writer.
 - Refined by [0013](0013-strategies-build-bars.md): `api.bars()` is replaced by `api.trades()`.
 - Refined by [0014](0014-live-coverage.md): live coverage.

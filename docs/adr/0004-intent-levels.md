@@ -4,6 +4,7 @@
 
 **Related:**
 
+- Refines [0000. empiriq: a trading platform around PostgreSQL, built from services](0000-empiriq.md).
 - Refined by [0017](0017-venue-trading-rules.md): the planner does not round to the lot size.
 
 ## Context
