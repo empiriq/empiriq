@@ -32,12 +32,12 @@ too.
 | Whole project | [0000](0000-empiriq.md) |
 | Integration through the database | [0001](0001-database-is-the-api.md) |
 | Desired state and observed state | [0002](0002-desired-vs-observed.md), [0004](0004-intent-levels.md), [0017](0017-venue-trading-rules.md) |
-| Frames and determinism | [0005](0005-logical-time.md), [0008](0008-frames.md), [0009](0009-writers.md) |
+| Frames and determinism | [0005](0005-logical-time.md), [0008](0008-frames.md), [0009](0009-writers.md), [0022](0022-frames-belong-to-a-world.md) |
 | `database`: strategies and engine | [0006](0006-strategies-are-stable-functions.md), [0013](0013-strategies-build-bars.md), [0015](0015-strategies-run-as-strategy-role.md) |
 | `database`: market data | [0007](0007-market-data-model.md), [0009](0009-writers.md), [0014](0014-live-coverage.md), [0019](0019-measured-publish-delay.md) |
 | `feeder` | [0014](0014-live-coverage.md), [0016](0016-live-requests.md), [0018](0018-services-report-instruments.md), [0021](0021-services-identified-by-name.md) |
 | `backfiller` | [0010](0010-declarative-history.md), [0012](0012-backfiller-registry.md), [0018](0018-services-report-instruments.md), [0019](0019-measured-publish-delay.md), [0020](0020-backfill-runs-are-internal.md), [0021](0021-services-identified-by-name.md) |
-| `reconciler` | [0002](0002-desired-vs-observed.md), [0008](0008-frames.md), [0017](0017-venue-trading-rules.md) |
+| `reconciler` | [0002](0002-desired-vs-observed.md), [0008](0008-frames.md), [0017](0017-venue-trading-rules.md), [0022](0022-frames-belong-to-a-world.md) |
 | `board` | [0011](0011-board.md), [0020](0020-backfill-runs-are-internal.md) |
 
 ## All ADRs
@@ -66,3 +66,4 @@ too.
 | 0019 | [The publish delay is measured from live trades](0019-measured-publish-delay.md)                                        | Proposed           |
 | 0020 | [Backfill runs are internal](0020-backfill-runs-are-internal.md)                                                        | Proposed           |
 | 0021 | [Feeders and backfillers are identified by their name](0021-services-identified-by-name.md)                             | Proposed           |
+| 0022 | [Frames belong to a world, the last reconciler closes a frame](0022-frames-belong-to-a-world.md)                        | Proposed           |

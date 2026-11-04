@@ -10,6 +10,7 @@
 - Refined by [0013](0013-strategies-build-bars.md): `api.bars()` is replaced by `api.trades()`.
 - Refined by [0014](0014-live-coverage.md): live coverage.
 - Refined by [0015](0015-strategies-run-as-strategy-role.md): strategies run as `empiriq_strategy`.
+- Refined by [0022](0022-frames-belong-to-a-world.md): frames belong to a world, the last reconciler closes a frame.
 
 ## Context
 

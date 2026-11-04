@@ -6,6 +6,7 @@
 
 - Refines [0000. empiriq: a trading platform around PostgreSQL, built from services](0000-empiriq.md).
 - Refined by [0013](0013-strategies-build-bars.md): `api.bars()` is replaced by `api.trades()`.
+- Refined by [0022](0022-frames-belong-to-a-world.md): `as_of` increases for each world, not for each account.
 
 ## Context
 
