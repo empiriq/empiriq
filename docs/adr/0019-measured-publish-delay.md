@@ -33,7 +33,7 @@ when the venue published it. So the real delay can be measured.
   most 10000 for each instrument, in the last 7 days. A measurement needs at
   least 1000 trades. Both times come from the venue, so the local clock does
   not matter.
-- `api.lease_history()` and `api.start_backfill()` use the measured delay. If
+- `api.lease_history()` uses the measured delay. If
   it is older than one hour, they measure again first.
 - Without a measurement (no live trades yet, or depth, which has no trade
   time) the default of the backfiller applies: the setting `publish_delay`

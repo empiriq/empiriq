@@ -88,7 +88,7 @@ shape. The columns are a range, so an aggregated source stays possible later.
 | `FirstTradeID` | `first_trade_id` | `bigint`      | Primary key, together with `instrument_id` |
 | `LastTradeID`  | `last_trade_id`  | `bigint`      | `>= first_trade_id`. Equal for raw trades. |
 | *proposed:* `IsBuyerMaker` | `aggressor` | `core.order_side` | `sell` if the buyer was the maker, else `buy`. Null if unknown. |
-| —              | `writer_id`      | `bigint`      | From `api.register_writer()` or `api.start_backfill()` |
+| —              | `writer_id`      | `bigint`      | From `api.register_feeder()` or `api.lease_history()` |
 | —              | `seq`            | `bigint`      | Set by the database |
 | —              | `received_at`    | `timestamptz` | Default `clock_timestamp()` |
 
@@ -117,7 +117,7 @@ The price levels are parallel arrays. Index 1 is the best level.
 | Go (`Depth` / `DepthLevel`) | Column          | Type          | Rules |
 |-----------------------------|-----------------|---------------|-------|
 | `Symbol`                    | `instrument_id` | `bigint`      | Get it from `api.instrument_id` |
-| —                           | `writer_id`     | `bigint`      | From `api.register_writer()` |
+| —                           | `writer_id`     | `bigint`      | From `api.register_feeder()` |
 | `EventTime`                 | `event_time`    | `timestamptz` | Primary key, together with `instrument_id` |
 | `Bids()` → `Price`          | `bid_price`     | `numeric[]`   | Strictly descending, `> 0` |
 | `Bids()` → `Quantity`       | `bid_qty`       | `numeric[]`   | Same length as `bid_price`, `> 0` |
@@ -148,7 +148,7 @@ that the database assigns at insert.
 - A feeder registers once at start (see [Live requests](#live-requests)).
   `api.register_feeder()` returns the id of its writer. Put it into every
   row. After a restart, the same name returns the same writer.
-- A backfill run gets its own writer from `api.start_backfill()` (see
+- A backfill run gets its own writer from `api.lease_history()` (see
   [Backfill](#backfill)).
 - **One rule:** a writer commits its transactions for one instrument one after
   the other. Parallel work on different instruments is allowed.
@@ -272,8 +272,6 @@ When there is no work, wait for `NOTIFY empiriq_history` or for a timer.
   it is resumed.
 - **Source units.** If the source delivers fixed units, for example daily
   files, read the units that overlap the period and skip rows outside it.
-- **Manual runs.** `api.start_backfill()` starts a run for a given period
-  without a request. Its period counts as covered too.
 
 **Publish delay.** Historical sources have the trade time, but not the time
 when the venue published the trade. A backfiller sets
@@ -377,7 +375,7 @@ func aggressor(t Trade) any {
 	return "buy"
 }
 
-// writerID comes from api.register_writer() or api.start_backfill().
+// writerID comes from api.register_feeder() or api.lease_history().
 func writeTrades(ctx context.Context, conn *pgx.Conn, writerID int64, ids map[string]int64, batch []Trade) error {
 	tx, err := conn.Begin(ctx)
 	if err != nil {

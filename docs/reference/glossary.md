@@ -51,7 +51,7 @@ avoid. A word in *italics* has its own entry on this page.
 | **trade time** | When a trade happened on the venue. Used to put trades into periods. | `trade_time`, Go `TradeTime` | |
 | **received time** | When the row reached the database. Used for latency monitoring only. | `received_at` | ingest time |
 | **stream** | One instrument and one event type: `trade` or `depth`. Several writers can write it. | `market.stream`, `(instrument_id, stream)` | feed, channel, topic |
-| **writer** | A process that writes market data: a feeder, or one backfill run. Every row has its writer. | `market.writer`, `writer_id`, `api.register_writer()` | source, producer, client |
+| **writer** | A process that writes market data: a feeder, or one backfill run. Every row has its writer. | `market.writer`, `writer_id`, `api.register_feeder()` | source, producer, client |
 | **close** (a writer) | Mark a writer as finished: all its rows are committed, and it writes no more. Frames that start later see all its rows. | `api.close_writer()`, `close_order` | seal, finish |
 | **backfill run** | Loading of one stream for one period. It is its own writer. Done runs form the coverage. Internal: the operator sees history requests, not runs ([ADR 0011](../adr/0011-board.md)). | `market.backfill_run`, `api.finish_backfill()` | job, import |
 | **live request** | Desired live data: one stream of one instrument that feeders write all the time. An operator can pause, resume or withdraw it. | `market.live_request`, `api.add_live_request()`, `api.live_streams()` | subscription (that is for strategies), feed |

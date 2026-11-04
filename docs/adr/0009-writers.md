@@ -31,8 +31,9 @@ sequencer.
 ### Every row has a writer
 
 - `market.writer` registers each process that writes market data. A feeder
-  calls `api.register_writer(name)` once at start. Each backfill run is its own
-  writer, created by `api.start_backfill()`.
+  gets its writer from `api.register_feeder()` at start
+  ([ADR 0016](0016-live-requests.md)). Each backfill run is its own writer,
+  created by `api.lease_history()`.
 - Every row of `market.trade` and `market.depth` has a `writer_id`.
 - One rule remains: a writer commits its transactions for one instrument one
   after the other. Then `seq` grows in commit order for each writer and
