@@ -23,8 +23,11 @@ venue are observed state.
 - `api.report_instruments(venue_id, instruments)` takes the complete list of
   instruments of one venue: symbol, kind, base asset, quote asset, settle
   asset and whether the instrument trades now.
-- It creates missing venues, assets and instruments, and updates changed
-  ones. An instrument that is not in the list any more becomes inactive.
+- It creates missing assets and instruments, and updates changed ones. An
+  instrument that is not in the list any more becomes inactive.
+- The venue must exist. Only `api.register_writer()` registers venues: a
+  service registers first and reports its instruments after that. A report
+  for an unknown venue is an error, so a typo creates no venue.
 - An empty list is an error, so that a failed request to the venue cannot
   make all instruments inactive.
 - Feeders and backfillers call it for each of their venues at start, and then
@@ -32,8 +35,9 @@ venue are observed state.
 - An instrument keeps its id forever. A delisted instrument stays, with its
   market data and history.
 - The operator cannot register instruments. The board shows them
-  read-only. The owner can still call `api.register_instrument()` for a venue
-  without a service, for example a paper venue.
+  read-only. The owner can still call `api.register_instrument()` for a
+  registered venue. A venue without a service, for example a paper venue,
+  the owner inserts into `core.venue` by hand.
 
 ## Consequences
 

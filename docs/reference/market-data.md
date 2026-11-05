@@ -54,8 +54,10 @@ select api.report_instruments('binance-futures-um', '[
 ]');
 ```
 
-- Missing venues, assets and instruments are created. Changed ones are
-  updated. Ids never change.
+- Missing assets and instruments are created. Changed ones are updated.
+  Ids never change.
+- The venue must exist: `api.register_writer()` registers the venues of the
+  service. So register first, then report.
 - Instruments that are not in the list any more become inactive.
 - An empty list is an error.
 

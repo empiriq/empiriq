@@ -20,7 +20,7 @@ avoid. A word in *italics* has its own entry on this page.
 
 | Term | Meaning | In code | Do not use |
 |------|---------|---------|------------|
-| **venue** | A place where orders are executed: an exchange, a broker or a simulator. | `core.venue`, `venue_id` | exchange (except as an example of a venue), market, broker |
+| **venue** | A place where orders are executed: an exchange, a broker or a simulator. | `core.venue`, `venue_id`, `api.register_writer()` | exchange (except as an example of a venue), market, broker |
 | **account** | A trading account on one *venue*. All *observed state* and *desired state* belong to an account. | `core.account`, `account_id` | wallet, portfolio, sub-account |
 | **asset** | Something that can be held in a *balance*: a coin, a currency, a token. | `core.asset`, `asset_id` | coin, currency, token |
 | **instrument** | Something that you can trade on a venue. Its price is in the *quote asset* for one unit of the *base asset*. Kinds: `spot`, `perpetual`, `future`, `option`. | `core.instrument`, `instrument_id`, `api.report_instruments()` | market, pair, ticker, contract |
