@@ -171,7 +171,7 @@ feeder works like this:
    of its writer:
    ```sql
    select api.register_writer('binance-feeder', 'feeder',
-     array['binance-spot', 'binance-futures-um'], array['trade']::market.stream[],
+     array['binance-spot', 'binance-futures-um'], array['trade']::market.stream_kind[],
      'v1.0.0', '{"heartbeat_interval": "30 seconds"}');
    ```
 2. `LISTEN empiriq_live`.
@@ -243,7 +243,7 @@ of `api.take_work()` ([ADR 0012](../adr/0012-backfiller-registry.md)):
 
 ```sql
 select api.register_writer('my-backfiller@host1', 'backfiller',
-         array['binance-spot'], array['trade']::market.stream[], '1.0',
+         array['binance-spot'], array['trade']::market.stream_kind[], '1.0',
          '{"max_span": "1 day", "heartbeat_interval": "30 seconds"}');
 ```
 

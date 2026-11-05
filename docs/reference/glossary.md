@@ -21,7 +21,7 @@ avoid. A word in *italics* has its own entry on this page.
 | Term | Meaning | In code | Do not use |
 |------|---------|---------|------------|
 | **venue** | A place where orders are executed: an exchange, a broker or a simulator. | `core.venue`, `venue_id`, `api.register_writer()` | exchange (except as an example of a venue), market, broker |
-| **venue stream** | One event type of one venue, for example `trade` of `binance-spot`. A writer registers it with its capabilities. Not a *stream*: a stream is one instrument and one event type. | `core.venue_stream`, `api.register_writer()` | channel, feed |
+| **venue stream** | One event type of one venue, for example `trade` of `binance-spot`. A writer registers it with its capabilities. Not a *stream*: a stream is one instrument and one event type. | `core.stream`, `api.register_writer()` | channel, feed |
 | **account** | A trading account on one *venue*. All *observed state* and *desired state* belong to an account. | `core.account`, `account_id` | wallet, portfolio, sub-account |
 | **asset** | Something that can be held in a *balance*: a coin, a currency, a token. | `core.asset`, `asset_id` | coin, currency, token |
 | **instrument** | Something that you can trade on a venue. Its price is in the *quote asset* for one unit of the *base asset*. Kinds: `spot`, `perpetual`, `future`, `option`. | `core.instrument`, `instrument_id`, `api.report_instruments()` | market, pair, ticker, contract |
@@ -51,7 +51,7 @@ avoid. A word in *italics* has its own entry on this page.
 | **event time** | When the venue published an event. Market data is *visible* from this moment. | `event_time`, Go `EventTime` | timestamp, ts |
 | **trade time** | When a trade happened on the venue. Used to put trades into periods. | `trade_time`, Go `TradeTime` | |
 | **received time** | When the row reached the database. Used for latency monitoring only. | `received_at` | ingest time |
-| **stream** | One instrument and one event type: `trade` or `depth`. Several writers can write it. | `market.stream`, `(instrument_id, stream)` | feed, channel, topic |
+| **stream** | One instrument and one event type: `trade` or `depth`. Several writers can write it. | `market.stream_kind`, `(instrument_id, stream)` | feed, channel, topic |
 | **writer** | A process that writes market data: a feeder or a backfiller (its kind). One writer for the life of the service. It registers its capabilities, sends heartbeats and gets its work from `api.take_work()`. Every row has its writer. | `market.writer`, `writer_id`, `api.register_writer()`, `api.writer` | source, producer, client |
 | **backfill run** | Loading of one stream for one period. Its rows have the writer of its backfiller. Done runs form the coverage. Internal: the operator sees history requests, not runs ([ADR 0011](../adr/0011-board.md)). | `market.backfill_run`, `api.finish_backfill()` | job, import |
 | **live request** | Desired live data: one stream of one instrument that feeders write all the time. An operator can pause, resume or withdraw it. | `market.live_request`, `api.add_live_request()`, `api.take_work()` | subscription (that is for strategies), feed |

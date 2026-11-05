@@ -44,7 +44,7 @@ what services report: observed state.
   default, so a second process of the same image needs only another value.
 - Its **capabilities** are all pairs of the venues and streams
   (`market.writer_stream`). New venues and venue streams
-  (`core.venue_stream`) are registered with them
+  (`core.stream`) are registered with them
   ([ADR 0018](0018-services-report-instruments.md)).
 - Its **settings** apply to `api.take_work()`: `max_span`, `retry_after`,
   `stale_after` and `heartbeat_interval`. The backfiller declares them once,
