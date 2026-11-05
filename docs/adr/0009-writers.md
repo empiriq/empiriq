@@ -35,7 +35,7 @@ sequencer.
   service is its writer: it registers with `api.register_writer()`, which
   returns the id. The same name returns the same writer after a restart.
 - The writer also keeps what the service reports: version, settings,
-  heartbeat and capabilities (`market.writer_stream`). There is no separate
+  heartbeat and capabilities (`venue_names`, `stream_kinds`). There is no separate
   table for feeders or backfillers ([ADR 0012](0012-backfiller-registry.md),
   [ADR 0016](0016-live-requests.md)).
 - Every row of `market.trade` and `market.depth` has a `writer_id`.

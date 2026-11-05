@@ -28,8 +28,8 @@ work has desired state. Live data is work too.
   ([ADR 0012](0012-backfiller-registry.md)). It works like "apply" on the
   name and returns the id of its writer. Every row of market data stores the
   writer id.
-- Its **capabilities** are all pairs of the venues and streams
-  (`market.writer_stream`), like those of a backfiller.
+- Its **capabilities** are all pairs of its venues and stream kinds
+  (`venue_names`, `stream_kinds` of `market.writer`), like those of a backfiller.
 - `api.writer` shows each feeder with the backfillers: whether it is alive
   (a heartbeat within 3 heartbeat intervals) and its capabilities.
 

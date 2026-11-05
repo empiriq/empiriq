@@ -42,9 +42,10 @@ what services report: observed state.
   in `market.writer`. Another name is another process. A
   service takes its name from an environment variable; its image sets a
   default, so a second process of the same image needs only another value.
-- Its **capabilities** are all pairs of the venues and streams
-  (`market.writer_stream`). New venues and venue streams
-  (`core.stream`) are registered with them
+- Its **capabilities** are all pairs of its venues and stream kinds: the
+  arrays `venue_names` and `stream_kinds` of `market.writer`. One writer
+  cannot have other stream kinds for another venue. New venues and venue
+  streams (`core.stream`) are registered with them
   ([ADR 0018](0018-services-report-instruments.md)).
 - Its **settings** apply to `api.take_work()`: `max_span`, `retry_after`,
   `stale_after` and `heartbeat_interval`. The backfiller declares them once,
