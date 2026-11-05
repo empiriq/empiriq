@@ -21,6 +21,7 @@ avoid. A word in *italics* has its own entry on this page.
 | Term | Meaning | In code | Do not use |
 |------|---------|---------|------------|
 | **venue** | A place where orders are executed: an exchange, a broker or a simulator. | `core.venue`, `venue_id`, `api.register_writer()` | exchange (except as an example of a venue), market, broker |
+| **venue stream** | One event type of one venue, for example `trade` of `binance-spot`. A writer registers it with its capabilities. Not a *stream*: a stream is one instrument and one event type. | `core.venue_stream`, `api.register_writer()` | channel, feed |
 | **account** | A trading account on one *venue*. All *observed state* and *desired state* belong to an account. | `core.account`, `account_id` | wallet, portfolio, sub-account |
 | **asset** | Something that can be held in a *balance*: a coin, a currency, a token. | `core.asset`, `asset_id` | coin, currency, token |
 | **instrument** | Something that you can trade on a venue. Its price is in the *quote asset* for one unit of the *base asset*. Kinds: `spot`, `perpetual`, `future`, `option`. | `core.instrument`, `instrument_id`, `api.report_instruments()` | market, pair, ticker, contract |
@@ -55,7 +56,7 @@ avoid. A word in *italics* has its own entry on this page.
 | **backfill run** | Loading of one stream for one period. Its rows have the writer of its backfiller. Done runs form the coverage. Internal: the operator sees history requests, not runs ([ADR 0011](../adr/0011-board.md)). | `market.backfill_run`, `api.finish_backfill()` | job, import |
 | **live request** | Desired live data: one stream of one instrument that feeders write all the time. An operator can pause, resume or withdraw it. | `market.live_request`, `api.add_live_request()`, `api.take_work()` | subscription (that is for strategies), feed |
 | **history request** | Desired history: one stream for one period. An operator can pause, resume or withdraw it. | `market.history_request`, `api.add_history_request()`, `api.pause_history_request()`, `api.withdraw_history_request()` | order, job |
-| **capability** | One venue and one stream that a feeder can write or a backfiller can load. A feeder gets only the live requests of its capabilities, and a backfiller leases only periods of its capabilities. | `market.writer_stream`, `api.writer_stream` | skill, feature |
+| **capability** | One *venue stream* that a feeder can write or a backfiller can load. A feeder gets only the live requests of its capabilities, and a backfiller leases only periods of its capabilities. | `market.writer_stream`, `api.writer_stream` | skill, feature |
 | **heartbeat** (of a service) | A sign that a service is alive, sent every `heartbeat_interval`. A stream has its own heartbeat: the *watermark*. | `api.writer_heartbeat()`, `api.take_work()`, `heartbeat_at` | ping, keepalive |
 | **retry** (a history request) | Let backfillers lease the failed periods of a request now, without waiting for `retry_after`. | `api.retry_history_request()`, `retry_requested_at` | rerun, restart |
 | **coverage** | The periods of a stream for which every event is stored. *History coverage*: the union of the periods of all done backfill runs. With *live coverage*: the coverage of the stream. | `api.history_coverage`, `api.stream_summary.covered` | availability |
