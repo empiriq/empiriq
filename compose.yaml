@@ -5,14 +5,22 @@
 #
 name: empiriq
 
-# All services log in as the owner of the database (POSTGRES_USER). Feeders
-# and backfillers switch to their empiriq role at connect
-# (options=-c role=empiriq_feeder), so that the stack checks the grants of
-# api. Logins for each service are a matter of the installation, not of
-# this repository: see the README.
+# All services log in as the owner of the database (EMPIRIQ_DATABASE_USER).
+# Feeders and backfillers switch to their empiriq role at connect
+# (EMPIRIQ_DATABASE_ROLE), so that the stack checks the grants of api.
+# Logins for each service are a matter of the installation, not of this
+# repository: see the README.
 x-image: &local-image
   # Without a registry the images exist only locally: never pull them.
   pull_policy: ${PULL_POLICY:-never}
+
+# The connection to the database. All services take the same variables.
+x-database: &database
+  EMPIRIQ_DATABASE_HOST: database
+  EMPIRIQ_DATABASE_PORT: "5432"
+  EMPIRIQ_DATABASE_NAME: ${EMPIRIQ_DATABASE_NAME:-empiriq}
+  EMPIRIQ_DATABASE_USER: ${EMPIRIQ_DATABASE_USER:-empiriq}
+  EMPIRIQ_DATABASE_PASSWORD: ${EMPIRIQ_DATABASE_PASSWORD:-empiriq}
 
 services:
   # The empiriq database. The migrations in the image run when the volume is empty.
@@ -21,9 +29,9 @@ services:
     image: ${REGISTRY:-}empiriq/database:${DATABASE_VERSION:-dev}
     <<: *local-image
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-empiriq}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-empiriq}
-      POSTGRES_DB: ${POSTGRES_DB:-empiriq}
+      POSTGRES_DB: ${EMPIRIQ_DATABASE_NAME:-empiriq}
+      POSTGRES_USER: ${EMPIRIQ_DATABASE_USER:-empiriq}
+      POSTGRES_PASSWORD: ${EMPIRIQ_DATABASE_PASSWORD:-empiriq}
     ports:
       - "${DATABASE_PORT:-1792}:5432"
     volumes:
@@ -43,7 +51,8 @@ services:
       database:
         condition: service_healthy
     environment:
-      BACKFILLER_DATABASE_URL: postgres://${POSTGRES_USER:-empiriq}:${POSTGRES_PASSWORD:-empiriq}@database:5432/${POSTGRES_DB:-empiriq}?options=-c%20role%3Dempiriq_feeder
+      <<: *database
+      EMPIRIQ_DATABASE_ROLE: empiriq_feeder
       BACKFILLER_VENUES: binance-spot=spot,binance-futures-um=futures/um
       BACKFILLER_WORKERS: "2"
     restart: unless-stopped
@@ -56,7 +65,8 @@ services:
       database:
         condition: service_healthy
     environment:
-      FEEDER_DATABASE_URL: postgres://${POSTGRES_USER:-empiriq}:${POSTGRES_PASSWORD:-empiriq}@database:5432/${POSTGRES_DB:-empiriq}?options=-c%20role%3Dempiriq_feeder
+      <<: *database
+      EMPIRIQ_DATABASE_ROLE: empiriq_feeder
       FEEDER_VENUES: binance-spot=spot,binance-futures-um=futures/um
     restart: unless-stopped
 
@@ -73,12 +83,8 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: ${BOARD_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${BOARD_ADMIN_PASSWORD:-admin}
-      EMPIRIQ_DATABASE_HOST: database
-      EMPIRIQ_DATABASE_PORT: "5432"
       # Grafana cannot set a role at connect, so the board uses the owner.
-      EMPIRIQ_DATABASE_NAME: ${POSTGRES_DB:-empiriq}
-      EMPIRIQ_DATABASE_USER: ${POSTGRES_USER:-empiriq}
-      EMPIRIQ_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-empiriq}
+      <<: *database
       EMPIRIQ_LOG_STORE_URL: http://log-store:3100
     volumes:
       - board_data:/var/lib/grafana

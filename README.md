@@ -151,14 +151,21 @@ same `docker-bake.hcl` and only add the push.
 
 ## Database login
 
-All services log in as the owner of the database: `POSTGRES_USER` and
-`POSTGRES_PASSWORD`. The stack is for development, so one login is enough.
+All services connect with the same variables:
 
-Feeders and backfillers switch to the role `empiriq_feeder` at connect:
+| Variable                    | Meaning |
+|-----------------------------|---------|
+| `EMPIRIQ_DATABASE_HOST`     | Host of the empiriq database |
+| `EMPIRIQ_DATABASE_PORT`     | Its port |
+| `EMPIRIQ_DATABASE_NAME`     | Database name |
+| `EMPIRIQ_DATABASE_USER`     | Login |
+| `EMPIRIQ_DATABASE_PASSWORD` | Its password |
+| `EMPIRIQ_DATABASE_ROLE`     | Feeders and backfillers only, optional: the role to switch to at connect |
 
-```
-postgres://empiriq:empiriq@database:5432/empiriq?options=-c%20role%3Dempiriq_feeder
-```
+In the stack, all services log in as the owner of the database:
+`EMPIRIQ_DATABASE_USER` and `EMPIRIQ_DATABASE_PASSWORD` of `.env`. The stack
+is for development, so one login is enough. Feeders and backfillers switch
+to the role `empiriq_feeder` at connect (`EMPIRIQ_DATABASE_ROLE`).
 
 So they have only the privileges of that role, and a missing grant in `api`
 shows at once. This is a check, not protection: a service could reset the
@@ -175,8 +182,8 @@ create role binance_feeder login password '...' in role empiriq_feeder;
 create role board login password '...' in role empiriq_operator;
 ```
 
-Then use these logins in the database URLs of the services, without
-`options`.
+Then give each service its login in `EMPIRIQ_DATABASE_USER`, without
+`EMPIRIQ_DATABASE_ROLE`.
 
 ## Logs
 
@@ -203,8 +210,9 @@ Copy `.env.example` to `.env` and change what you need. All values in
   are in `versions.env`.
 - **Paths for `SOURCE=local`:** `DATABASE_DIR`, `BINANCE_BACKFILLER_DIR`,
   `BINANCE_FEEDER_DIR`, `BOARD_DIR`.
-- **Database:** `DATABASE_PORT`, `POSTGRES_DB`, and the owner login
-  `POSTGRES_USER` / `POSTGRES_PASSWORD`, used by all services.
+- **Database:** `DATABASE_PORT`, its port on this computer;
+  `EMPIRIQ_DATABASE_NAME`, and the owner login `EMPIRIQ_DATABASE_USER` /
+  `EMPIRIQ_DATABASE_PASSWORD`, used by all services.
 - **Board:** `BOARD_PORT`, `BOARD_ADMIN_USER`, `BOARD_ADMIN_PASSWORD`.
   The admin password is used only when Grafana starts the first time. The
   board has no login for operators, so it listens on `127.0.0.1` only.
