@@ -9,6 +9,12 @@
 include versions.env
 -include .env
 
+# compose.yaml takes all settings from .env. Without it, make creates it
+# from .env.example.
+.env:
+	cp .env.example $@
+	@echo "created .env from .env.example"
+
 # Where bake takes the sources: local (the repositories next to this one) or
 # git (GitHub, at the tags of versions.env).
 SOURCE     ?= local

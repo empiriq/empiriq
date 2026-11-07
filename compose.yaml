@@ -12,28 +12,28 @@ name: empiriq
 # repository: see the README.
 x-image: &local-image
   # Without a registry the images exist only locally: never pull them.
-  pull_policy: ${PULL_POLICY:-never}
+  pull_policy: ${PULL_POLICY}
 
 # The connection to the database. All services take the same variables.
 x-database: &database
   EMPIRIQ_DATABASE_HOST: database
   EMPIRIQ_DATABASE_PORT: "5432"
-  EMPIRIQ_DATABASE_NAME: ${EMPIRIQ_DATABASE_NAME:-empiriq}
-  EMPIRIQ_DATABASE_USER: ${EMPIRIQ_DATABASE_USER:-empiriq}
-  EMPIRIQ_DATABASE_PASSWORD: ${EMPIRIQ_DATABASE_PASSWORD:-empiriq}
+  EMPIRIQ_DATABASE_NAME: ${EMPIRIQ_DATABASE_NAME}
+  EMPIRIQ_DATABASE_USER: ${EMPIRIQ_DATABASE_USER}
+  EMPIRIQ_DATABASE_PASSWORD: ${EMPIRIQ_DATABASE_PASSWORD}
 
 services:
   # The empiriq database. The migrations in the image run when the volume is empty.
   database:
     container_name: empiriq-database
-    image: ${REGISTRY:-}empiriq/database:${DATABASE_VERSION:-dev}
+    image: ${REGISTRY}empiriq/database:${DATABASE_VERSION}
     <<: *local-image
     environment:
-      POSTGRES_DB: ${EMPIRIQ_DATABASE_NAME:-empiriq}
-      POSTGRES_USER: ${EMPIRIQ_DATABASE_USER:-empiriq}
-      POSTGRES_PASSWORD: ${EMPIRIQ_DATABASE_PASSWORD:-empiriq}
+      POSTGRES_DB: ${EMPIRIQ_DATABASE_NAME}
+      POSTGRES_USER: ${EMPIRIQ_DATABASE_USER}
+      POSTGRES_PASSWORD: ${EMPIRIQ_DATABASE_PASSWORD}
     ports:
-      - "${DATABASE_PORT:-1792}:5432"
+      - "${DATABASE_PORT}:5432"
     volumes:
       - database_data:/var/lib/postgresql
     healthcheck:
@@ -45,7 +45,7 @@ services:
 
   binance-backfiller:
     container_name: empiriq-binance-backfiller
-    image: ${REGISTRY:-}empiriq/binance-backfiller:${BINANCE_BACKFILLER_VERSION:-dev}
+    image: ${REGISTRY}empiriq/binance-backfiller:${BINANCE_BACKFILLER_VERSION}
     <<: *local-image
     depends_on:
       database:
@@ -59,7 +59,7 @@ services:
 
   binance-feeder:
     container_name: empiriq-binance-feeder
-    image: ${REGISTRY:-}empiriq/binance-feeder:${BINANCE_FEEDER_VERSION:-dev}
+    image: ${REGISTRY}empiriq/binance-feeder:${BINANCE_FEEDER_VERSION}
     <<: *local-image
     depends_on:
       database:
@@ -72,17 +72,17 @@ services:
 
   board:
     container_name: empiriq-board
-    image: ${REGISTRY:-}empiriq/board:${BOARD_VERSION:-dev}
+    image: ${REGISTRY}empiriq/board:${BOARD_VERSION}
     <<: *local-image
     depends_on:
       database:
         condition: service_healthy
     ports:
       # Only this computer: the board has no login (anonymous Admin).
-      - "127.0.0.1:${BOARD_PORT:-3000}:3000"
+      - "127.0.0.1:${BOARD_PORT}:3000"
     environment:
-      GF_SECURITY_ADMIN_USER: ${BOARD_ADMIN_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${BOARD_ADMIN_PASSWORD:-admin}
+      GF_SECURITY_ADMIN_USER: ${BOARD_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${BOARD_ADMIN_PASSWORD}
       # Grafana cannot set a role at connect, so the board uses the owner.
       <<: *database
       EMPIRIQ_LOG_STORE_URL: http://log-store:3100
@@ -101,7 +101,7 @@ services:
     user: "0"
     command: ["-config.file=/etc/loki/log-store.yaml", "-config.expand-env=true"]
     environment:
-      LOKI_RETENTION: ${LOKI_RETENTION:-168h}
+      LOKI_RETENTION: ${LOKI_RETENTION}
     volumes:
       - ./etc/log-store.yaml:/etc/loki/log-store.yaml:ro
       - log_store_data:/loki

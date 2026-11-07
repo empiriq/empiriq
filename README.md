@@ -204,7 +204,10 @@ filters for the service, the level and a text search.
 ## Settings
 
 Copy `.env.example` to `.env` and change what you need. All values in
-`.env.example` are the defaults.
+`.env.example` are the defaults; `compose.yaml` has none of its own. `make`
+creates `.env` from `.env.example` if it is missing. The versions of the
+images come from `versions.env`, so run the stack with `make`, not with
+`docker compose` alone.
 
 - **Images:** `SOURCE`, `GITHUB_ORG`, `REGISTRY`, `PULL_POLICY`. The versions
   are in `versions.env`.
