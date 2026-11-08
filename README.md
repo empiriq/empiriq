@@ -5,7 +5,7 @@
 empiriq keeps the current state of your trading accounts in PostgreSQL:
 balances, positions and orders. It also keeps the market data for these
 accounts. Strategies are SQL functions. They declare what the account
-*should* look like. Small external services load market data and reconcile the
+_should_ look like. Small external services load market data and reconcile the
 account with the venue.
 
 ```sql
@@ -28,8 +28,8 @@ $$;
 
 ## Ideas
 
-- **Declarative.** You state *what* you want: a balance, a position or a set
-  of orders. Planners and reconcilers decide *how*.
+- **Declarative.** You state _what_ you want: a balance, a position or a set
+  of orders. Planners and reconcilers decide _how_.
 - **Desired state and observed state.** Strategies never call the venue.
   Reconcilers make the account match the desired state, like Kubernetes
   controllers.
@@ -79,10 +79,10 @@ empiriq has one repository for each service. This repository has the
 documentation of the project and runs all services together for trying and
 testing.
 
-| Repository           | What it is |
-|----------------------|------------|
-| `database`           | PostgreSQL with the schema, the engine and `api` |
-| `binance-backfiller` | Loads history from the Binance archive |
+| Repository           | What it is                                            |
+| -------------------- | ----------------------------------------------------- |
+| `database`           | PostgreSQL with the schema, the engine and `api`      |
+| `binance-backfiller` | Loads history from the Binance archive                |
 | `binance-feeder`     | Writes live trades from the Binance WebSocket streams |
-| `board`              | Grafana with the board |
-| `empiriq`            | The documentation, and the stack of all services |
+| `board`              | Grafana with the board                                |
+| `empiriq`            | The documentation, and the stack of all services      |

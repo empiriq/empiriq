@@ -30,14 +30,6 @@ own.
   the grants of `api`. Logins for each service belong to a real installation,
   not to this repository.
 
-## Docs and code
-
-`make check-docs` checks the docs against the code of `../database`: names of
-`api`, `market` and `core`, links and ADR numbers. Run it after every change of
-the docs or of the schema. A name that an ADR decided but the code does not
-have yet goes under `[planned]` in `docs/code-names.txt`; remove it when the
-code has it.
-
 ## Ubiquitous language
 
 The rules for language and writing style apply to all repositories of

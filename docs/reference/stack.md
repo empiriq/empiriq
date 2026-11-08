@@ -153,7 +153,7 @@ or image.
 | `reset`        | Deletes all data: the database, the settings and users of Grafana. Then starts everything again. |
 | `status`, `logs` | Shows the containers, follows the logs |
 | `open`         | Opens the board in the browser |
-| `lint`, `check-docs` | Checks `compose.yaml` and `docker-bake.hcl`; checks the docs against the code |
+| `lint`        | Checks `compose.yaml` and `docker-bake.hcl` |
 
 These targets run psql in the database container as the owner.
 

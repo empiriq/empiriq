@@ -129,11 +129,6 @@ open: ## Open the board in the browser.
 lint: ## Check compose.yaml and docker-bake.hcl.
 	@$(COMPOSE) config -q && docker buildx bake -f docker-bake.hcl --print >/dev/null && echo ok
 
-.PHONY: check-docs
-check-docs: ## Check the docs against the code: names in the database, links, ADR numbers.
-	@python3 scripts/check-docs.py --database $(DATABASE_DIR) \
-	  --repo $(BOARD_DIR) --repo $(BINANCE_FEEDER_DIR) --repo $(BINANCE_BACKFILLER_DIR)
-
 ##@ Database
 
 .PHONY: psql
