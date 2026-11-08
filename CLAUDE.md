@@ -14,6 +14,10 @@ of its own. The services live in their own repositories next to this one.
 - Containers take their environment only from `env/*.env` (`env_file`),
   never from `environment:` in `compose.yaml`. Values that depend on the
   place come from `.env` as `${VAR}`. See `env/README.md`.
+- Names in `.env`: `IMAGE_*` for all images, `<SERVICE>_*` for one service,
+  with its name in `compose.yaml` (`DATABASE_PORT`, `LOG_STORE_RETENTION`).
+  The names of the images (`POSTGRES_*`, `GF_*`, `EMPIRIQ_DATABASE_*`) appear
+  only in `env/`.
 - All services take the database as the same variables
   `EMPIRIQ_DATABASE_HOST`, `_PORT`, `_NAME`, `_USER`, `_PASSWORD`
   (`env/database-client.env`). All log in as the owner. Feeders and

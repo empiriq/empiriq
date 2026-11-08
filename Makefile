@@ -4,9 +4,8 @@
 #   make rebuild build the images again and restart what changed
 #   make help    list all targets
 #
-# Versions come from versions.env, settings from .env (see .env.example).
+# Settings come from .env (see .env.example).
 
-include versions.env
 -include .env
 
 # compose.yaml takes all settings from .env. Without it, make creates it
@@ -15,20 +14,9 @@ include versions.env
 	cp .env.example $@
 	@echo "created .env from .env.example"
 
-# Where bake takes the sources: local (the repositories next to this one) or
-# git (GitHub, at the tags of versions.env).
-SOURCE     ?= local
-GITHUB_ORG ?= empiriq
-# Prefix of the image names, for example ghcr.io/<org>/. Empty: local images.
-REGISTRY   ?=
-DATABASE_DIR           ?= ../database
-BINANCE_BACKFILLER_DIR ?= ../binance-backfiller
-BINANCE_FEEDER_DIR     ?= ../binance-feeder
-BOARD_DIR              ?= ../board
-
 # Git revisions for the image labels, from the repositories next to this one.
 rev = $(shell git -C $(1) rev-parse --short HEAD 2>/dev/null)
-ifeq ($(SOURCE),local)
+ifeq ($(IMAGE_SOURCE),local)
 DATABASE_REVISION           ?= $(call rev,$(DATABASE_DIR))
 BINANCE_BACKFILLER_REVISION ?= $(call rev,$(BINANCE_BACKFILLER_DIR))
 BINANCE_FEEDER_REVISION     ?= $(call rev,$(BINANCE_FEEDER_DIR))
@@ -39,18 +27,13 @@ BAKE_ALLOW = $(foreach d,$(DATABASE_DIR) $(BINANCE_BACKFILLER_DIR) $(BINANCE_FEE
 endif
 
 # docker buildx bake and docker compose read these from the environment.
-export SOURCE GITHUB_ORG REGISTRY PULL_POLICY \
-       DATABASE_VERSION BINANCE_BACKFILLER_VERSION BINANCE_FEEDER_VERSION BOARD_VERSION \
+export IMAGE_SOURCE IMAGE_GITHUB_ORG IMAGE_REGISTRY IMAGE_PULL_POLICY \
        DATABASE_DIR BINANCE_BACKFILLER_DIR BINANCE_FEEDER_DIR BOARD_DIR \
        DATABASE_REVISION BINANCE_BACKFILLER_REVISION BINANCE_FEEDER_REVISION BOARD_REVISION
 
-DB_IMAGE = $(REGISTRY)empiriq/database:$(DATABASE_VERSION)
-IMAGES = $(DB_IMAGE) \
-         $(REGISTRY)empiriq/binance-backfiller:$(BINANCE_BACKFILLER_VERSION) \
-         $(REGISTRY)empiriq/binance-feeder:$(BINANCE_FEEDER_VERSION) \
-         $(REGISTRY)empiriq/board:$(BOARD_VERSION)
+DB_IMAGE = $(IMAGE_REGISTRY)empiriq/database:dev
+IMAGES = $(DB_IMAGE) $(foreach i,binance-backfiller binance-feeder board,$(IMAGE_REGISTRY)empiriq/$(i):dev)
 
-BOARD_PORT   ?= 3000
 URL          = http://localhost:$(BOARD_PORT)
 COMPOSE      = docker compose
 PSQL         = $(COMPOSE) exec -T database sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -v ON_ERROR_STOP=1 -X'
@@ -80,18 +63,12 @@ help: ## Display this help.
 ##@ Images
 
 .PHONY: build
-build: ## Build all images, or one with S=<image>. SOURCE=git builds from GitHub.
-ifeq ($(SOURCE),git)
-	@test -n "$(GITHUB_ORG)" || { echo "SOURCE=git needs GITHUB_ORG"; exit 1; }
-	@for v in $(DATABASE_VERSION) $(BINANCE_BACKFILLER_VERSION) $(BINANCE_FEEDER_VERSION) $(BOARD_VERSION); do \
-	  test "$$v" != dev || { echo "SOURCE=git needs git tags in versions.env, not dev"; exit 1; }; \
-	done
-endif
+build: ## Build all images, or one with S=<image>. IMAGE_SOURCE=git builds from GitHub.
 	docker buildx bake -f docker-bake.hcl $(BAKE_ALLOW) --load $(S)
 
 .PHONY: images
 images: ## Show the built images of empiriq.
-	@docker image ls --filter 'reference=$(REGISTRY)empiriq/*'
+	@docker image ls --filter 'reference=$(IMAGE_REGISTRY)empiriq/*'
 
 ##@ Stack
 
@@ -104,8 +81,8 @@ up: check-images ## Start the database and all services from the built images.
 
 .PHONY: check-images
 check-images:
-	@# Without a registry (PULL_POLICY never), every image must be built.
-	@if [ "$(or $(PULL_POLICY),never)" = never ]; then for i in $(IMAGES); do \
+	@# Without a registry (IMAGE_PULL_POLICY never), every image must be built.
+	@if [ "$(IMAGE_PULL_POLICY)" = never ]; then for i in $(IMAGES); do \
 	  docker image inspect $$i >/dev/null 2>&1 || { echo "no image $$i: run make build"; exit 1; }; \
 	done; fi
 

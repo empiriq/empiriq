@@ -112,19 +112,19 @@ It uses only built images: if one is missing, it says so.
 ## Images
 
 `docker-bake.hcl` describes the images. `make build` runs `docker buildx
-bake` with the variables of `versions.env` and `.env`.
+bake` with the variables of `.env`. The stack is for trying and testing
+empiriq, so the images have no versions: all have the tag `dev`.
 
 | Image | Repository | Target |
 |-------|------------|--------|
-| `empiriq/database:<version>` | database | the stage `database` of its Dockerfile |
-| `empiriq/binance-backfiller:<version>` | binance-backfiller | the Dockerfile |
-| `empiriq/binance-feeder:<version>` | binance-feeder | the Dockerfile |
-| `empiriq/board:<version>` | board | the Dockerfile |
+| `empiriq/database:dev` | database | the stage `database` of its Dockerfile |
+| `empiriq/binance-backfiller:dev` | binance-backfiller | the Dockerfile |
+| `empiriq/binance-feeder:dev` | binance-feeder | the Dockerfile |
+| `empiriq/board:dev` | board | the Dockerfile |
 
-**Sources.** `SOURCE` decides where bake takes the code:
+**Sources.** `IMAGE_SOURCE` decides where bake takes the code:
 
-- `local` (default): the repositories next to this one, as they are on disk,
-  with the version `dev`:
+- `local` (default): the repositories next to this one, as they are on disk:
   ```
   empiriq/
     database/
@@ -133,20 +133,18 @@ bake` with the variables of `versions.env` and `.env`.
     board/
     empiriq/              this repository
   ```
-- `git`: GitHub, at the tags of `versions.env`. No clones are needed:
+- `git`: GitHub, the default branch. No clones are needed:
   ```sh
-  make build SOURCE=git                    # the organization empiriq
-  make build SOURCE=git GITHUB_ORG=<org>   # a fork
+  make build IMAGE_SOURCE=git                          # the organization empiriq
+  make build IMAGE_SOURCE=git IMAGE_GITHUB_ORG=<org>   # a fork
   ```
 
-**Versions.** `versions.env` has one version for each image. A set of tags
-that work together is a release of the stack. Each image reports its version
-in its labels (`org.opencontainers.image.version`, `revision`), and the Go
-services also in their registration.
+Each image reports the git revision of its repository in its labels
+(`org.opencontainers.image.revision`).
 
 **Registry.** There is none yet. The images are local, and compose never
-pulls them (`PULL_POLICY=never`). With a registry, set `REGISTRY` (for
-example `ghcr.io/<org>/`) and `PULL_POLICY=missing`. GitHub Actions can use the
+pulls them (`IMAGE_PULL_POLICY=never`). With a registry, set `IMAGE_REGISTRY`
+(for example `ghcr.io/<org>/`) and `IMAGE_PULL_POLICY=missing`. GitHub Actions can use the
 same `docker-bake.hcl` and only add the push.
 
 ## Database login
@@ -163,7 +161,7 @@ All services connect with the same variables:
 | `EMPIRIQ_DATABASE_ROLE`     | Feeders and backfillers only, optional: the role to switch to at connect |
 
 In the stack, all services log in as the owner of the database:
-`EMPIRIQ_DATABASE_USER` and `EMPIRIQ_DATABASE_PASSWORD` of `.env`. The stack
+`DATABASE_USER` and `DATABASE_PASSWORD` of `.env`. The stack
 is for development, so one login is enough. Feeders and backfillers switch
 to the role `empiriq_feeder` at connect (`EMPIRIQ_DATABASE_ROLE`).
 
@@ -197,7 +195,7 @@ filters for the service, the level and a text search.
   `ERROR:`, `FATAL:`, as `info`, `warn` and `error`). Postgres writes the
   `DETAIL`, `HINT` and `STATEMENT` of an error as separate lines: Alloy joins
   them with the error into one entry. Lines without a level have no `level`.
-- **Retention:** `LOKI_RETENTION`, default 7 days (`168h`).
+- **Retention:** `LOG_STORE_RETENTION`, default 7 days (`168h`).
 - **No dependency:** the services keep the default log driver. If Loki or
   Alloy stops, the services do not notice, and `make logs` still works.
 
@@ -205,17 +203,20 @@ filters for the service, the level and a text search.
 
 Copy `.env.example` to `.env` and change what you need. All values in
 `.env.example` are the defaults; `compose.yaml` has none of its own. `make`
-creates `.env` from `.env.example` if it is missing. The versions of the
-images come from `versions.env`, so run the stack with `make`, not with
-`docker compose` alone.
+creates `.env` from `.env.example` if it is missing.
 
-- **Images:** `SOURCE`, `GITHUB_ORG`, `REGISTRY`, `PULL_POLICY`. The versions
-  are in `versions.env`.
-- **Paths for `SOURCE=local`:** `DATABASE_DIR`, `BINANCE_BACKFILLER_DIR`,
+The names follow one rule: `IMAGE_*` for all images, `<SERVICE>_*` for one
+service, with its name in `compose.yaml` (`DATABASE_PORT`,
+`LOG_STORE_RETENTION`). `env/` passes them to the containers under the names
+that the images expect.
+
+- **Images:** `IMAGE_SOURCE`, `IMAGE_GITHUB_ORG`, `IMAGE_REGISTRY`,
+  `IMAGE_PULL_POLICY`.
+- **Paths for `IMAGE_SOURCE=local`:** `DATABASE_DIR`, `BINANCE_BACKFILLER_DIR`,
   `BINANCE_FEEDER_DIR`, `BOARD_DIR`.
 - **Database:** `DATABASE_PORT`, its port on this computer;
-  `EMPIRIQ_DATABASE_NAME`, and the owner login `EMPIRIQ_DATABASE_USER` /
-  `EMPIRIQ_DATABASE_PASSWORD`, used by all services.
+  `DATABASE_NAME`, and the owner login `DATABASE_USER` /
+  `DATABASE_PASSWORD`, used by all services.
 - **Board:** `BOARD_PORT`, `BOARD_ADMIN_USER`, `BOARD_ADMIN_PASSWORD`.
   The admin password is used only when Grafana starts the first time. The
   board has no login for operators, so it listens on `127.0.0.1` only.
@@ -271,8 +272,7 @@ memory.
 ```
 docs/               the documentation of the project
 examples/           SQL for the tutorial: live trades, history, a strategy
-docker-bake.hcl     how the images are built: sources, versions, tags
-versions.env        the version of each image
+docker-bake.hcl     how the images are built: sources and tags
 compose.yaml        the database and the services, from the images
 etc/                the configuration of the log store and the log agent:
   log-store.yaml    Loki: storage and retention of logs

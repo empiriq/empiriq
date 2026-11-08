@@ -13,13 +13,13 @@ name: empiriq
 # installation, not of this repository: see the README.
 x-image: &local-image
   # Without a registry the images exist only locally: never pull them.
-  pull_policy: ${PULL_POLICY}
+  pull_policy: ${IMAGE_PULL_POLICY}
 
 services:
   # The empiriq database. The migrations in the image run when the volume is empty.
   database:
     container_name: empiriq-database
-    image: ${REGISTRY}empiriq/database:${DATABASE_VERSION}
+    image: ${IMAGE_REGISTRY}empiriq/database:dev
     <<: *local-image
     env_file:
       - env/database.env
@@ -38,7 +38,7 @@ services:
 
   binance-backfiller:
     container_name: empiriq-binance-backfiller
-    image: ${REGISTRY}empiriq/binance-backfiller:${BINANCE_BACKFILLER_VERSION}
+    image: ${IMAGE_REGISTRY}empiriq/binance-backfiller:dev
     <<: *local-image
     depends_on:
       database:
@@ -52,7 +52,7 @@ services:
 
   binance-feeder:
     container_name: empiriq-binance-feeder
-    image: ${REGISTRY}empiriq/binance-feeder:${BINANCE_FEEDER_VERSION}
+    image: ${IMAGE_REGISTRY}empiriq/binance-feeder:dev
     <<: *local-image
     depends_on:
       database:
@@ -66,7 +66,7 @@ services:
 
   board:
     container_name: empiriq-board
-    image: ${REGISTRY}empiriq/board:${BOARD_VERSION}
+    image: ${IMAGE_REGISTRY}empiriq/board:dev
     <<: *local-image
     depends_on:
       database:
