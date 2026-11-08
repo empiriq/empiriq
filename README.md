@@ -220,6 +220,14 @@ images come from `versions.env`, so run the stack with `make`, not with
   The admin password is used only when Grafana starts the first time. The
   board has no login for operators, so it listens on `127.0.0.1` only.
 
+`.env` has the values. Which container gets which variable is in `env/`:
+one file for each service, and `env/database-client.env` with the
+connection to the database for all services. To add a setting for your
+installation only, for example a setting of Grafana as
+`GF_<SECTION>_<KEY>`, put it into `env/<service>.local.env`
+(`env/board.local.env`). Git ignores these files. See
+[`env/README.md`](env/README.md).
+
 Change the passwords before you run the stack on a server.
 
 ## Work with the data
@@ -249,8 +257,9 @@ through an image:
   the image only copies the files.
 - **Migrations:** `make build S=database && make reset`. The migrations run only
   on an empty database.
-- **A new service.** Add it to `compose.yaml`. A new feeder or backfiller
-  uses the owner login with `options=-c%20role%3Dempiriq_feeder`.
+- **A new service.** Add it to `compose.yaml` with `env_file`: its own
+  `env/<service>.env`, and `env/database-client.env` if it uses the database.
+  A new feeder or backfiller sets `EMPIRIQ_DATABASE_ROLE=empiriq_feeder`.
 
 Tests of the services do not use the stack. `make smoke` in database builds
 and runs its own test image. `make test-integration` in binance-backfiller and
@@ -269,5 +278,6 @@ etc/                the configuration of the log store and the log agent:
   log-store.yaml    Loki: storage and retention of logs
   log-agent.alloy   Alloy: which logs go to Loki, and their labels
 .env.example        settings and their defaults
+env/                the environment of each container, from .env
 Makefile            make targets
 ```

@@ -11,11 +11,14 @@ of its own. The services live in their own repositories next to this one.
 - Configuration of a service that is the same everywhere belongs into the
   repository of the service (its Dockerfile). This repository sets only what
   depends on the place: paths, ports, passwords.
+- Containers take their environment only from `env/*.env` (`env_file`),
+  never from `environment:` in `compose.yaml`. Values that depend on the
+  place come from `.env` as `${VAR}`. See `env/README.md`.
 - All services take the database as the same variables
-  `EMPIRIQ_DATABASE_HOST`, `_PORT`, `_NAME`, `_USER`, `_PASSWORD` (`x-database`
-  in `compose.yaml`). All log in as the owner. Feeders and backfillers add
-  `EMPIRIQ_DATABASE_ROLE=empiriq_feeder`, so the stack checks the grants of
-  `api`. Logins for each service belong to a real installation,
+  `EMPIRIQ_DATABASE_HOST`, `_PORT`, `_NAME`, `_USER`, `_PASSWORD`
+  (`env/database-client.env`). All log in as the owner. Feeders and
+  backfillers add `EMPIRIQ_DATABASE_ROLE=empiriq_feeder`, so the stack checks
+  the grants of `api`. Logins for each service belong to a real installation,
   not to this repository.
 
 ## Docs and code
