@@ -5,6 +5,11 @@ the project (`docs/`), builds the images of all repositories
 (`docker-bake.hcl`) and starts them together (`compose.yaml`). It has no code
 of its own. The services live in their own repositories next to this one.
 
+`README.md` is the entry point of the documentation: what empiriq is, a
+quickstart and links. Details go into `docs/`, by the kind of document
+(`docs/README.md`). Directories of this repository have no README of their
+own.
+
 - Each service repository has one Dockerfile and knows nothing about this
   repository. Compose uses only images: no `build:` and no mounts of
   service repositories.
@@ -13,7 +18,7 @@ of its own. The services live in their own repositories next to this one.
   depends on the place: paths, ports, passwords.
 - Containers take their environment only from `env/*.env` (`env_file`),
   never from `environment:` in `compose.yaml`. Values that depend on the
-  place come from `.env` as `${VAR}`. See `env/README.md`.
+  place come from `.env` as `${VAR}`. See `docs/reference/stack.md`.
 - Names in `.env`: `IMAGE_*` for all images, `<SERVICE>_*` for one service,
   with its name in `compose.yaml` (`DATABASE_PORT`, `LOG_STORE_RETENTION`).
   The names of the images (`POSTGRES_*`, `GF_*`, `EMPIRIQ_DATABASE_*`) appear

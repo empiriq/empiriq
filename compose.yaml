@@ -6,7 +6,7 @@
 name: empiriq
 
 # The containers take their environment from the files in env/ (see
-# env/README.md), and from env/<service>.local.env if it exists. Values come
+# docs/reference/stack.md), and from env/<service>.local.env if it exists. Values come
 # from .env. All services log in as the owner of the database. Feeders and
 # backfillers switch to their empiriq role at connect, so that the stack
 # checks the grants of api. Logins for each service are a matter of the
