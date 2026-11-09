@@ -44,6 +44,17 @@ the project.
 - If code and glossary disagree, point it out instead of picking one silently.
 - Terms listed under "Open decisions" need the qualified form until decided.
 
+## Documentation
+
+- Explanation and reference describe the current state. If you change code,
+  update them in place, in the same change. Never add a document that only
+  corrects another one.
+- An ADR records why: the options and the choice. Write one only if options
+  were weighed. Never edit an accepted ADR: add a new one
+  ([docs/adr/README.md](docs/adr/README.md)).
+- Do not put names of tables, columns or functions into an ADR. Use the
+  terms of the glossary.
+
 ## Writing style
 
 Write for readers whose first language is not English: docs, `COMMENT ON`,

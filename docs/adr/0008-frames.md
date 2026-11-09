@@ -6,105 +6,59 @@
 
 - Supersedes [0003. Cycle barrier with NOTIFY and a trigger](0003-cycle-barrier.md).
 - Refines [0000. empiriq: a trading platform around PostgreSQL, built from services](0000-empiriq.md).
-- Refined by [0009](0009-writers.md): cutoffs for each writer.
-- Refined by [0013](0013-strategies-build-bars.md): `api.bars()` is replaced by `api.trades()`.
-- Refined by [0014](0014-live-coverage.md): live coverage.
-- Refined by [0015](0015-strategies-run-as-strategy-role.md): strategies run as `empiriq_strategy`.
-- Refined by [0022](0022-frames-belong-to-a-world.md): frames belong to a world, the last reconciler closes a frame.
 
 ## Context
 
-ADR 0003 used a global cycle: a scheduler started it, every worker sent an
-ack, and a barrier then ran all strategies. This model has four problems:
+ADR 0003 used a global cycle: a scheduler started it, every worker confirmed
+it, and a barrier then ran all strategies. This model has four problems:
 
-- Something must call `api.start_cycle()`, but no service does.
+- Something must start a cycle, but no service does.
 - Feeders wait for a cycle, although market data arrives all the time.
 - One slow venue delays the strategies of all accounts.
 - Live trading and a backtest can see different data. A trade that reaches
-  the database late is invisible in the live run, but visible in a later
-  backtest with the same `as_of`.
+  the database late is invisible in the live run. A later backtest with the
+  same `as_of` sees it.
+
+## Options
+
+What starts a frame:
+
+- **A scheduler** with a fixed interval. One more component. Strategies can
+  run on observed state that is not reconciled yet.
+- **The reconcilers.** A frame ends when its reconciliations are complete.
+  No component is added, and strategies always see reconciled state.
+
+How a frame becomes repeatable:
+
+- **Wait for feeders** in the barrier. Feeders become part of every frame,
+  and a slow feeder stops trading.
+- **Record what the frame saw.** At the end of a frame, store a cutoff for
+  each stream. A replay uses the same cutoffs.
 
 ## Decision
 
-### Feeders write all the time
-
-Feeders write the streams of the live requests all the time, not in frames
-([ADR 0016](0016-live-requests.md)). Their data serves live trading and later
-backtests. A backfiller adds history and fills gaps.
-
-For each stream, a feeder also reports a heartbeat, the watermark: it updates
-`complete_until` also when there are no events
-([ADR 0014](0014-live-coverage.md)). In a quiet market the strategies still
-run, on unchanged data. A stale watermark shows a broken feeder.
-
-### Reconciliations drive frames
-
-Reconcilers set the rhythm. A frame is one step of a world. When the last
-reconciler of the world confirms the frame, the frame ends: the strategies of
-the world run, then the planners, and `NOTIFY empiriq_frame` opens the next
-frame ([ADR 0022](0022-frames-belong-to-a-world.md)).
-
-- No scheduler is needed. In a backtest, the simulated reconcilers move
-  `as_of` through history.
-- A reconciler confirms every frame, also when the venue did not respond.
-
-### Cutoffs make frames repeatable
-
-Every row in `market.trade` and `market.depth` has a writer and a `seq`,
-assigned at insert. When a frame ends, before its strategies run, the engine
-records a **cutoff** for each subscribed stream and each writer: its highest
-`seq` ([ADR 0022](0022-frames-belong-to-a-world.md)). The frame sees a row
-only if `event_time <= as_of` and `seq <=` the cutoff of its writer
-([ADR 0009](0009-writers.md)).
-
-A replay of a recorded frame uses the same cutoffs, so it sees exactly the same
-rows. Late rows are invisible in both runs.
-
-A replay world works on backfilled history. Its frames record cutoffs too, so
-a backfill that runs during a backtest does not change it.
-
-### Strategies subscribe to streams
-
-A strategy lists its streams in `core.strategy_stream` (instrument and event
-type). The engine records cutoffs only for these streams. Inside a frame, the
-helper functions (`api.trades()`, `api.last_quote()`, `api.depth_levels()`)
-raise an error for a stream without a subscription.
-
-### Reconcilers write an event journal
-
-Reconcilers report events with an `event_time`: order accepted, order
-rejected, fill, balance change, position change. `core.account_event` stores
-each event. The tables of observed state are updated from the same report.
-`core.reconciliation` stores the `seq` of the last account event. So it is
-known which account events a frame was based on.
-
-### A declarative table controls strategies
-
-`core.strategy` works like a Kubernetes Deployment:
-
-- `desired_status` is `running` or `stopped`. Only running strategies get
-  frames.
-- `on_stop` defines what happens to the desired state when the strategy
-  stops: `keep` leaves it, `cancel` removes it, so the reconciler cancels the
-  open orders.
-- The clock (`live`, `replay`) is a property of the world
-  ([ADR 0022](0022-frames-belong-to-a-world.md)). Starting a backtest means:
-  create a replay world with simulated accounts, add
-  strategies to them, start the simulated reconcilers and the world.
-
-`api.strategy_status` shows the observed side: the last frame, its status and
-its error.
+- Feeders write market data all the time and take no part in frames. They
+  report a watermark also in a quiet market.
+- Reconcilers set the rhythm. When the last reconciliation of a frame is
+  complete, the strategies run and the next frame opens. No scheduler.
+- A reconciler completes every reconciliation, also when the venue did not
+  respond.
+- At the end of a frame, before the strategies run, the engine records a
+  cutoff for each stream. A frame sees only rows below its cutoffs. A replay
+  uses the same cutoffs.
+- A strategy declares the streams that it reads. Cutoffs exist only for these
+  streams.
+- Reconcilers report account events into a journal. Each reconciliation
+  records the last event that it includes.
+- Strategies are controlled by desired state: running or stopped, and what
+  happens to their desired state when they stop.
 
 ## Consequences
 
-- The global cycle, the worker registry, `api.ack()`, `api.nack()` and
-  `api.start_cycle()` are removed.
-- Frames run in the transaction of the last `api.reconciled()`. A slow
-  strategy makes that reconciler slow. A separate runner remains an option.
-- Cutoffs need an index on `(instrument_id, writer_id, seq)`. Their cost is
-  one index lookup for each subscribed stream and writer in a frame.
-- The observed state that a strategy reads is the current state. Rebuilding
-  it from the event journal for an exact replay is future work.
-- How a strategy sends intents to several accounts of its world is an open
-  question.
-- Stopping with "close all positions" (`flatten`) is not supported yet.
+- The global cycle and the worker registry are gone.
+- The strategies run in the transaction of the last reconciliation. A slow
+  strategy makes that reconciler slow.
+- A late row is invisible in the frame and in its replay.
+- Cutoffs cost one index lookup for each subscribed stream.
+- Strategies read the current observed state. An exact replay of observed
+  state from the journal is future work.

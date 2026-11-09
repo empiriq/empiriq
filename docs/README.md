@@ -8,11 +8,15 @@ kinds of documents, one for each need of a reader.
 | **Tutorials** (`tutorials/`) | Learn by doing | [Your first strategy](tutorials/first-strategy.md): start empiriq, load live and historical trades, run a strategy on history. *Planned:* a first backtest with a simulated reconciler |
 | **How-to guides** (`how-to/`) | Do a specific task | [Run the stack](how-to/run-the-stack.md): start, change and reset the stack. *Planned:* write a feeder, write a backfiller, write a reconciler, run a backtest, add a venue, set up the board |
 | **Reference** (`reference/`) | Look up facts | [Glossary](reference/glossary.md) (ubiquitous language), [Market data](reference/market-data.md) (contract for feeders and backfillers), [Stack](reference/stack.md) (services, images, settings, logs, make targets). *Planned:* reference of the `api` schema, generated from `COMMENT ON`; reconciler protocol; intent types |
-| **Explanation** (`explanation/`) | Understand the design | [Architecture](explanation/architecture.md) |
+| **Explanation** (`explanation/`) | Understand the design | [Architecture](explanation/architecture.md), [Frames, time and determinism](explanation/frames.md) |
 
-[ADRs](adr/README.md) record the decisions and their reasons. Start with
-[ADR 0000](adr/0000-empiriq.md): it describes the whole project. The
-[ADRs by part](adr/README.md#by-part) lead from there to the details.
+Tutorials, how-to guides, reference and explanation describe empiriq as it
+is now. Edit them in place with every change.
+
+[ADRs](adr/README.md) record why empiriq works this way: the options and the
+choice. They do not describe the current state. Start with
+[ADR 0000](adr/0000-empiriq.md). The [ADRs by part](adr/README.md#by-part)
+lead from there to the details.
 
 ## Conventions
 
@@ -26,7 +30,8 @@ kinds of documents, one for each need of a reader.
   and the changelog of `api` stay next to the schema, in the `database`
   repository.
 - A change to `api` updates the reference and the changelog in the same pull
-  request. If it changes a contract or a decision, it also updates the
-  documents here.
+  request. If it changes a contract, it also updates the documents here. If
+  it changes a decision, it also adds an ADR
+  ([when to write an ADR](adr/README.md#when-to-write-an-adr)).
 - Follow the writing rules in [CLAUDE.md](../CLAUDE.md): short sentences,
   active voice, terms from the glossary.

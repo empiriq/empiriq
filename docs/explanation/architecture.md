@@ -90,111 +90,23 @@ never make trading decisions. Because of this split, you can test strategies
 in isolation, and backtests are reliable. One reconciler can also serve many
 strategies.
 
-## Frames
+## Frames and time
 
-A **world** is a set of accounts with one clock. A **frame** is
-one step of a world at one `as_of`. The last reconciler of the world ends the
-frame ([ADR 0022](../adr/0022-frames-belong-to-a-world.md)).
+A **world** is a set of accounts with one clock: `live` or `replay`. A
+**frame** is one step of a world at one `as_of`.
 
-```mermaid
-sequenceDiagram
-  autonumber
-  participant F as Feeder
-  participant X as Reconcilers
-  participant DB as empiriq
+1. Feeders write market data all the time, not in frames.
+2. The database opens a frame and sends `NOTIFY empiriq_frame`.
+3. Each reconciler reconciles its accounts and calls `api.reconciled()`.
+4. The last call ends the frame. The frame handler records the cutoffs, runs
+   the strategies of the world and the planners. The next frame opens.
 
-  loop all the time
-    F->>DB: COPY market data
-    F->>DB: api.report_watermark()
-  end
-  DB-->>X: NOTIFY empiriq_frame {world_id, frame_id, as_of}
-  X->>DB: read api.order_action
-  X->>X: place / cancel on the venue
-  X->>DB: api.report_order / balance / position / fill
-  X->>DB: api.reconciled(account_id, frame_id), for each account
-  Note over DB: the last call ends the frame:<br/>the frame handler runs the strategies<br/>and the planners, the next frame opens
-  DB-->>X: NOTIFY empiriq_frame {world_id, frame_id, as_of}
-```
+A strategy never calls `now()`. Its time is `ctx.as_of`. It sees market data
+only if the venue published it by `as_of` and the row is below the cutoff of
+its writer. So a replay of a frame sees the same rows, and backtests run the
+same code as live trading.
 
-1. Feeders write the streams of the active live requests all the time.
-   For each stream they also send a heartbeat with `api.report_watermark()`,
-   also when the market is quiet.
-2. The database opens a frame of a world. `NOTIFY empiriq_frame` sends its id
-   and `as_of` to the reconcilers.
-3. Each reconciler sends the order actions to the venue and reports the
-   observed state. Every report also goes into the account event journal.
-   Then it calls `api.reconciled(account_id, frame_id)` for each of its
-   accounts in the world.
-4. The last call ends the frame. In its transaction, the frame handler runs
-   the running strategies of the world and the planners. Then the next frame
-   opens, and its `NOTIFY` sends the new desired state to the reconcilers.
-
-This design has these consequences:
-
-- **No scheduler.** The slowest reconciler of a world sets its rhythm. In a
-  replay world, the simulated reconcilers respond at once, so the world runs
-  as fast as the database.
-- **One `as_of` for all accounts of a world.** A strategy sees all accounts
-  of its world at the same `as_of`. This is what arbitrage between venues
-  needs.
-- **The slowest venue sets the rhythm** for all strategies of its world.
-- **Every frame needs every reconciler.** A reconciler calls
-  `api.reconciled()` also when the venue did not respond. A reconciler that
-  stops or hangs stops its world (open question 1).
-- **Quiet markets.** Frames also run when no new data arrived. A stale
-  heartbeat shows a broken feeder. Its detection belongs to the container
-  level.
-- **Isolation.** Each strategy runs in its own subtransaction. If a strategy
-  fails, it keeps its previous desired state. `api.strategy_run` shows the
-  error.
-- **Order.** `as_of` increases for each world. The next frame of a world
-  opens only when the previous one ends.
-
-The frame handler runs in the transaction of the last `api.reconciled()`.
-This is simple and atomic. But a slow strategy also makes that reconciler
-slow. See the open questions.
-
-## Time and determinism
-
-A strategy never calls `now()`. Its logical time is `ctx.as_of`. `api.now()`
-returns the same value from a setting that the engine sets for the
-transaction. The helper functions use two rules for visibility:
-
-- Market data is visible only after the venue **published** it:
-  `event_time <= as_of`. The `trade_time` of a trade (when it happened) only
-  puts the trade into a period. It never controls visibility.
-- Inside a frame, the **writer** of the row decides
-  ([ADR 0009](../adr/0009-writers.md)). Every row has a writer: the feeder or
-  the backfiller that wrote it. The row is visible only if its `seq` is not
-  higher than the **cutoff** of that writer: its highest `seq` when the frame
-  ended, before the strategies ran. Rows of a writer without a cutoff are
-  invisible.
-
-The second rule makes frames repeatable. A trade can arrive in the database
-after a frame, although its `event_time` is before `as_of`. The frame did not
-see it. A replay with the same cutoffs does not see it either. This is true
-also when a feeder and a backfiller write the same stream at the same time.
-
-A strategy builds its bars from `api.trades()`
-([ADR 0013](../adr/0013-strategies-build-bars.md)). It must use only periods
-that are **closed** at `as_of`. A period that starts at `ts` is complete only
-at `ts + interval`. The [market data reference](../reference/market-data.md)
-has the details.
-
-So a strategy is a pure function of its inputs: visible market data, observed
-state, params and strategy state. For this reason, backtests and live trading
-use **the same code**. The clock is a property of the world:
-
-| Clock      | Accounts                                             | `as_of`                                      | Cutoffs  | Market data                      |
-|------------|------------------------------------------------------|----------------------------------------------|----------|----------------------------------|
-| `live`     | Real venues, or simulated accounts for paper trading | Wall clock                                   | Recorded | Feeders, real time               |
-| `replay`   | Simulated fills against history                      | The previous `as_of` + the step of the world | Recorded | Backfillers, before the backtest |
-
-A backtest needs no feeder. Request the history with `api.add_history_request()`
-before the backtest starts, and backfillers load it into `market.*`. Then the
-replay world moves `as_of` step by step, and its simulated reconcilers
-respond at once. Its frames record cutoffs like the frames of a live world, so
-a backtest stays repeatable also when a backfill runs at the same time.
+[Frames, time and determinism](frames.md) describes the details.
 
 ## Declarative state: three intent kinds
 
@@ -544,8 +456,8 @@ backfiller loads the requested history first.
    work. Inverse pairs and routes with more steps (`ETH → BTC → USDT`) need a
    design.
 5. **Strategies with more than one account,** for example arbitrage across
-   venues. With [ADR 0022](../adr/0022-frames-belong-to-a-world.md), a frame
-   has one `as_of` for all accounts of a world. Open: how a strategy sends
+   venues. A frame has one `as_of` for all accounts of a world
+   ([frames](frames.md)). Open: how a strategy sends
    intents to several accounts, and how claims and `on_stop` work across
    them. This is part of the decision about the frame handler.
 6. **Migration tooling.** Options: goose (Go ecosystem), sqitch, or versioned
