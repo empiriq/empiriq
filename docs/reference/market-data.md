@@ -43,8 +43,7 @@ select api.instrument_id('binance', 'BTCUSDT');
 
 A row with an unknown instrument fails on the foreign key.
 
-Feeders and backfillers report the instruments of their venues
-([ADR 0018](../adr/0018-services-report-instruments.md)), at start and every
+Feeders and backfillers report the instruments of their venues, at start and every
 hour. A report is the complete list of one venue, as the venue publishes it:
 
 ```sql
@@ -143,8 +142,7 @@ returns notional and running totals.
 
 ## Writers and seq
 
-Every process that writes market data is a **writer**
-([ADR 0009](../adr/0009-writers.md)). Every row has a `writer_id` and a `seq`
+Every process that writes market data is a **writer**. Every row has a `writer_id` and a `seq`
 that the database assigns at insert.
 
 - A feeder registers once at start (see [Live requests](#live-requests)).
@@ -163,7 +161,7 @@ as long as its service.
 
 ## Live requests
 
-Live data is declarative ([ADR 0016](../adr/0016-live-requests.md)). An
+Live data is declarative. An
 operator adds a live request for each stream that feeders must write. A
 feeder works like this:
 
@@ -203,7 +201,7 @@ select api.report_watermark($writer_id, $instrument_id, 'trade', $complete_until
 `event_time <= complete_until`. In a quiet market the heartbeat continues, so
 strategies run on unchanged data. A stale heartbeat shows a broken feeder.
 
-Each report also records *live coverage* ([ADR 0014](../adr/0014-live-coverage.md)):
+Each report also records *live coverage*:
 the periods in which this writer stored every event. A report continues the
 last period of the writer in two cases:
 
@@ -226,7 +224,7 @@ the heartbeats of a service instead ([Backfill](#backfill)).
 
 ## Backfill
 
-History is declarative ([ADR 0010](../adr/0010-declarative-history.md)).
+History is declarative.
 Someone requests it, and backfillers load what is missing:
 
 ```sql
@@ -239,7 +237,7 @@ select * from api.history_coverage;
 ```
 
 A backfiller registers when it starts, with its capabilities and the settings
-of `api.take_work()` ([ADR 0012](../adr/0012-backfiller-registry.md)):
+of `api.take_work()`:
 
 ```sql
 select api.register_writer('my-backfiller@host1', 'backfiller',
@@ -282,7 +280,7 @@ When there is no work, wait for `NOTIFY empiriq_history` or for a timer.
 **Publish delay.** Historical sources have the trade time, but not the time
 when the venue published the trade. A backfiller sets
 `event_time = trade_time + publish_delay`. empiriq measures the delay from
-live trades of the venue ([ADR 0019](../adr/0019-measured-publish-delay.md)):
+live trades of the venue:
 
 - the 99th percentile of `event_time - trade_time` over the newest live
   trades, at most 10000 for each instrument, in the last 7 days;
@@ -316,8 +314,7 @@ of the source for the same period:
 **Retry.** A failed run blocks its period for `retry_after`. `api.history_request`
 shows the failed runs of a request (`failed_runs`) and the newest error
 (`last_error`). To load the failed periods now, call
-`api.retry_history_request(id)`. Backfill runs themselves are internal
-([ADR 0011](../adr/0011-board.md)).
+`api.retry_history_request(id)`. Backfill runs themselves are internal.
 
 **Depth.** Venues usually do not provide historical depth snapshots. The
 history of depth comes from the recordings of the live feeder or from a data
@@ -327,7 +324,7 @@ vendor.
 
 | Function | Returns |
 |----------|---------|
-| `api.trades(instrument_id, from, to, as_of)` | Visible trades with `trade_time` in `[from, to)`, oldest first: `trade_time`, `first_trade_id`, `last_trade_id`, `price`, `qty`, `aggressor`. The strategy builds bars from them ([ADR 0013](../adr/0013-strategies-build-bars.md)). |
+| `api.trades(instrument_id, from, to, as_of)` | Visible trades with `trade_time` in `[from, to)`, oldest first: `trade_time`, `first_trade_id`, `last_trade_id`, `price`, `qty`, `aggressor`. The strategy builds bars from them. |
 | `api.last_quote(instrument_id, as_of)` | The best bid and best ask (`api.quote`) of the last visible depth snapshot. All fields are null if there is no snapshot. |
 | `api.depth_levels(instrument_id, as_of)` | All price levels of that snapshot: `side`, `level`, `price`, `qty`, `notional`, `cum_qty`, `cum_notional`. |
 

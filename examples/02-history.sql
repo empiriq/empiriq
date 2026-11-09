@@ -3,7 +3,7 @@
 --   make sql F=examples/02-history.sql
 --
 -- A history request declares which history is needed. The backfiller loads
--- what is missing from the Binance archive (docs/adr/0010-declarative-history.md).
+-- what is missing from the Binance archive.
 -- The archive publishes a day in the morning of the next day (UTC), so
 -- yesterday is the newest day that is sure to exist.
 

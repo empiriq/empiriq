@@ -2,8 +2,8 @@
 --
 --   make sql F=examples/01-live-trades.sql
 --
--- The feeder writes the trades of every active live request
--- (docs/adr/0016-live-requests.md). The instrument comes from the feeder:
+-- The feeder writes the trades of every active live request.
+-- The instrument comes from the feeder:
 -- it reports all instruments of its venues at start.
 
 -- Write the trades of BTCUSDT on Binance USDⓈ-M futures all the time.

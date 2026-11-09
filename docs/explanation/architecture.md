@@ -1,7 +1,6 @@
 # Architecture
 
 > Status: **draft**. Names, tables and functions will change before the first release.
-> Decisions with lasting impact are recorded as [ADRs](../adr/README.md).
 
 empiriq is an algorithmic trading platform built around PostgreSQL. The
 database holds the current state of every trading account. It also holds the
@@ -123,7 +122,7 @@ calculates the delta: `target − observed − in-flight`. If the delta is large
 than the tolerance, the planner adds a desired order with
 `origin = 'planner'`. So reconcilers only reconcile orders. The planner does
 not round to the trading rules of the venue. If the venue rejects an order,
-the reconciler reports it ([ADR 0017](../adr/0017-venue-trading-rules.md)).
+the reconciler reports it.
 
 The reference planners send one market order for each delta. For better
 execution (TWAP, passive limit orders), replace the planner functions. Another
@@ -261,9 +260,8 @@ Feeders, backfillers and reconcilers are long-running services.
 
 1. Register once at start with `api.register_writer(name, 'feeder', ...)`. Report the
    instruments of each venue with `api.report_instruments()`, at start and
-   every hour ([ADR 0018](../adr/0018-services-report-instruments.md)). Write the streams
-   that `api.take_work()` returns, and follow `NOTIFY empiriq_live`
-   ([ADR 0016](../adr/0016-live-requests.md)).
+   every hour. Write the streams
+   that `api.take_work()` returns, and follow `NOTIFY empiriq_live`.
 2. Write trades into `market.trade` and depth snapshots into `market.depth`.
    Use `COPY` into a staging table, then `insert ... on conflict do nothing`.
    Put the id of the writer from `api.register_writer()` into `writer_id`
@@ -273,7 +271,7 @@ Feeders, backfillers and reconcilers are long-running services.
 3. Call `api.report_watermark(writer_id, instrument_id, stream,
    complete_until)` for each stream regularly, also when no events arrive.
    After each connect or reconnect, also pass `p_since`. The reports record
-   the live coverage ([ADR 0014](../adr/0014-live-coverage.md)).
+   the live coverage.
 
 The [market data reference](../reference/market-data.md) has the field
 mapping, the rules and a Go example.
@@ -281,14 +279,13 @@ mapping, the rules and a Go example.
 **Backfiller**
 
 A backfiller is a long-running service, like a feeder. All control goes
-through SQL ([ADR 0010](../adr/0010-declarative-history.md)):
+through SQL:
 
 1. An operator or another service requests history with
    `api.add_history_request(instrument_id, streams, from, to)`:
    one history request for each stream.
 2. The backfiller registers with `api.register_writer(name, 'backfiller', ...)`:
-   its venues, streams and the settings of `api.take_work()`. Then it sends heartbeats
-   ([ADR 0012](../adr/0012-backfiller-registry.md)). Like a feeder, it reports
+   its venues, streams and the settings of `api.take_work()`. Then it sends heartbeats. Like a feeder, it reports
    the instruments of its venues with `api.report_instruments()`.
 3. It listens on `empiriq_history` and also checks regularly. It calls
    `api.take_work(name)` to get its next missing period, only for
@@ -297,7 +294,7 @@ through SQL ([ADR 0010](../adr/0010-declarative-history.md)):
    with the writer from `api.register_writer()`. It
    sets `event_time = trade_time + publish_delay`, because historical sources
    have no publish time. The backfill run gives the delay, measured from live trades
-   of the venue ([ADR 0019](../adr/0019-measured-publish-delay.md)).
+   of the venue.
 5. It ends the run with `api.finish_backfill(run_id, rows)`, or with an
    error text. On success the period is covered.
 
@@ -326,8 +323,7 @@ details.
    3. Call `api.reconciled(account_id, frame_id)`. Call it also when the
       venue did not respond. Otherwise the frame never ends.
 3. Do not expect the strategies to be done when `api.reconciled()` returns.
-   Today they are for the last reconciler, but the frame handler may change
-   (open question 1).
+   Today they are for the last reconciler, but the frame handler may change.
 4. Always use the `client_order_id` from the database. This makes retries
    safe.
 
@@ -340,8 +336,8 @@ documentation.
 |----------------------|------------------------|----------------------------------------------------------------------|
 | `empiriq_feeder`     | feeder, backfiller     | Write `market.*`, call `api.report_watermark()`                      |
 | `empiriq_reconciler` | reconciler             | Read `api.order_action`, call `api.report_*` and `api.reconciled()`  |
-| `empiriq_strategy`   | strategy authors, frames | Create functions in `strategies`. Read market data only through `api.trades()`, `api.last_quote()` and `api.depth_levels()`, and account views. Frames run strategies as this role ([ADR 0015](../adr/0015-strategies-run-as-strategy-role.md)). |
-| `empiriq_operator`   | board, people          | Read `api.*`, change desired state through `api` functions ([ADR 0011](../adr/0011-board.md)) |
+| `empiriq_strategy`   | strategy authors, frames | Create functions in `strategies`. Read market data only through `api.trades()`, `api.last_quote()` and `api.depth_levels()`, and account views. Frames run strategies as this role. |
+| `empiriq_operator`   | board, people          | Read `api.*`, change desired state through `api` functions |
 
 All write operations use `SECURITY DEFINER` functions in `api` with a fixed
 `search_path`. So clients never need privileges on `core`.
@@ -350,7 +346,7 @@ The frame handler runs inside the last `api.reconciled()` of a frame, as the
 owner. The strategy itself runs
 as `empiriq_strategy` through `core.call_strategy()`. It cannot read
 `market.*` directly, only through the helper functions, which apply the
-frame rules ([ADR 0015](../adr/0015-strategies-run-as-strategy-role.md)).
+frame rules.
 `STABLE` prevents direct writes.
 
 > **Known gap.** `api.balance`, `api.position` and `api."order"` show all
@@ -359,8 +355,7 @@ frame rules ([ADR 0015](../adr/0015-strategies-run-as-strategy-role.md)).
 ## Time-series storage
 
 Feeders and backfillers store only raw events: trades in `market.trade` and
-depth snapshots in `market.depth`
-([ADR 0007](../adr/0007-market-data-model.md)). Functions calculate all other
+depth snapshots in `market.depth`. Functions calculate all other
 values when you read them:
 
 - strategies build bars from `api.trades()`;
@@ -370,7 +365,7 @@ values when you read them:
 
 So all consumers see the same values. These tables and `core.fill` are plain
 tables. Partitioning, retention and materialized bars come later, when real
-data volumes require them. See the open questions.
+data volumes require them.
 
 ## Services
 
@@ -382,7 +377,7 @@ empiriq has five services. Each service runs in its own container.
 | `feeder`     | Writes live market data from one venue or data source.                                      | Long-running     | TBD |
 | `backfiller` | Loads requested historical market data for backtests and analysis.                          | Long-running     | One repository for each source, for example `binance-backfiller` |
 | `reconciler` | Reconciles accounts with one venue, reports observed state and ends frames. A simulated reconciler serves paper trading and backtests. | Long-running | TBD |
-| `board`      | The user interface. Shows the state and changes desired state, only through `api` ([ADR 0011](../adr/0011-board.md)). Built with Grafana. | Long-running | `board` |
+| `board`      | The user interface. Shows the state and changes desired state, only through `api`. Built with Grafana. | Long-running | `board` |
 
 A deployment usually runs one feeder and one reconciler for each venue.
 
@@ -413,69 +408,3 @@ The `empiriq` repository starts the service `database` and the other services to
 `docker compose`. The quickstart will add a simulated reconciler and an
 example strategy to it. For a backtest, a
 backfiller loads the requested history first.
-
-## Open questions
-
-1. **Frame handler and deadline.** The frame handler runs in the transaction
-   of the last reconciler of a frame. Problems:
-   - a slow strategy blocks that reconciler, which then does not process
-     venue events;
-   - `statement_timeout` can only stop the whole call, not one strategy;
-   - a reconciler that stops or hangs stops its world: the frame never ends.
-
-   Options: the reconcilers that wait call a function that removes silent
-   reconcilers from the frame after `stale_after`, based on heartbeats. A
-   procedure can run each strategy in its own transaction. A separate runner
-   for the handler stays possible. The contract for reconcilers stays the
-   same, because they wait for `NOTIFY empiriq_frame`.
-2. **Exact replay.** Cutoffs make market data repeatable. Other inputs of a
-   frame are not recorded yet:
-   - observed state: strategies read the current tables. Each account event
-     carries the full state of one entity, so the state as of
-     `account_event_seq` is the last event for each key. Inside a frame,
-     `api.balance`, `api.position` and `api."order"` could read it from the
-     journal;
-   - strategy state before the frame, params and a hash of the strategy code;
-   - the intents of the frame, to compare a replay with the original.
-
-   Then `api.replay_frame(frame_id)` can rerun a frame, for debugging and for
-   regression tests of new strategy versions. Strategies should then not read
-   desired state, because it is not recorded.
-3. **Stop with flatten.** `on_stop` supports `keep` and `cancel`. Closing
-   positions is a process, not one action: send orders, wait for fills, retry.
-   A possible design:
-   - on stop, replace the desired state of the strategy with
-     `target_position = 0` for each instrument that it claims;
-   - the strategy is `stopping` and gets no strategy runs, but planners keep running;
-   - when all positions are 0 within the tolerance, it becomes `stopped` and
-     its claims are released.
-
-   Open points: what "flat" means for spot, how to execute (market orders or
-   passive orders with a timeout), and the link to a kill switch (question 8).
-4. **Balance conversion paths.** Today only direct `asset/funding` spot pairs
-   work. Inverse pairs and routes with more steps (`ETH → BTC → USDT`) need a
-   design.
-5. **Strategies with more than one account,** for example arbitrage across
-   venues. A frame has one `as_of` for all accounts of a world
-   ([frames](frames.md)). Open: how a strategy sends
-   intents to several accounts, and how claims and `on_stop` work across
-   them. This is part of the decision about the frame handler.
-6. **Migration tooling.** Options: goose (Go ecosystem), sqitch, or versioned
-   files with a `schema_migrations` table.
-7. **Time-series scaling.** Native partitioning or a time-series extension.
-   Decide when data volumes are known.
-8. **Risk limits.** Maximum position, maximum order notional and a kill
-   switch. They would be a layer between desired state and
-   `api.order_action`, enforced in the database.
-9. **Materialized bars.** Today strategies build bars from trades in every
-   frame. Many strategies or long windows will need a bar table that is
-   updated incrementally.
-10. **Depth retention.** Depth snapshots with N levels at venue update rates
-    grow fast. How long do we keep them? At what resolution for backtests?
-11. **Detection of broken feeders.** A stale heartbeat shows it. Who reacts,
-    and how: the container platform, an alert, or a pause of the strategies?
-12. **Full order books.** Depth has only the top N levels. Venues usually do
-    not provide historical depth, so backfill of depth needs recordings or a
-    data vendor.
-13. **Aggressor side in the event.** `market.trade.aggressor` exists, but the
-    Go `Trade` event has no field for it yet.

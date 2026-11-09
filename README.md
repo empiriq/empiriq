@@ -68,7 +68,6 @@ each step.
   backfillers.
 - [Stack](docs/reference/stack.md): services, images, settings, logs and
   make targets.
-- [ADRs](docs/adr/README.md): the decisions and their reasons.
 
 [docs/README.md](docs/README.md) lists all documents and the rules for
 writing them.

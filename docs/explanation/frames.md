@@ -1,8 +1,7 @@
 # Frames, time and determinism
 
 This document describes how frames work now. It changes together with the
-code. The reasons for the design are in the ADRs listed under
-[Decisions](#decisions).
+code.
 
 A **world** is a set of accounts with one clock. A **frame** is one step of
 a world at one `as_of`. In each frame, the reconcilers reconcile every
@@ -175,15 +174,3 @@ which account events a frame was based on.
 - **Strategies with more than one account.** How a strategy sends intents to
   several accounts of its world is open.
 - **A reconciler that hangs** stops its world. There is no deadline yet.
-
-See open questions 1, 2 and 5 in the [architecture](architecture.md#open-questions).
-
-## Decisions
-
-| ADR | Why |
-|-----|-----|
-| [0005](../adr/0005-logical-time.md) | Logical time instead of the wall clock, and visibility by publication time. |
-| [0008](../adr/0008-frames.md) | Reconciliations drive frames instead of a scheduler. Cutoffs make frames repeatable. |
-| [0009](../adr/0009-writers.md) | One cutoff for each writer, so several writers can write one stream. |
-| [0022](../adr/0022-frames-belong-to-a-world.md) | A frame is a step of a world, not of one account. |
-| [0003](../adr/0003-cycle-barrier.md) | Superseded: a global cycle with a barrier. |

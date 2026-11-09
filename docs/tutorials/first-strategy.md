@@ -39,7 +39,7 @@ seconds, the page **Instruments** of the board lists thousands of them.
 ## 3. Write live trades
 
 Live data is declarative: you add a *live request*, and every feeder that can
-write the stream writes it ([ADR 0016](../adr/0016-live-requests.md)).
+write the stream writes it.
 
 ```sh
 make sql F=examples/01-live-trades.sql
@@ -56,7 +56,7 @@ page **Chart** shows the candles of the trades as they arrive.
 ## 4. Load the history of yesterday
 
 History is declarative too. A *history request* says which period is needed.
-The backfiller loads what is missing ([ADR 0010](../adr/0010-declarative-history.md)).
+The backfiller loads what is missing.
 
 ```sh
 make sql F=examples/02-history.sql

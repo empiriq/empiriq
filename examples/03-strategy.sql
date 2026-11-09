@@ -8,7 +8,7 @@
 -- Nothing is sent to Binance: the account is in a replay world, and there is
 -- no reconciler yet.
 
--- A replay world with one frame for each hour of yesterday (ADR 0022), and
+-- A replay world with one frame for each hour of yesterday, and
 -- its account. empiriq has no api function for worlds and accounts yet, so
 -- the owner of the database inserts them.
 insert into core.world (name, clock, step, replay_to)

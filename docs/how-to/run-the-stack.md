@@ -77,8 +77,7 @@ Change the passwords before you run the stack on a server.
 
 ## Use a login for each service
 
-On a real installation, create a login for each service with its role
-([ADR 0001](../adr/0001-database-is-the-api.md)):
+On a real installation, create a login for each service with its role:
 
 ```sql
 create role binance_feeder login password '...' in role empiriq_feeder;

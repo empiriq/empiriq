@@ -114,8 +114,7 @@ backfillers switch to the role `empiriq_feeder` at connect. So they have
 only the privileges of that role, and a missing grant in `api` shows at
 once. This is a check, not protection: a service could reset the role.
 Grafana cannot set a role at connect, so the board works as the owner. It
-still changes data only through `api` functions
-([ADR 0011](../adr/0011-board.md)).
+still changes data only through `api` functions.
 
 ## Logs
 

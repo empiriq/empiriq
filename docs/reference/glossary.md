@@ -27,7 +27,7 @@ avoid. A word in *italics* has its own entry on this page.
 | **instrument** | Something that you can trade on a venue. Its price is in the *quote asset* for one unit of the *base asset*. Kinds: `spot`, `perpetual`, `future`, `option`. | `core.instrument`, `instrument_id`, `api.report_instruments()` | market, pair, ticker, contract |
 | **symbol** | The venue's own name for an *instrument* (`BTCUSDT`). Only used at the boundary; inside the database we use `instrument_id`. | `core.instrument.symbol`, Go `Symbol` | ticker |
 | **base asset** / **quote asset** | The asset being bought or sold / the asset prices are expressed in. In `BTCUSDT`, BTC is base, USDT is quote. | `base_asset`, `quote_asset` | |
-| **trading rules** | Limits of the venue for orders: the price step, the quantity step, the minimum notional. empiriq does not store them; the venue checks them, and the reconciler reports a rejection in `status_reason` ([ADR 0017](../adr/0017-venue-trading-rules.md)). | | filters, tick size and lot size (as stored values) |
+| **trading rules** | Limits of the venue for orders: the price step, the quantity step, the minimum notional. empiriq does not store them; the venue checks them, and the reconciler reports a rejection in `status_reason`. | | filters, tick size and lot size (as stored values) |
 
 ## Market data
 
@@ -53,7 +53,7 @@ avoid. A word in *italics* has its own entry on this page.
 | **received time** | When the row reached the database. Used for latency monitoring only. | `received_at` | ingest time |
 | **stream** | One instrument and one event type: `trade` or `depth`. Several writers can write it. | `market.stream_kind`, `(instrument_id, stream)` | feed, channel, topic |
 | **writer** | A process that writes market data: a feeder or a backfiller (its kind). One writer for the life of the service. It registers its capabilities, sends heartbeats and gets its work from `api.take_work()`. Every row has its writer. | `market.writer`, `writer_id`, `api.register_writer()`, `api.writer` | source, producer, client |
-| **backfill run** | Loading of one stream for one period. Its rows have the writer of its backfiller. Done runs form the coverage. Internal: the operator sees history requests, not runs ([ADR 0011](../adr/0011-board.md)). | `market.backfill_run`, `api.finish_backfill()` | job, import |
+| **backfill run** | Loading of one stream for one period. Its rows have the writer of its backfiller. Done runs form the coverage. Internal: the operator sees history requests, not runs. | `market.backfill_run`, `api.finish_backfill()` | job, import |
 | **live request** | Desired live data: one stream of one instrument that feeders write all the time. An operator can pause, resume or withdraw it. | `market.live_request`, `api.add_live_request()`, `api.take_work()` | subscription (that is for strategies), feed |
 | **history request** | Desired history: one stream for one period. An operator can pause, resume or withdraw it. | `market.history_request`, `api.add_history_request()`, `api.pause_history_request()`, `api.withdraw_history_request()` | order, job |
 | **capability** | One *venue stream* that a feeder can write or a backfiller can load. A feeder gets only the live requests of its capabilities, and a backfiller leases only periods of its capabilities. | `market.writer.venue_names`, `market.writer.stream_kinds`, `api.writer.capabilities` | skill, feature |

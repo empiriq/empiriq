@@ -49,11 +49,11 @@ the project.
 - Explanation and reference describe the current state. If you change code,
   update them in place, in the same change. Never add a document that only
   corrects another one.
-- An ADR records why: the options and the choice. Write one only if options
-  were weighed. Never edit an accepted ADR: add a new one
-  ([docs/adr/README.md](docs/adr/README.md)).
-- Do not put names of tables, columns or functions into an ADR. Use the
-  terms of the glossary.
+- The documents have no history and no links to issues. Git keeps the
+  history. The goal and the reasons of a change belong into its GitHub issue
+  in `empiriq/empiriq`, and into the pull request.
+- Write the reason for a design in a document only if it is not obvious, in
+  one sentence.
 
 ## Writing style
 
@@ -85,5 +85,5 @@ message in [Conventional Commits](https://www.conventionalcommits.org/) format,
 in a separate code block.
 
 - Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `build`, `ci`.
-- Scopes for this repo: `compose`, `bake`, `make`, `docs`, `adr`.
+- Scopes for this repo: `compose`, `bake`, `make`, `docs`.
 - Subject in English, imperative mood, no trailing period, max 72 characters.
